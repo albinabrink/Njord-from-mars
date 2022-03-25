@@ -9,18 +9,18 @@ outliner_price_max=pd.DataFrame(columns=colonne)
 among_negative_W_max=pd.DataFrame(columns=colonne)
 among_negative_P_max=pd.DataFrame(columns=colonne)
 among_negative_P_MF_max=pd.DataFrame(columns=colonne)
-contatore_tot=0
-contatore_2010=0
-contatore_2011=0
+contatore_tot = 0
+contatore_2010 = 0
+contatore_2011 = 0
 contatore_2012 = 0
-contatore_2013=0
-contatore_2014=0
-contatore_2015=0
-contatore_2016=0
-contatore_2017=0
-contatore_2018=0
-contatore_2019=0
-contatore_2020=0
+contatore_2013 = 0
+contatore_2014 = 0
+contatore_2015 = 0
+contatore_2016 = 0
+contatore_2017 = 0
+contatore_2018 = 0
+contatore_2019 = 0
+contatore_2020 = 0
 for item in models:  #loops for all the models
     data=pd.read_excel(item+"_model_results.xlsx",index_col=0)
     for nation in data.index: #loops for all the nations in the data
