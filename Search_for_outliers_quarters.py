@@ -12,7 +12,7 @@ among_negative_P_MF_max=pd.DataFrame(columns=colonne)
 contatore_tot=0
 contatore_2010=0
 contatore_2011=0
-contatore_2012=0
+contatore_2012 = 0
 contatore_2013=0
 contatore_2014=0
 contatore_2015=0
