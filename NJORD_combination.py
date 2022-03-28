@@ -17,8 +17,8 @@ nations_list = os.listdir(path_input + "\\Export\\")
 Europe = ["Albania","Andorra","Austria","Belarus","Belgium","Bosnia and Herzegovina","Bulgaria","Croatia","Cyprus","Czech Republic","Denmark","Estonia","Finland","France","Georgia","Germany","Greece","Greenland","Hungary","Iceland","Ireland","Italy","Latvia","Lithuania","Luxembourg","Macedonia  North","Malta","Moldova Republic of","Netherlands","Norway","Poland","Portugal","Romania","Russian Federation","Serbia","Slovakia","Slovenia","Spain","Sweden","Switzerland","Ukraine","United Kingdom"]
 desiderio = ["2009-Q4","2010-Q1","2010-Q2","2010-Q3","2010-Q4","2011-Q1","2011-Q2","2011-Q3","2011-Q4","2012-Q1","2012-Q2","2012-Q3","2012-Q4","2013-Q1","2013-Q2","2013-Q3","2013-Q4","2014-Q1","2014-Q2","2014-Q3","2014-Q4","2015-Q1","2015-Q2","2015-Q3","2015-Q4","2016-Q1","2016-Q2","2016-Q3","2016-Q4","2017-Q1","2017-Q2","2017-Q3","2017-Q4","2018-Q1","2018-Q2","2018-Q3","2018-Q4","2019-Q1","2019-Q2","2019-Q3","2019-Q4","2020-Q1","2020-Q2","2020-Q3","2020-Q4"]
 #desiderio=["2020-Q4"]#,"2010-Q1","2010-Q2","2010-Q3","2010-Q4","2011-Q1","2011-Q2","2011-Q3","2011-Q4","2012-Q1","2012-Q2","2012-Q3","2012-Q4","2013-Q1","2013-Q2","2013-Q3","2013-Q4","2014-Q1","2014-Q2","2014-Q3","2014-Q4","2015-Q1","2015-Q2","2015-Q3","2015-Q4","2016-Q1","2016-Q2","2016-Q3","2016-Q4","2017-Q1","2017-Q2","2017-Q3","2017-Q4","2018-Q1","2018-Q2","2018-Q3","2018-Q4","2019-Q1","2019-Q2","2019-Q3","2019-Q4","2020-Q1","2020-Q2","2020-Q3","2020-Q4"]
-outliners_Price = pd.read_excel("Outliners_price_quarter.xlsx",index_col=0)
-outliners_Weight = pd.read_excel("Outliners_weight_quarter.xlsx",index_col=0)
+outlier_Price = pd.read_excel("outlier_price_quarter.xlsx",index_col=0)
+outlier_Weight = pd.read_excel("outlier_weight_quarter.xlsx",index_col=0)
 #desiderio=["2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019","2020"] #2008","2009","2010","2011","2012","2013","2014","2015","2016",
 index = []
 combined = pd.DataFrame()
@@ -633,7 +633,7 @@ for year in desiderio:
 
         ################################## Selection of the model #####################################################
       #  print(year,"year",year_test,"year test",year_output,"year output","!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-### Outliners to be implemented and a way to select the model according to the year###
+### outlier to be implemented and a way to select the model according to the year###
 
 ####################################################################################################
         combined_MF.at[name, "Ref " + year_test] = ref_value
@@ -644,227 +644,227 @@ for year in desiderio:
         combined_MF.at[name, "Other " + year_test] = reference_data_year[other][name]
 
         # print(installed_capacity_weight,installed_capacity_price,installed_capacity_MF_price,"!!!!!!!!!!!!!!!!!!!!!!!!!!   !!!!!!!!!!!!!!!!")
-        colonna = cont_col+1
+        column = cont_col+1
         if year_test == "2014" or year_test == "2015" or year_test == "2016" or year_test == "2017" or year_test == \
                 "2013" or year_test == "2012" or year_test == "2011" or year_test == "2010" or year_test == "2009" or \
                 year_test == "2008":
             # print(name,manufacturing_value,"= manufactering",net_trade_weight,"= net weight",net_trade_price,"= net price",installed_capacity_weight,"= inst weight",installed_capacity_price,"= insta price")
-            if name in outliners_Weight.index:
-                #  print("is outliner")
-                if outliners_Weight.at[name, year_output] == "Yes":
-                    #   print("outliner per il corrente anno")
-                    if name in outliners_Price.index and outliners_Price.at[name, year_output] == "Yes":          #both outliners I keep the normal model
+            if name in outlier_Weight.index:
+                #  print("is outlier")
+                if outlier_Weight.at[name, year_output] == "Yes":
+                    #   print("outlier per il corrente anno")
+                    if name in outlier_Price.index and outlier_Price.at[name, year_output] == "Yes":  # both outlier I keep the normal model
                         if manufacturing_value == 0:
                             # print("no manufac")
                             if net_trade_weight <= 0:
                                 combined.at[name, "NJORD "+year_output] = installed_capacity_price
-                                combined.at[name, colonna] = "Price"
-                                combined_MF.at[name, "NJORD " + year_output] = installed_capacity_MF_price
-                                combined_MF.at[name, colonna] = "Price"
+                                combined.at[name, column] = "Price"
+                                combined_MF.at[name, "NJORD "+year_output] = installed_capacity_MF_price
+                                combined_MF.at[name, column] = "Price"
                                 #   print(name, "1")
                             if net_trade_weight >= 0 and installed_capacity_weight <= 0:
-                                combined.at[name, "NJORD " + year_output] = installed_capacity_price
-                                combined.at[name, colonna] = "Price"
+                                combined.at[name, "NJORD "+year_output] = installed_capacity_price
+                                combined.at[name, column] = "Price"
                                 combined_MF.at[name, "NJORD "+year_output] = installed_capacity_MF_price
-                                combined_MF.at[name, colonna] = "Price"
+                                combined_MF.at[name, column] = "Price"
                                 #  print(name, "2")
                             if net_trade_weight >= 0 and installed_capacity_weight >= 0:
                                 combined.at[name, "NJORD "+year_output] = installed_capacity_weight
-                                combined.at[name, colonna] = "Weight"
+                                combined.at[name, column] = "Weight"
                                 combined_MF.at[name, "NJORD "+year_output] = installed_capacity_weight
-                                combined_MF.at[name, colonna] = "Weight"
+                                combined_MF.at[name, column] = "Weight"
                                 # print(name, "3")
                         else:
                             combined.at[name, "NJORD "+year_output] = installed_capacity_weight
-                            combined.at[name, colonna] = "Weight"
+                            combined.at[name, column] = "Weight"
                             combined_MF.at[name, "NJORD "+year_output] = installed_capacity_weight
-                            combined_MF.at[name, colonna] = "Weight"
-                    if name in outliners_Price.index and outliners_Price.at[name, year] != "Yes":   #price result is not outliners, thus it is selected
-                        # print("in price the nation is oultiner but not for this year")
+                            combined_MF.at[name, column] = "Weight"
+                    if name in outlier_Price.index and outlier_Price.at[name, year] != "Yes":  # price result is not outlier, thus it is selected
+                        # print("in price the nation is outlier but not for this year")
                         combined.at[name,"NJORD "+year_output] = installed_capacity_price
-                        combined.at[name, colonna] = "Price-out"
+                        combined.at[name, column] = "Price-out"
                         combined_MF.at[name, "NJORD "+year_output] = installed_capacity_MF_price
-                        combined_MF.at[name, colonna] = "Price-out"
+                        combined_MF.at[name, column] = "Price-out"
                     else:
-                      #  print("  nation is not  oultiner at all")
+                        # print("  nation is not  outlier at all")
                         combined.at[name, "NJORD "+year_output] = installed_capacity_price
-                        combined.at[name, colonna] = "Price-out"
+                        combined.at[name, column] = "Price-out"
                         combined_MF.at[name, "NJORD "+year_output] = installed_capacity_MF_price
-                        combined_MF.at[name, colonna] = "Price-out"
+                        combined_MF.at[name, column] = "Price-out"
 
                 else:
                  #   print("not for the current")
                     if manufacturing_value == 0:
                         if net_trade_weight <= 0:
                             combined.at[name, "NJORD "+year_output] = installed_capacity_price
-                            combined.at[name, colonna] = "Price"
+                            combined.at[name, column] = "Price"
                             combined_MF.at[name, "NJORD "+year_output] = installed_capacity_MF_price
-                            combined_MF.at[name, colonna] = "Price"
+                            combined_MF.at[name, column] = "Price"
                          #   print(name,"1")
                         if net_trade_weight >= 0 and installed_capacity_weight <= 0:
                             combined.at[name, "NJORD "+year_output] = installed_capacity_price
-                            combined.at[name, colonna] = "Price"
+                            combined.at[name, column] = "Price"
                             combined_MF.at[name, "NJORD "+year_output] = installed_capacity_MF_price
-                            combined_MF.at[name, colonna] = "Price"
+                            combined_MF.at[name, column] = "Price"
                          #   print(name,"2")
                         if net_trade_weight >= 0 and installed_capacity_weight >= 0:
                             combined.at[name, "NJORD "+year_output] = installed_capacity_weight
-                            combined.at[name, colonna] = "Weight"
+                            combined.at[name, column] = "Weight"
                             combined_MF.at[name, "NJORD "+year_output] = installed_capacity_weight
-                            combined_MF.at[name, colonna] = "Weight"
+                            combined_MF.at[name, column] = "Weight"
                             #print(name, "3")
                     else:
                         if installed_capacity_weight < 0 and installed_capacity_price > 0:
                             combined.at[name, "NJORD "+year_output] = installed_capacity_price
-                            combined.at[name, colonna] = "Price"
+                            combined.at[name, column] = "Price"
                             combined_MF.at[name, "NJORD "+year_output] = installed_capacity_MF_price
-                            combined_MF.at[name, colonna] = "Price"
+                            combined_MF.at[name, column] = "Price"
                         else:
                             combined.at[name, "NJORD "+year_output] = installed_capacity_weight
-                            combined.at[name, colonna] = "Weight"
+                            combined.at[name, column] = "Weight"
                             combined_MF.at[name, "NJORD "+year_output] = installed_capacity_weight
-                            combined_MF.at[name, colonna] = "Weight"
+                            combined_MF.at[name, column] = "Weight"
             else:
-              #  print("not outliner")
+              #  print("not outlier")
                 if manufacturing_value == 0:
                     if net_trade_weight <= 0:
                         combined.at[name, "NJORD "+year_output] = installed_capacity_price
-                        combined.at[name, colonna] = "Price"
+                        combined.at[name, column] = "Price"
                         combined_MF.at[name, "NJORD "+year_output] = installed_capacity_MF_price
-                        combined_MF.at[name, colonna] = "Price"
+                        combined_MF.at[name, column] = "Price"
                     if net_trade_weight >= 0 and installed_capacity_weight <=0:
                         combined.at[name, "NJORD "+year_output] = installed_capacity_price
-                        combined.at[name, colonna] = "Price"
+                        combined.at[name, column] = "Price"
                         combined_MF.at[name, "NJORD "+year_output] = installed_capacity_MF_price
-                        combined_MF.at[name, colonna] = "Price"
+                        combined_MF.at[name, column] = "Price"
                     if net_trade_weight >= 0 and installed_capacity_weight >= 0:
                         combined.at[name, "NJORD "+year_output] = installed_capacity_weight
-                        combined.at[name, colonna] = "Weight"
+                        combined.at[name, column] = "Weight"
                         combined_MF.at[name, "NJORD "+year_output] = installed_capacity_weight
-                        combined_MF.at[name, colonna] = "Weight"
+                        combined_MF.at[name, column] = "Weight"
                 else:
                     if installed_capacity_weight < 0 and installed_capacity_price > 0:
                         combined.at[name, "NJORD "+year_output] = installed_capacity_price
-                        combined.at[name, colonna] = "Price"
+                        combined.at[name, column] = "Price"
                         combined_MF.at[name, "NJORD "+year_output] = installed_capacity_MF_price
-                        combined_MF.at[name, colonna] = "Price"
+                        combined_MF.at[name, column] = "Price"
                     else:
                         combined.at[name, "NJORD "+year_output] = installed_capacity_weight
-                        combined.at[name, colonna] = "Weight"
+                        combined.at[name, column] = "Weight"
                         combined_MF.at[name, "NJORD "+year_output] = installed_capacity_weight
-                        combined_MF.at[name, colonna] = "Weight"
+                        combined_MF.at[name, column] = "Weight"
 
         if year_test == "2018" or year_test == "2019" or year_test == "2020":
             # print(name,manufacturing_value,"= manufactering",net_trade_weight,"= net weight",net_trade_price,"= net price",installed_capacity_weight,"= inst weight",installed_capacity_price,"= insta price")
-            if name in outliners_Price.index:
+            if name in outlier_Price.index:
                 # print(name, " is outlier")
-                if outliners_Price.at[name, year_output] == "Yes":
+                if outlier_Price.at[name, year_output] == "Yes":
                     #  print(name, " for this year")
-                    if name in outliners_Weight.index and outliners_Weight.at[name, year_output] == "Yes":
+                    if name in outlier_Weight.index and outlier_Weight.at[name, year_output] == "Yes":
                         # print("bot outliers")
                         if manufacturing_value == 0:
                             if net_trade_price <= 0:
                                 combined.at[name, "NJORD "+year_output] = installed_capacity_weight
-                                combined.at[name, colonna] = "Weight"
+                                combined.at[name, column] = "Weight"
                                 combined_MF.at[name, "NJORD "+year_output] = installed_capacity_weight
-                                combined_MF.at[name, colonna] = "Weight"
+                                combined_MF.at[name, column] = "Weight"
                                 #   print(name,"1")
                             if net_trade_price >= 0 and installed_capacity_price <= 0:
                                 combined.at[name, "NJORD "+year_output] = installed_capacity_weight
-                                combined.at[name, colonna] = "Weight"
+                                combined.at[name, column] = "Weight"
                                 combined_MF.at[name, "NJORD "+year_output] = installed_capacity_weight
-                                combined_MF.at[name, colonna] = "Weight"
+                                combined_MF.at[name, column] = "Weight"
                                 #   print(name, "2")
                             if net_trade_price >= 0 and installed_capacity_price >= 0:
                                 combined.at[name, "NJORD "+year_output] = installed_capacity_price
-                                combined.at[name, colonna] = "Price"
+                                combined.at[name, column] = "Price"
                                 combined_MF.at[name, "NJORD "+year_output] = installed_capacity_MF_price
-                                combined_MF.at[name, colonna] = "Price"
+                                combined_MF.at[name, column] = "Price"
                                 #  print(name, "3")
                         else:
                             combined.at[name, "NJORD "+year_output] = installed_capacity_price
-                            combined.at[name, colonna] = "Price"
+                            combined.at[name, column] = "Price"
                             combined_MF.at[name, "NJORD "+year_output] = installed_capacity_MF_price
-                            combined_MF.at[name, colonna] = "Price"
-                    if name in outliners_Weight.index and outliners_Weight.at[name, year] != "Yes":
+                            combined_MF.at[name, column] = "Price"
+                    if name in outlier_Weight.index and outlier_Weight.at[name, year] != "Yes":
                       #  print("replacing because in weight is ouliner bet not for this year")
                         combined.at[name, "NJORD "+year_output] = installed_capacity_weight
-                        combined.at[name, colonna] = "Weight_out"
+                        combined.at[name, column] = "Weight_out"
                         combined_MF.at[name, "NJORD "+year_output] = installed_capacity_weight
-                        combined_MF.at[name, colonna] = "Weight-out"
-                    if name not in outliners_Weight.index:
-                        # print("replacing because in weight not outliner at all")
+                        combined_MF.at[name, column] = "Weight-out"
+                    if name not in outlier_Weight.index:
+                        # print("replacing because in weight not outlier at all")
                         combined.at[name, "NJORD "+year_output] = installed_capacity_weight
-                        combined.at[name, colonna] = "Weight_out"
+                        combined.at[name, column] = "Weight_out"
                         combined_MF.at[name, "NJORD "+year_output] = installed_capacity_weight
-                        combined_MF.at[name, colonna] = "Weight-out"
+                        combined_MF.at[name, column] = "Weight-out"
 
                 else:
                     #  print("not for this year")
                     if manufacturing_value == 0:
                         if net_trade_price <= 0:
                             combined.at[name, "NJORD "+year_output] = installed_capacity_weight
-                            combined.at[name, colonna] = "Weight"
+                            combined.at[name, column] = "Weight"
                             combined_MF.at[name, "NJORD "+year_output] = installed_capacity_weight
-                            combined_MF.at[name, colonna] = "Weight"
+                            combined_MF.at[name, column] = "Weight"
                         #   print("Price")
                         if net_trade_price >= 0 and installed_capacity_price <= 0:
                             combined.at[name, "NJORD "+year_output] = installed_capacity_weight
-                            combined.at[name, colonna] = "Weight"
+                            combined.at[name, column] = "Weight"
                             combined_MF.at[name, "NJORD "+year_output] = installed_capacity_weight
-                            combined_MF.at[name, colonna] = "Weight"
+                            combined_MF.at[name, column] = "Weight"
                         if net_trade_price >= 0 and installed_capacity_price >= 0:
                             combined.at[name, "NJORD "+year_output] = installed_capacity_price
-                            combined.at[name, colonna] = "Price"
+                            combined.at[name, column] = "Price"
                             combined_MF.at[name, "NJORD "+year_output] = installed_capacity_MF_price
-                            combined_MF.at[name, colonna] = "Price"
+                            combined_MF.at[name, column] = "Price"
                     else:
                         if installed_capacity_price < 0 and installed_capacity_weight > 0:
                             combined.at[name, "NJORD "+year_output] = installed_capacity_weight
-                            combined.at[name, colonna] = "Weight"
+                            combined.at[name, column] = "Weight"
                             combined_MF.at[name, "NJORD "+year_output] = installed_capacity_weight
-                            combined_MF.at[name, colonna] = "Weight"
+                            combined_MF.at[name, column] = "Weight"
                         else:
                             combined.at[name, "NJORD "+year_output] = installed_capacity_price
-                            combined.at[name, colonna] = "Price"
+                            combined.at[name, column] = "Price"
                             combined_MF.at[name, "NJORD "+year_output] = installed_capacity_MF_price
-                            combined_MF.at[name, colonna] = "Price"
+                            combined_MF.at[name, column] = "Price"
             else:
                 if manufacturing_value == 0:
                     if net_trade_price <= 0:
                         combined.at[name, "NJORD "+year_output] = installed_capacity_weight
-                        combined.at[name, colonna] = "Weight"
+                        combined.at[name, column] = "Weight"
                         combined_MF.at[name, "NJORD "+year_output] = installed_capacity_weight
-                        combined_MF.at[name, colonna] = "Weight"
+                        combined_MF.at[name, column] = "Weight"
                     #   print("Price")
                     if net_trade_price >= 0 and installed_capacity_price <= 0:
                         combined.at[name, "NJORD "+year_output] = installed_capacity_weight
-                        combined.at[name, colonna] = "Weight"
+                        combined.at[name, column] = "Weight"
                         combined_MF.at[name, "NJORD "+year_output] = installed_capacity_weight
-                        combined_MF.at[name, colonna] = "Weight"
+                        combined_MF.at[name, column] = "Weight"
                     if net_trade_price >= 0 and installed_capacity_price >= 0:
                         combined.at[name, "NJORD "+year_output] = installed_capacity_price
-                        combined.at[name, colonna] = "Price"
+                        combined.at[name, column] = "Price"
                         combined_MF.at[name, "NJORD "+year_output] = installed_capacity_MF_price
-                        combined_MF.at[name, colonna] = "Price"
+                        combined_MF.at[name, column] = "Price"
                 else:
                     if installed_capacity_price < 0 and installed_capacity_weight > 0:
                         combined.at[name, "NJORD "+year_output] = installed_capacity_weight
-                        combined.at[name, colonna] = "Weight"
+                        combined.at[name, column] = "Weight"
                         combined_MF.at[name, "NJORD "+year_output] = installed_capacity_weight
-                        combined_MF.at[name, colonna] = "Weight"
+                        combined_MF.at[name, column] = "Weight"
                     else:
                         combined.at[name, "NJORD "+year_output] = installed_capacity_price
-                        combined.at[name, colonna] = "Price"
+                        combined.at[name, column] = "Price"
                         combined_MF.at[name, "NJORD "+year_output] = installed_capacity_MF_price
-                        combined_MF.at[name, colonna] = "Price"
+                        combined_MF.at[name, column] = "Price"
 
         if combined.at[name, "NJORD "+year_output] <= 0:
             combined.at[name, "NJORD "+year_output] = 0
-            combined.at[name, colonna] = "Negative"
+            combined.at[name, column] = "Negative"
         if combined_MF.at[name, "NJORD "+year_output] <= 0:
             combined_MF.at[name, "NJORD "+year_output] = 0
-            combined_MF.at[name, colonna] = "Negative"
+            combined_MF.at[name, column] = "Negative"
 
     cont_col = cont_col+1
 combined_MF.to_excel("NJORD-Combined_model_results.xlsx")
@@ -891,11 +891,11 @@ for nation in quartly.index:
         somma = q1+q2+q3+q4
         yearly.at[nation, "NJORD "+year] = somma
 
-for colonna in quartly.columns:
-    if "NJORD" in str(colonna):
+for column in quartly.columns:
+    if "NJORD" in str(column):
         continue
     else:
-        to_add = quartly[colonna]
+        to_add = quartly[column]
         yearly = yearly.join(to_add)
 
 yearly.to_excel("NJORD-Combined_model_results_year.xlsx")

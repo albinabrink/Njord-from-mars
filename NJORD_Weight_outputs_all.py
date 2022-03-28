@@ -666,11 +666,11 @@ for nation in quartly.index:
         somma=q1+q2+q3+q4
         yearly.at[nation,"NJORD "+year]=somma
 
-for colonna in quartly.columns:
-    if "NJORD" in str(colonna):
+for column in quartly.columns:
+    if "NJORD" in str(column):
         continue
     else:
-        to_add=quartly[colonna]
+        to_add=quartly[column]
         yearly=yearly.join(to_add)
 
 yearly.to_excel("NJORD-Weight_model_results_year.xlsx")
