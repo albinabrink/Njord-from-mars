@@ -965,7 +965,8 @@ for year in period_col:
     print(year)
     if "Ref" in year or "Source" in year or "Diff" in year:
         continue
-    for region######################################## DATA SET ################## to change in index:
+    for region in index:
+        ######################################## DATA SET ################## to change in index:
         difference_sum = 0
         NJORD_value_sum = 0
         ref_value_sum = 0
