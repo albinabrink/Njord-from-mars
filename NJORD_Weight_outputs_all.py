@@ -69,15 +69,15 @@ for year in period:
         change_list = change.index.values
 
         #### only in Weight
-        module_weight = pd.read_excel("Module_weight.xlsx",index_col=0)
+        module_weight = pd.read_excel("Module_weight.xlsx", index_col=0)
 
         #reading the import and export full raw data
-        imports = pd.read_excel(path_input+"Import"+"\\"+name+".xlsx",index_col=0, na_values=['NA'])
-        exports = pd.read_excel(path_input+"Export"+"\\"+name+".xlsx",index_col=0, na_values=['NA'])
+        imports = pd.read_excel(path_input+"Import"+"\\"+name+".xlsx", index_col=0, na_values=['NA'])
+        exports = pd.read_excel(path_input+"Export"+"\\"+name+".xlsx", index_col=0, na_values=['NA'])
         imports = imports.fillna(0) #filling empty spaces with 0
-        imports = imports.replace(to_replace="No Quantity",value=0) #replacing no quantity with 0
+        imports = imports.replace(to_replace="No Quantity", value=0) #replacing no quantity with 0
         exports = exports.fillna(0)#filling empty spaces with 0
-        exports = exports.replace(to_replace="No Quantity",value=0)
+        exports = exports.replace(to_replace="No Quantity", value=0)
         # Selecting the time period (Q4 previous year and 1-2-3 of current year)
         #time_window_import=[word1+add2+str(int(year)-1)+"-Q4",word1+add2+year+"-Q1",word1+add2+year+"-Q2",word1+add2+year+"-Q3"]
         #time_window_export=[word2+add2+str(int(year)-1)+"-Q4",word2+add2+year+"-Q1",word2+add2+year+"-Q2",word2+add2+year+"-Q3"]
@@ -88,9 +88,9 @@ for year in period:
         exports_period = exports[time_window_export]
         #print(exports_period)
         ###monitoring the source of the data: Mirror or direct?
-        import_source=[]
-        d_count_import=0
-        m_count_import=0
+        import_source = []
+        d_count_import = 0
+        m_count_import = 0
         for letter in imports_period.loc["DataType"]:
             import_source.append(letter)
             if letter == "D":
@@ -336,17 +336,17 @@ nations_list = os.listdir(path_input + "\\Export\\")
 period = ["2009-Q4", "2010-Q1", "2010-Q2", "2010-Q3", "2010-Q4", "2011-Q1", "2011-Q2", "2011-Q3", "2011-Q4", "2012-Q1", "2012-Q2", "2012-Q3", "2012-Q4", "2013-Q1", "2013-Q2", "2013-Q3", "2013-Q4", "2014-Q1", "2014-Q2", "2014-Q3", "2014-Q4", "2015-Q1", "2015-Q2", "2015-Q3", "2015-Q4", "2016-Q1", "2016-Q2", "2016-Q3", "2016-Q4", "2017-Q1", "2017-Q2", "2017-Q3", "2017-Q4", "2018-Q1", "2018-Q2", "2018-Q3", "2018-Q4", "2019-Q1", "2019-Q2", "2019-Q3", "2019-Q4", "2020-Q1", "2020-Q2", "2020-Q3", "2020-Q4"]
 
 #period=["2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019","2020"] #2008","2009","2010","2011","2012","2013","2014","2015","2016",
-index=[]
-reference_data_year=pd.read_excel("Reference_accumulated_2022.xlsx",index_col=0, na_values=['NA'])
-previous_capacity_P=0
-previous_capacity_P_MF=0
-previous_capacity_W=0
+index = []
+reference_data_year = pd.read_excel("Reference_accumulated_2022.xlsx",index_col=0, na_values=['NA'])
+previous_capacity_P = 0
+previous_capacity_P_MF = 0
+previous_capacity_W = 0
 output_W=pd.DataFrame()
 output_W_each_year=pd.DataFrame()
 for year in period:
     for name in nations_list:
-        name=name.split(".")
-        name=name[0]
+        name = name.split(".")
+        name = name[0]
         # no reference for these
         year_test=year.split("-")
         year_test=year_test[0]
