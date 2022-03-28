@@ -14,16 +14,25 @@ path_output = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Feb\\"# this will b
 
 os.makedirs(path_output, exist_ok=True)
 nations_list = os.listdir(path_input + "\\Export\\")
-Europe = ["Albania","Andorra","Austria","Belarus","Belgium","Bosnia and Herzegovina","Bulgaria","Croatia","Cyprus","Czech Republic","Denmark","Estonia","Finland","France","Georgia","Germany","Greece","Greenland","Hungary","Iceland","Ireland","Italy","Latvia","Lithuania","Luxembourg","Macedonia  North","Malta","Moldova Republic of","Netherlands","Norway","Poland","Portugal","Romania","Russian Federation","Serbia","Slovakia","Slovenia","Spain","Sweden","Switzerland","Ukraine","United Kingdom"]
-desiderio = ["2009-Q4","2010-Q1","2010-Q2","2010-Q3","2010-Q4","2011-Q1","2011-Q2","2011-Q3","2011-Q4","2012-Q1","2012-Q2","2012-Q3","2012-Q4","2013-Q1","2013-Q2","2013-Q3","2013-Q4","2014-Q1","2014-Q2","2014-Q3","2014-Q4","2015-Q1","2015-Q2","2015-Q3","2015-Q4","2016-Q1","2016-Q2","2016-Q3","2016-Q4","2017-Q1","2017-Q2","2017-Q3","2017-Q4","2018-Q1","2018-Q2","2018-Q3","2018-Q4","2019-Q1","2019-Q2","2019-Q3","2019-Q4","2020-Q1","2020-Q2","2020-Q3","2020-Q4"]
+Europe = ["Albania", "Andorra", "Austria", "Belarus", "Belgium", "Bosnia and Herzegovina", "Bulgaria", "Croatia",
+          "Cyprus", "Czech Republic", "Denmark", "Estonia", "Finland", "France", "Georgia", "Germany", "Greece",
+          "Greenland", "Hungary", "Iceland", "Ireland", "Italy", "Latvia", "Lithuania", "Luxembourg",
+          "Macedonia  North", "Malta", "Moldova Republic of", "Netherlands", "Norway", "Poland", "Portugal", "Romania",
+          "Russian Federation", "Serbia", "Slovakia", "Slovenia", "Spain", "Sweden", "Switzerland", "Ukraine",
+          "United Kingdom"]
+desiderio = ["2010-Q2", "2010-Q3", "2010-Q4", "2011-Q1", "2011-Q2", "2011-Q3", "2011-Q4", # Removed 2010-Q1 and 2009-Q4
+             "2012-Q1", "2012-Q2", "2012-Q3", "2012-Q4", "2013-Q1", "2013-Q2", "2013-Q3", "2013-Q4", "2014-Q1",
+             "2014-Q2", "2014-Q3", "2014-Q4", "2015-Q1", "2015-Q2", "2015-Q3", "2015-Q4", "2016-Q1", "2016-Q2",
+             "2016-Q3", "2016-Q4", "2017-Q1", "2017-Q2", "2017-Q3", "2017-Q4", "2018-Q1", "2018-Q2", "2018-Q3",
+             "2018-Q4", "2019-Q1", "2019-Q2", "2019-Q3", "2019-Q4", "2020-Q1", "2020-Q2", "2020-Q3"] # and 2020-Q4
 #desiderio=["2020-Q4"]#,"2010-Q1","2010-Q2","2010-Q3","2010-Q4","2011-Q1","2011-Q2","2011-Q3","2011-Q4","2012-Q1","2012-Q2","2012-Q3","2012-Q4","2013-Q1","2013-Q2","2013-Q3","2013-Q4","2014-Q1","2014-Q2","2014-Q3","2014-Q4","2015-Q1","2015-Q2","2015-Q3","2015-Q4","2016-Q1","2016-Q2","2016-Q3","2016-Q4","2017-Q1","2017-Q2","2017-Q3","2017-Q4","2018-Q1","2018-Q2","2018-Q3","2018-Q4","2019-Q1","2019-Q2","2019-Q3","2019-Q4","2020-Q1","2020-Q2","2020-Q3","2020-Q4"]
-outlier_Price = pd.read_excel("outlier_price_quarter.xlsx",index_col=0)
-outlier_Weight = pd.read_excel("outlier_weight_quarter.xlsx",index_col=0)
+outlier_Price = pd.read_excel("outlier_price_quarter.xlsx", index_col=0)
+outlier_Weight = pd.read_excel("outlier_weight_quarter.xlsx", index_col=0)
 #desiderio=["2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019","2020"] #2008","2009","2010","2011","2012","2013","2014","2015","2016",
 index = []
 combined = pd.DataFrame()
 combined_MF = pd.DataFrame()
-reference_data_year = pd.read_excel("Reference_accumulated_2022.xlsx",index_col=0, na_values=['NA'])
+reference_data_year = pd.read_excel("Reference_accumulated_2022.xlsx", index_col=0, na_values=['NA'])
 previous_capacity_P = 0
 previous_capacity_P_MF = 0
 previous_capacity_W = 0
@@ -52,8 +61,6 @@ for name in nations_list: ### Split and renaming of countries with multiple poss
     if name == "Côte d'Ivoire":
         name = "Côte dIvoire"
     if name == "Falkland Islands (Malvinas)":
-        name = "Falkland Islands"
-    if name == "Falkland Islands (Malvinas)": #Same thing Twice?
         name = "Falkland Islands"
     if name == "Hong Kong  China":
         name = "Hong Kong"
@@ -623,6 +630,7 @@ for year in desiderio:
 
         if "Q4" in year:
             year_output = str(int(year_test) + 1) + "-Q1"
+            # print(year_output)
         if "Q1" in year:
             year_output = str(year_test) + "-Q2"
         if "Q2" in year:
@@ -651,6 +659,7 @@ for year in desiderio:
             # print(name,manufacturing_value,"= manufactering",net_trade_weight,"= net weight",net_trade_price,"= net price",installed_capacity_weight,"= inst weight",installed_capacity_price,"= insta price")
             if name in outlier_Weight.index:
                 #  print("is outlier")
+                # print(outlier_Weight)
                 if outlier_Weight.at[name, year_output] == "Yes":
                     #   print("outlier per il corrente anno")
                     if name in outlier_Price.index and outlier_Price.at[name, year_output] == "Yes":  # both outlier I keep the normal model
@@ -693,26 +702,26 @@ for year in desiderio:
                         combined_MF.at[name, column] = "Price-out"
 
                 else:
-                 #   print("not for the current")
+                    #   print("not for the current")
                     if manufacturing_value == 0:
                         if net_trade_weight <= 0:
                             combined.at[name, "NJORD "+year_output] = installed_capacity_price
                             combined.at[name, column] = "Price"
                             combined_MF.at[name, "NJORD "+year_output] = installed_capacity_MF_price
                             combined_MF.at[name, column] = "Price"
-                         #   print(name,"1")
+                        #   print(name,"1")
                         if net_trade_weight >= 0 and installed_capacity_weight <= 0:
                             combined.at[name, "NJORD "+year_output] = installed_capacity_price
                             combined.at[name, column] = "Price"
                             combined_MF.at[name, "NJORD "+year_output] = installed_capacity_MF_price
                             combined_MF.at[name, column] = "Price"
-                         #   print(name,"2")
+                        #   print(name,"2")
                         if net_trade_weight >= 0 and installed_capacity_weight >= 0:
                             combined.at[name, "NJORD "+year_output] = installed_capacity_weight
                             combined.at[name, column] = "Weight"
                             combined_MF.at[name, "NJORD "+year_output] = installed_capacity_weight
                             combined_MF.at[name, column] = "Weight"
-                            #print(name, "3")
+                        # print(name, "3")
                     else:
                         if installed_capacity_weight < 0 and installed_capacity_price > 0:
                             combined.at[name, "NJORD "+year_output] = installed_capacity_price
@@ -725,7 +734,7 @@ for year in desiderio:
                             combined_MF.at[name, "NJORD "+year_output] = installed_capacity_weight
                             combined_MF.at[name, column] = "Weight"
             else:
-              #  print("not outlier")
+                #  print("not outlier")
                 if manufacturing_value == 0:
                     if net_trade_weight <= 0:
                         combined.at[name, "NJORD "+year_output] = installed_capacity_price
@@ -755,7 +764,7 @@ for year in desiderio:
                         combined_MF.at[name, column] = "Weight"
 
         if year_test == "2018" or year_test == "2019" or year_test == "2020":
-            # print(name,manufacturing_value,"= manufactering",net_trade_weight,"= net weight",net_trade_price,"= net price",installed_capacity_weight,"= inst weight",installed_capacity_price,"= insta price")
+            # print(name,manufacturing_value,"= manufacturing",net_trade_weight,"= net weight",net_trade_price,"= net price",installed_capacity_weight,"= inst weight",installed_capacity_price,"= insta price")
             if name in outlier_Price.index:
                 # print(name, " is outlier")
                 if outlier_Price.at[name, year_output] == "Yes":
@@ -787,7 +796,7 @@ for year in desiderio:
                             combined_MF.at[name, "NJORD "+year_output] = installed_capacity_MF_price
                             combined_MF.at[name, column] = "Price"
                     if name in outlier_Weight.index and outlier_Weight.at[name, year] != "Yes":
-                      #  print("replacing because in weight is ouliner bet not for this year")
+                        #  print("replacing because in weight is outlier bet not for this year")
                         combined.at[name, "NJORD "+year_output] = installed_capacity_weight
                         combined.at[name, column] = "Weight_out"
                         combined_MF.at[name, "NJORD "+year_output] = installed_capacity_weight
@@ -876,7 +885,7 @@ desiderio = ["2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "20
 print(quartly.columns)
 for nation in quartly.index:
     for year in desiderio:
-        q1=quartly.loc[nation, "NJORD "+year+"-Q1"]
+        q1 = quartly.loc[nation, "NJORD "+year+"-Q1"]
         q2 = quartly.loc[nation, "NJORD " + year + "-Q2"]
         q3 = quartly.loc[nation, "NJORD " + year + "-Q3"]
         q4 = quartly.loc[nation, "NJORD " + year + "-Q4"]
@@ -956,7 +965,7 @@ for year in period_col:
     print(year)
     if "Ref" in year or "Source" in year or "Diff" in year:
         continue
-    for region in index:
+    for region######################################## DATA SET ################## to change in index:
         difference_sum = 0
         NJORD_value_sum = 0
         ref_value_sum = 0
@@ -1014,7 +1023,8 @@ for year in period_col:
                 country = "Venezuela"
             if country == "Viet Nam":
                 country = "Vietnam"
-            NJORD_value = Combined[year][country] ######################################## DATA SET ################## to change
+            ######################################## DATA SET ################## to change
+            NJORD_value = Combined[year][country]
             ref_value = 0
             if reference_data_year[PVPS][country] == 0:
                 ref_value = reference_data_year[other][country]
