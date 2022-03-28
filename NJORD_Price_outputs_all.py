@@ -1,21 +1,16 @@
 import pandas as pd
 import os
 #### This script calculate the installed capacity
-unit= "Price"
+unit = "Price"
 
 ### change path also in lines  453 -454####
-path_input="C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Feb\\Raw_data\\Final_database\\Price\\"  # this is the path_out_final in the script From_html_to_db
-path_output="C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Feb\\"# this will be the folder from where the GUI will read the data
+path_input = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\Raw_data\\Final_database\\Price\\"  # this is the path_out_final in the script From_html_to_db
+path_output = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\"# this will be the folder from where the GUI will read the data
 
 ######
 
 os.makedirs(path_output, exist_ok=True)
 lista_nazioni=os.listdir(path_input+"\\Export\\")
-# Europe = ["Albania", "Andorra", "Austria", "Belarus", "Belgium", "Bosnia and Herzegovina", "Bulgaria", "Croatia",
-#        "Cyprus", "Czech Republic", "Denmark", "Estonia", "Finland", "France", "Georgia", "Germany", "Greece",
-#        "Greenland","Hungary","Iceland","Ireland","Italy","Latvia","Lithuania","Luxembourg","Macedonia  North","Malta",
-#        "Moldova Republic of","Netherlands","Norway","Poland","Portugal","Romania","Russian Federation","Serbia",
-#        "Slovakia","Slovenia","Spain","Sweden","Switzerland","Ukraine","United Kingdom"]
 Europe = ["Albania", "Andorra", "Austria", "Belarus", "Belgium", "Bosnia_and_Herzegovina", "Bulgaria", "Croatia",
           "Cyprus", "Czech_Republic", "Denmark", "Estonia", "Finland", "France", "Georgia", "Germany", "Greece",
           "Greenland", "Hungary", "Iceland", "Ireland", "Italy", "Latvia", "Lithuania", "Luxembourg",
@@ -25,7 +20,7 @@ Europe = ["Albania", "Andorra", "Austria", "Belarus", "Belgium", "Bosnia_and_Her
 desiderio=["2009-Q4","2010-Q1","2010-Q2","2010-Q3","2010-Q4","2011-Q1","2011-Q2","2011-Q3","2011-Q4","2012-Q1","2012-Q2","2012-Q3","2012-Q4","2013-Q1","2013-Q2","2013-Q3","2013-Q4","2014-Q1","2014-Q2","2014-Q3","2014-Q4","2015-Q1","2015-Q2","2015-Q3","2015-Q4","2016-Q1","2016-Q2","2016-Q3","2016-Q4","2017-Q1","2017-Q2","2017-Q3","2017-Q4","2018-Q1","2018-Q2","2018-Q3","2018-Q4","2019-Q1","2019-Q2","2019-Q3","2019-Q4","2020-Q1","2020-Q2","2020-Q3","2020-Q4"]
 
 
-#desiderio=["2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019","2020"] #2008","2009","2010","2011","2012","2013","2014","2015","2016",
+#period=["2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019","2020"] #2008","2009","2010","2011","2012","2013","2014","2015","2016",
 indici=[]
 reference_data_year = pd.read_excel("Reference_accumulated_2022.xlsx",index_col=0, na_values=['NA'])
 previous_capacity_P = 0
@@ -458,21 +453,21 @@ output_MF_year=pd.DataFrame()
 import pandas as pd
 import os
 #### This script calculate the installed capacity
-unit= "Price"
-path_input="C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Feb\\Raw_data\\Final_database\\before_maximizing_bk\\Price\\"  # this is the path_out_final in the script From_html_to_db
-path_output="C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Feb\\"# this will be the folder from where the GUI will read the data
+unit = "Price"
+path_input = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\Raw_data\\Final_database\\before_maximizing_bk\\Price\\"  # this is the path_out_final in the script From_html_to_db
+path_output = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\"# this will be the folder from where the GUI will read the data
 os.makedirs(path_output, exist_ok = True)
-lista_nazioni=os.listdir(path_input+"\\Export\\")
+lista_nazioni = os.listdir(path_input+"\\Export\\")
 
 desiderio=["2009-Q4","2010-Q1","2010-Q2","2010-Q3","2010-Q4","2011-Q1","2011-Q2","2011-Q3","2011-Q4","2012-Q1","2012-Q2","2012-Q3","2012-Q4","2013-Q1","2013-Q2","2013-Q3","2013-Q4","2014-Q1","2014-Q2","2014-Q3","2014-Q4","2015-Q1","2015-Q2","2015-Q3","2015-Q4","2016-Q1","2016-Q2","2016-Q3","2016-Q4","2017-Q1","2017-Q2","2017-Q3","2017-Q4","2018-Q1","2018-Q2","2018-Q3","2018-Q4","2019-Q1","2019-Q2","2019-Q3","2019-Q4","2020-Q1","2020-Q2","2020-Q3","2020-Q4"]
 
 
-#desiderio=["2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019","2020"] #2008","2009","2010","2011","2012","2013","2014","2015","2016",
-indici=[]
-reference_data_year=pd.read_excel("Reference_accumulated_2022.xlsx",index_col=0, na_values=['NA'])
-previous_capacity_P=0
-previous_capacity_P_MF=0
-previous_capacity_W=0
+#period=["2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019","2020"] #2008","2009","2010","2011","2012","2013","2014","2015","2016",
+indici = []
+reference_data_year = pd.read_excel("Reference_accumulated_2022.xlsx", index_col=0, na_values=['NA'])
+previous_capacity_P = 0
+previous_capacity_P_MF = 0
+previous_capacity_W = 0
 for cat in lista_nazioni:
     zzz=cat.split(".")
     indici.append(zzz[0])
