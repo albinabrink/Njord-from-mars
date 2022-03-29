@@ -67,3 +67,74 @@ def manufacturing(nation, year):  # Extract the manufacturing for a nation in a 
         return manufacturing_value
 # print(manufacturing(test, period))
 
+
+def imports_exports(input, import_export, name, year, unit):  # Read in export or import
+    data = pd.read_excel(input+str(import_export)+"\\"+name+".xlsx", index_col=0, na_values=['NA'])
+    data = data.fillna(0)
+    data = data.replace(to_replace="No Quantity", value=0)
+    add2 = ""
+    add1 = ""
+    word1 = ""
+    word2 = ""
+    time_window = [word1+add2+str(year)]
+
+
+def calc_PV_factor(nation_list, period, unit):
+    pv_share_unit = pd.read_excel("Share_in_PV_" + unit + ".xlsx", index_col=0)
+    pv_share_unit_list = pv_share_unit.index.values
+    cont = 0
+    pv_factor = 0
+
+
+def direct_or_mirror(data, unit, import_export, year, name):
+    data = pd.read_excel(data+import_export+"\\"+name+".xlsx", index_col=0, na_values=['NA'])
+    data = data.fillna(0)  # filling empty spaces with 0
+    data = data.replace(to_replace="No Quantity", value=0)  # replacing no quantity with 0
+    source = []
+    d_count = 0
+    m_count = 0
+    if unit == "Price":
+        add1 = "value in "
+        word1 = "Imported "
+        word2 = "Exported "
+    else:
+        add2 = ""
+        add1 = ""
+        word1 = ""
+        word2 = ""
+    time_window = [word1+add1+str(year)]
+    if import_export == "Export":
+        time_window = [word2+add1+str(year)]
+    data_period = data[time_window]
+    for letter in data_period.loc["DataType"]:
+        source.append(letter)
+        if letter == "D":
+            d_count += 1
+        else:
+            m_count += 1
+    while t is True:
+        if d_count == 4:
+            source_data = "D"
+            t = False
+            continue
+        if m_count == 4:
+            source_data = "M"
+            t = False
+            continue
+        if m_count < d_count:
+            source_data = "D*"
+            t = False
+            continue
+        if m_count > d_count:
+            source_data = "M*"
+            t = False
+        if m_count == d_count:
+            source_data = "M*"
+            t = False
+            continue
+    return source_data, source
+
+
+
+
+

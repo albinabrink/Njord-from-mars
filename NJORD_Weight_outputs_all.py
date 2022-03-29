@@ -86,17 +86,17 @@ for year in period:
         #focusing the data_Set at only the selected period
         imports_period = imports[time_window_import]
         exports_period = exports[time_window_export]
-        #print(exports_period)
-        ###monitoring the source of the data: Mirror or direct?
+        # print(exports_period)
+        ### monitoring the source of the data: Mirror or direct?
         import_source = []
         d_count_import = 0
         m_count_import = 0
         for letter in imports_period.loc["DataType"]:
             import_source.append(letter)
             if letter == "D":
-                d_count_import=d_count_import+1
+                d_count_import = d_count_import+1
             else:
-                m_count_import=m_count_import+1
+                m_count_import = m_count_import+1
         export_source = []
         d_count_export = 0
         m_count_export = 0
@@ -157,11 +157,11 @@ for year in period:
         if source_data_import != source_data_export:
             source_data_total = "I_"+source_data_import+"-E_"+source_data_export
 
-        #calculating the sum of export and import
+        # calculating the sum of export and import
         if "World" in exports_period.index.values:
-            sum_exports = exports_period.drop(["DataType", "World"]).to_numpy().sum() ## Sum of all export in the time period
+            sum_exports = exports_period.drop(["DataType", "World"]).to_numpy().sum()  # Sum of all export in the time period
         else:
-            sum_exports = exports_period.drop("DataType").to_numpy().sum()  ## Sum of all export in the time period
+            sum_exports = exports_period.drop("DataType").to_numpy().sum()  # Sum of all export in the time period
 
         if "World" in imports_period.index.values:
             sum_imports = imports_period.drop(["DataType", "World"]).to_numpy().sum()       ## Sum of all import in the time period
@@ -220,7 +220,7 @@ for year in period:
             cont = cont+1
 
         cont = 0
-        PV_factor_exp=0
+        PV_factor_exp = 0
         for item in nations_within_exports:
             if item == "DataType":
                 continue
