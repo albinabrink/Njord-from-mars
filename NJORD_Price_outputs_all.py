@@ -440,8 +440,8 @@ for year in desiderio:
             output_P_MF_each_year.at[name, "IRENA s " + year_test] = reference_data_year[str(year_test) + " - IRENA s"][name]
             output_P_MF_each_year.at[name, "PVPS " + year_test] = reference_data_year[PVPS][name]
             output_P_MF_each_year.at[name, "Other " + year_test] = reference_data_year[other][name]
-            print(installed_capacity,"Installed capacity [MW] of "+name+" for the year "+year+" without Market Factor, Price ",source_data_total)
-            print(installed_capacity_MF,"Installed capacity [MW] of "+name+" for the year "+year+" with Market Factor, Price ",source_data_total,export_source,import_source)
+            print(installed_capacity, "Installed capacity [MW] of "+name+" for the year "+year+" without Market Factor, Price ",source_data_total)
+            print(installed_capacity_MF, "Installed capacity [MW] of "+name+" for the year "+year+" with Market Factor, Price ",source_data_total,export_source,import_source)
 
 
 output_P_MF_each_year.to_excel(path_output+"Price_MF_max_model_results.xlsx")

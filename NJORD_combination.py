@@ -1047,14 +1047,14 @@ for year in period_col:
                 NJORD_value_sum = NJORD_value_sum + NJORD_value
             else:
                 NJORD_value_sum = NJORD_value_sum + NJORD_value
-            print(ref_value,source,country,year,"Referenza")
+            print(ref_value, source, country, year, "Referenza")
             ref_value_sum = ref_value_sum + ref_value
-            print(ref_value_sum,"totale",region,"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+            print(ref_value_sum, "totale", region, "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
             ref_tot_irena = ref_tot_irena+reference_data_year[Irena][country]
             ref_tot_pvps = ref_tot_pvps+reference_data_year[PVPS][country]
             ref_tot_other = ref_tot_other+reference_data_year[other][country]
-        print(NJORD_value_sum,"SOMMA!!!!!!!",region)
-        region = region.replace("_"," ")
+        print(NJORD_value_sum, "SOMMA!!!!!!!", region)
+        region = region.replace("_", " ")
 
         Combined_region_results.at[region, "NJORD " + only_year] = NJORD_value_sum
         Combined_region_results.at[region, "Ref " + only_year] = ref_value_sum

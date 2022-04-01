@@ -81,20 +81,20 @@ models=["NJORD-Weight","NJORD-Price","NJORD-Combined"]
 ################################################################################################
 #               To add more periods in these two variables as ,"2021-Q1","2021-Q2" etc...
 
-desiderio=["2010-Q1","2010-Q2","2010-Q3","2010-Q4","2011-Q1","2011-Q2","2011-Q3","2011-Q4",
-           "2012-Q1","2012-Q2","2012-Q3","2012-Q4","2013-Q1","2013-Q2","2013-Q3","2013-Q4",
-           "2014-Q1","2014-Q2","2014-Q3","2014-Q4","2015-Q1","2015-Q2","2015-Q3","2015-Q4",
-           "2016-Q1","2016-Q2","2016-Q3","2016-Q4","2017-Q1","2017-Q2","2017-Q3","2017-Q4",
-           "2018-Q1","2018-Q2","2018-Q3","2018-Q4","2019-Q1","2019-Q2","2019-Q3","2019-Q4",
-           "2020-Q1","2020-Q2","2020-Q3","2020-Q4"]
+desiderio = ["2010-Q1", "2010-Q2", "2010-Q3", "2010-Q4", "2011-Q1", "2011-Q2", "2011-Q3", "2011-Q4",
+             "2012-Q1", "2012-Q2", "2012-Q3", "2012-Q4", "2013-Q1", "2013-Q2", "2013-Q3", "2013-Q4",
+             "2014-Q1", "2014-Q2", "2014-Q3", "2014-Q4", "2015-Q1", "2015-Q2", "2015-Q3", "2015-Q4",
+             "2016-Q1", "2016-Q2", "2016-Q3", "2016-Q4", "2017-Q1", "2017-Q2", "2017-Q3", "2017-Q4",
+             "2018-Q1", "2018-Q2", "2018-Q3", "2018-Q4", "2019-Q1", "2019-Q2", "2019-Q3", "2019-Q4",
+             "2020-Q1", "2020-Q2", "2020-Q3", "2020-Q4"]
 
 #label for the output
-desiderio_lab = ["Prev","2010-Q1","2010-Q2","2010-Q3","2010-Q4","2011-Q1","2011-Q2","2011-Q3","2011-Q4",
-                 "2012-Q1","2012-Q2","2012-Q3","2012-Q4","2013-Q1","2013-Q2","2013-Q3","2013-Q4",
-                 "2014-Q1","2014-Q2","2014-Q3","2014-Q4","2015-Q1","2015-Q2","2015-Q3","2015-Q4",
-                 "2016-Q1","2016-Q2","2016-Q3","2016-Q4","2017-Q1","2017-Q2","2017-Q3","2017-Q4",
-                 "2018-Q1","2018-Q2","2018-Q3","2018-Q4","2019-Q1","2019-Q2","2019-Q3","2019-Q4",
-                 "2020-Q1","2020-Q2","2020-Q3","2020-Q4"]
+desiderio_lab = ["Prev", "2010-Q1", "2010-Q2", "2010-Q3", "2010-Q4", "2011-Q1", "2011-Q2", "2011-Q3", "2011-Q4",
+                 "2012-Q1", "2012-Q2", "2012-Q3", "2012-Q4", "2013-Q1", "2013-Q2", "2013-Q3", "2013-Q4",
+                 "2014-Q1", "2014-Q2", "2014-Q3", "2014-Q4", "2015-Q1", "2015-Q2", "2015-Q3", "2015-Q4",
+                 "2016-Q1", "2016-Q2", "2016-Q3", "2016-Q4", "2017-Q1", "2017-Q2", "2017-Q3", "2017-Q4",
+                 "2018-Q1", "2018-Q2", "2018-Q3", "2018-Q4", "2019-Q1", "2019-Q2", "2019-Q3", "2019-Q4",
+                 "2020-Q1", "2020-Q2", "2020-Q3", "2020-Q4"]
 
 # also this line has to be changed when increasing years...just change 2022 with the desired final year
 #ax0.set_xticks((np.arange(2009, 2022, 1.0)))
@@ -837,8 +837,8 @@ def two_model_comparison(name,year,model_1,model_2):
                 valore_y_1 = 0
                 valore_y_2 = 0
                 source_list = []
-                valore_y_1 = round(float(accumulated_installed_2009[name.replace("_", " ")]),2)
-                valore_y_2 = round(float(accumulated_installed_2009[name.replace("_", " ")]),2)
+                valore_y_1 = round(float(accumulated_installed_2009[name.replace("_", " ")]), 2)
+                valore_y_2 = round(float(accumulated_installed_2009[name.replace("_", " ")]), 2)
                 print(valore_y_1)
                 (eval(name + "_var_njord_model_1")).append(valore_y_1)
                 (eval(name + "_var_njord_model_2")).append(valore_y_2)
@@ -847,7 +847,7 @@ def two_model_comparison(name,year,model_1,model_2):
                 (eval(name + "_var_ref_model_2")).append(accumulated_reference_data["2009 - Total"][name.replace("_", " ")])
                 x_axis_ref.append(2009)
                 output_table_ref.at[name, "2009 Ref"] = round(accumulated_installed_2009[name.replace("_", " ")],2)
-                #output_table_model2.at[name, "2009 Ref"] = round(accumulated_installed_2009[name.replace("_", " ")],2)
+                # output_table_model2.at[name, "2009 Ref"] = round(accumulated_installed_2009[name.replace("_", " ")],2)
                 output_table_model1.at[name, "2009 [MW]"] = round(accumulated_installed_2009[name.replace("_", " ")],2)
                 output_table_model2.at[name, "2009 [MW]"] = round(accumulated_installed_2009[name.replace("_", " ")],2)
 
@@ -2116,8 +2116,6 @@ def two_states_comparison(name_1,name_2,year,model):
         #IMPORTANT: the region input box is checked for inputs, if no input is present the single region
         #           will be read!
 
-
-
 def model_comparison():
     try:
         name=my_entry_0.get()
@@ -2134,14 +2132,16 @@ def model_comparison():
         model_2 = my_entry_2.get()
         two_model_comparison(name, year, model_1, model_2)
     name = my_entry.get()
-    model_1=my_entry_5.get()
-    model_2=my_entry_2.get()
-    two_model_comparison(name,year,model_1,model_2)
+    model_1 = my_entry_5.get()
+    model_2 = my_entry_2.get()
+    two_model_comparison(name, year, model_1, model_2)
+
+
 def nations_comparison():
     try:
         name_1=my_entry_0.get()
         name_2=my_entry_7.get()
-        #year = my_entry_1.get()
+        # year = my_entry_1.get()
         model = my_entry_2.get()
         two_states_comparison(name_1, name_2, year, model)
     except KeyError:
@@ -2149,26 +2149,28 @@ def nations_comparison():
     else:
         name_1 = my_entry.get()
         name_2=my_entry_4.get()
-        #year = my_entry_1.get()
+        # year = my_entry_1.get()
         model = my_entry_2.get()
         two_states_comparison(name_1, name_2, year, model)
     name_1 = my_entry.get()
     name_2 = my_entry_4.get()
-    #year = my_entry_1.get()
+    # year = my_entry_1.get()
     model = my_entry_2.get()
     two_states_comparison(name_1, name_2, year, model)
+
+
 def single_models():
     try:
-        name=my_entry_0.get()
-        #year = my_entry_1.get()
+        name = my_entry_0.get()
+        # year = my_entry_1.get()
         model = my_entry_2.get()
         visualization(name, year, model)
     except KeyError:
         print("I use single nation")
         name = my_entry.get()
-        #year= my_entry_1.get()
-        model= my_entry_2.get()
-        visualization(name,year,model)
+        # year= my_entry_1.get()
+        model = my_entry_2.get()
+        visualization(name, year, model)
             ##############################################
 
 
@@ -2373,7 +2375,7 @@ def check15(event):
     update15(data)
 def check6(event):
     #what is typed#
-    typed=my_entry_6.get()
+    typed = my_entry_6.get()
     if typed == '':
         data = models
     else:

@@ -210,12 +210,14 @@ for year in period:
         cont = 0
         PV_factor_imp = 0
         for item in nations_within_imports:
+            print(len(nations_within_imports))
             if item == "DataType":
                 continue
             if item in pv_share_unit_list:
                 single_value = pv_share_unit[year_test][item]*percentage_imp[cont] #value for each single nation
             else:
                 single_value = pv_share_unit[year_test]["RoW"]*percentage_imp[cont]
+                print(cont)
             PV_factor_imp = PV_factor_imp+single_value
             cont = cont+1
 
@@ -227,6 +229,7 @@ for year in period:
             single_value = pv_share_unit[year_test]["RoW"]*percentage_exp[cont]
             PV_factor_exp = PV_factor_exp+single_value
             cont = cont+1
+
         if sum(percentage_imp) < 1:
             scarto = 1-sum(percentage_imp)
             mancanza = scarto*pv_share_unit[year_test]["RoW"]
@@ -244,6 +247,7 @@ for year in period:
                 installed_capacity = (((net_trade/1000)/module_weight[year_test]["Value"])/10**6)+(manufacturing_value/4)
             previous_capacity_W = previous_capacity_W + installed_capacity
             # print(installed_capacity, "Installed capacity [MW] of "+name+" for the year "+year+", Weight ", source_data_total)
+
         name = name.replace("_", " ")
         if name == "Bolivia  Plurinational State of":
             name = "Bolivia"
@@ -362,83 +366,83 @@ for year in period:
         print(name, year, year_test)
         ###
         ###correction needed for the format inside the table in the excel files ###
-        if unit=="Price":
-            add2="value in "
-            word1="Imported "
-            word2="Exported "
+        if unit == "Price":
+            add2 = "value in "
+            word1 = "Imported "
+            word2 = "Exported "
         else:
-            add2=""
-            add1=""
+            add2 = ""
+            add1 = ""
             word1 = ""
             word2 = ""
         ### table with the parameters according to the "unit" selected THEN THE VARIABLE is the same for both calculaiton ####
-        pv_share_unit=pd.read_excel("Share_in_PV_"+unit+".xlsx",index_col=0)  #valid for both
+        pv_share_unit = pd.read_excel("Share_in_PV_"+unit+".xlsx", index_col=0)  #valid for both
         ###Manufacturing for each country [MW] (same for both units) ####
-        manufacturing=pd.read_excel("Manufacturing.xlsx",index_col=0,na_values=['NA'])
-        manufacturing=manufacturing.fillna(0)
+        manufacturing = pd.read_excel("Manufacturing.xlsx", index_col=0, na_values=['NA'])
+        manufacturing = manufacturing.fillna(0)
         if name in manufacturing.index.values:
             manufacturing_value = manufacturing[year_test][name]
         else:
             manufacturing_value = 0
 
         ###only used if Price
-        change=pd.read_excel("PVxchange.xlsx",index_col=0)
-        change_list=change.index.values
+        change = pd.read_excel("PVxchange.xlsx", index_col=0)
+        change_list = change.index.values
 
         #### only in Weight
-        module_weight=pd.read_excel("Module_weight.xlsx",index_col=0)
+        module_weight = pd.read_excel("Module_weight.xlsx", index_col=0)
 
         #reading the import and export full raw data
-        imports=pd.read_excel(path_input+"Import"+"\\"+name+".xlsx",index_col=0, na_values=['NA'])
-        exports=pd.read_excel(path_input+"Export"+"\\"+name+".xlsx",index_col=0, na_values=['NA'])
-        imports=imports.fillna(0) #filling empty spaces with 0
-        imports=imports.replace(to_replace="No Quantity",value=0) #replacing no quantity with 0
-        exports=exports.fillna(0)#filling empty spaces with 0
-        exports=exports.replace(to_replace="No Quantity",value=0)
+        imports = pd.read_excel(path_input+"Import"+"\\"+name+".xlsx", index_col=0, na_values=['NA'])
+        exports = pd.read_excel(path_input+"Export"+"\\"+name+".xlsx", index_col=0, na_values=['NA'])
+        imports = imports.fillna(0) #filling empty spaces with 0
+        imports = imports.replace(to_replace="No Quantity",value=0) #replacing no quantity with 0
+        exports = exports.fillna(0)#filling empty spaces with 0
+        exports = exports.replace(to_replace="No Quantity",value=0)
         # Selecting the time period (Q4 previous year and 1-2-3 of current year)
         #time_window_import=[word1+add2+str(int(year)-1)+"-Q4",word1+add2+year+"-Q1",word1+add2+year+"-Q2",word1+add2+year+"-Q3"]
         #time_window_export=[word2+add2+str(int(year)-1)+"-Q4",word2+add2+year+"-Q1",word2+add2+year+"-Q2",word2+add2+year+"-Q3"]
-        time_window_import=[word1+add2+str(year)]
-        time_window_export=[word2+add2+str(year)]
+        time_window_import = [word1+add2+str(year)]
+        time_window_export = [word2+add2+str(year)]
         #focusing the data_Set at only the selected period
         imports_period = imports[time_window_import]
         exports_period = exports[time_window_export]
         #print(exports_period)
         ###monitoring the source of the data: Mirror or direct?
-        import_source=[]
-        d_count_import=0
-        m_count_import=0
+        import_source = []
+        d_count_import = 0
+        m_count_import = 0
         for letter in imports_period.loc["DataType"]:
             import_source.append(letter)
             if letter == "D":
-                d_count_import=d_count_import+1
+                d_count_import = d_count_import+1
             else:
-                m_count_import=m_count_import+1
+                m_count_import = m_count_import+1
         export_source = []
-        d_count_export=0
-        m_count_export=0
+        d_count_export = 0
+        m_count_export = 0
         for letter in exports_period.loc["DataType"]:
             export_source.append(letter)
             if letter == "D":
-                d_count_export=d_count_export+1
+                d_count_export = d_count_export+1
             else:
-                m_count_export=m_count_export+1
+                m_count_export = m_count_export+1
         t = True
         while t is True:
             if d_count_import == 4:
-                source_data_import="D"
+                source_data_import = "D"
                 t = False
                 continue
             if m_count_import == 4:
-                source_data_import="M"
+                source_data_import = "M"
                 t = False
                 continue
             if m_count_import < d_count_import:
-                source_data_import="D*"
+                source_data_import = "D*"
                 t = False
                 continue
             if m_count_import > d_count_import:
-                source_data_import="M*"
+                source_data_import = "M*"
                 t = False
             if m_count_import == d_count_import:
                 source_data_import = "M*"
@@ -446,23 +450,23 @@ for year in period:
                 continue
         #print(m_count_import,d_count_import,source_data_import,"risultato import")
 
-        q=True
+        q = True
         while q is True:    # very stupid solution for the problem!!!!
             if d_count_export == 4:
-                source_data_export="D"
-                q=False
+                source_data_export = "D"
+                q = False
                 continue
             if m_count_export == 4:
-                source_data_export="M"
-                q=False
+                source_data_export = "M"
+                q = False
                 continue
             if m_count_export < d_count_export:
-                source_data_export="D*"
-                q=False
+                source_data_export = "D*"
+                q = False
                 continue
             if m_count_export > d_count_export:
-                source_data_export="M*"
-                q=False
+                source_data_export = "M*"
+                q = False
             if m_count_export == d_count_export:
                 source_data_export = "M*"
                 q = False
@@ -470,9 +474,9 @@ for year in period:
 
         source_data_total = []
         if source_data_import == source_data_export:
-            source_data_total=source_data_export
+            source_data_total = source_data_export
         if source_data_import != source_data_export:
-            source_data_total="I_"+source_data_import+"-E_"+source_data_export
+            source_data_total = "I_"+source_data_import+"-E_"+source_data_export
 
         #calculating the sum of export and import
         if "World" in exports_period.index.values:
@@ -544,18 +548,18 @@ for year in period:
         for item in nations_within_exports:
             if item =="DataType":
                 continue
-            single_value= pv_share_unit[year_test]["RoW"]*percentage_exp[cont]
-            PV_factor_exp=PV_factor_exp+single_value
+            single_value = pv_share_unit[year_test]["RoW"]*percentage_exp[cont]
+            PV_factor_exp = PV_factor_exp+single_value
             cont=cont+1
-        if sum(percentage_imp) <1:
-            scarto=1-sum(percentage_imp)
-            mancanza=scarto*pv_share_unit[year_test]["RoW"]
-            PV_factor_imp=PV_factor_imp+mancanza
+        if sum(percentage_imp) < 1:
+            scarto = 1-sum(percentage_imp)
+            mancanza = scarto*pv_share_unit[year_test]["RoW"]
+            PV_factor_imp = PV_factor_imp+mancanza
         #### installed capacity ###
         ### the PV_factor_imp is the same because it is selected at the beginning according to the unit needed! ###
 
         #Clculaiton of the Nemarket_factort Trade
-        net_trade=((sum_imports*PV_factor_imp)-(sum_exports*PV_factor_exp))*1000
+        net_trade = ((sum_imports*PV_factor_imp)-(sum_exports*PV_factor_exp))*1000
 
         if unit == "Weight":
             if module_weight[year_test]["Value"] == 0:
@@ -646,38 +650,38 @@ for year in period:
 output_W_each_year.to_excel(path_output+"Weight_model_results.xlsx")
 
 
-quartly=pd.read_excel("NJORD-Weight_model_results.xlsx",index_col=0,)
-yearly=pd.DataFrame()
-period=["2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020"] #2008","2009","2010","2011","2012","2013","2014","2015","2016",
+quartly = pd.read_excel("NJORD-Weight_model_results.xlsx",index_col=0,)
+yearly = pd.DataFrame()
+period = ["2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020"] #2008","2009","2010","2011","2012","2013","2014","2015","2016",
 # print(quartly.columns)
 for nation in quartly.index:
     for year in period:
-        q1=quartly.loc[nation,"NJORD "+year+"-Q1"]
-        q2 = quartly.loc[nation,"NJORD " + year + "-Q2"]
-        q3 = quartly.loc[nation,"NJORD " + year + "-Q3"]
-        q4 = quartly.loc[nation,"NJORD " + year + "-Q4"]
-        if q1 <0:
-            q1=0
-        if q2 <0:
-            q2=0
-        if q3 <0:
-            q3=0
-        if q4 <0:
-            q4=0
-        somma=q1+q2+q3+q4
-        yearly.at[nation,"NJORD "+year]=somma
+        q1=quartly.loc[nation, "NJORD "+year+"-Q1"]
+        q2 = quartly.loc[nation, "NJORD " + year + "-Q2"]
+        q3 = quartly.loc[nation, "NJORD " + year + "-Q3"]
+        q4 = quartly.loc[nation, "NJORD " + year + "-Q4"]
+        if q1 < 0:
+            q1 = 0
+        if q2 < 0:
+            q2 = 0
+        if q3 < 0:
+            q3 = 0
+        if q4 < 0:
+            q4 = 0
+        somma = q1+q2+q3+q4
+        yearly.at[nation, "NJORD "+year] = somma
 
 for column in quartly.columns:
     if "NJORD" in str(column):
         continue
     else:
-        to_add=quartly[column]
-        yearly=yearly.join(to_add)
+        to_add = quartly[column]
+        yearly = yearly.join(to_add)
 
 yearly.to_excel("NJORD-Weight_model_results_year.xlsx")
 
 
-Ref_country=["Belgium","Chile","Denmark","Finland","France","Israel","Italy","Spain","Sweden","Switzerland"]
+Ref_country = ["Belgium", "Chile", "Denmark", "Finland", "France", "Israel", "Italy", "Spain", "Sweden", "Switzerland"]
 Asia=["Afghanistan","Bangladesh","Bhutan","Brunei_Darussalam","Cambodia","China","Hong_Kong__China","India","Indonesia","Japan","Kazakhstan","Kyrgyzstan","Lao_People's_Democratic_Republic","Malaysia","Maldives","Myanmar","Nepal","Korea__Democratic_People's_Republic_of","Korea__Republic_of","Pakistan","Philippines","Singapore","Korea__Democratic_People's_Republic_of","Sri_Lanka","Taipei__Chinese","Tajikistan","Thailand","Turkmenistan","Uzbekistan","Viet_Nam","Mongolia"]
 Europe=["Albania","Andorra","Austria","Belarus","Belgium","Bosnia_and_Herzegovina","Bulgaria","Croatia","Cyprus","Czech_Republic","Denmark","Estonia","Finland","France","Georgia","Germany","Greece","Greenland","Hungary","Iceland","Ireland","Italy","Latvia","Lithuania","Luxembourg","Macedonia__North","Malta","Moldova__Republic_of","Netherlands","Norway","Poland","Portugal","Romania","Russian_Federation","Serbia","Slovakia","Slovenia","Spain","Sweden","Switzerland","Ukraine","United_Kingdom"]
 Europa=["Albania","Andorra","Austria","Belarus","Belgium","Bosnia and Herzegovina","Bulgaria","Croatia","Cyprus","Czech Republic","Denmark","Estonia","Finland","France","Georgia","Germany","Greece","Greenland","Hungary","Iceland","Ireland","Italy","Latvia","Lithuania","Luxembourg","Macedonia  North","Malta","Moldova Republic of","Netherlands","Norway","Poland","Portugal","Romania","Russian Federation","Serbia","Slovakia","Slovenia","Spain","Sweden","Switzerland","Ukraine","United Kingdom"]
@@ -692,11 +696,11 @@ index=["Ref_country", "Asia", "Europe", "Africa", "North_America", "Central_Amer
 reference_data_year=pd.read_excel("Reference_accumulated_2022.xlsx",index_col=0, na_values=['NA'])
 Combined = pd.read_excel("NJORD-Weight_model_results_year.xlsx",index_col=0, na_values=['NA'])
 
-period_col=["NJORD 2010","Ref 2010","Source 2010","Diff 2010","NJORD 2011","Ref 2011","Source 2011","Diff 2011","NJORD 2012","Ref 2012","Source 2012","Diff 2012","NJORD 2013","Ref 2013","Source 2013","Diff 2013","NJORD 2014","Ref 2014","Source 2014","Diff 2014","NJORD 2015","Ref 2015","Source 2015","Diff 2015","NJORD 2016","Ref 2016","Source 2016","Diff 2016","NJORD 2017","Ref 2017","Source 2017","Diff 2017","NJORD 2018","Ref 2018","Source 2018","Diff 2018","NJORD 2019","Ref 2019","Source 2019","Diff 2019","NJORD 2020","Ref 2020","Source 2020","Diff 2020"]
+period_col = ["NJORD 2010","Ref 2010","Source 2010","Diff 2010","NJORD 2011","Ref 2011","Source 2011","Diff 2011","NJORD 2012","Ref 2012","Source 2012","Diff 2012","NJORD 2013","Ref 2013","Source 2013","Diff 2013","NJORD 2014","Ref 2014","Source 2014","Diff 2014","NJORD 2015","Ref 2015","Source 2015","Diff 2015","NJORD 2016","Ref 2016","Source 2016","Diff 2016","NJORD 2017","Ref 2017","Source 2017","Diff 2017","NJORD 2018","Ref 2018","Source 2018","Diff 2018","NJORD 2019","Ref 2019","Source 2019","Diff 2019","NJORD 2020","Ref 2020","Source 2020","Diff 2020"]
 #period=["2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019","2020"]
-output_column=["Absolut Country Average [%]","Total deviation for Data set [%]","Median [%]","Median [MW]","Standard deviation [MW]","Average deviation [MW]","T distribution [MW]"]
+output_column = ["Absolut Country Average [%]","Total deviation for Data set [%]","Median [%]","Median [MW]","Standard deviation [MW]","Average deviation [MW]","T distribution [MW]"]
 #Ref_country=Combined.index
-Combined_region_results=pd.DataFrame()
+Combined_region_results = pd.DataFrame()
 
 
 
@@ -762,7 +766,7 @@ for year in period_col:
                 country = "Venezuela"
             if country == "Viet Nam":
                 country = "Vietnam"
-            NJORD_value=Combined[year][country] ######################################## DATA SET ################## to change
+            NJORD_value = Combined[year][country] ######################################## DATA SET ################## to change
             ref_value = 0
             if reference_data_year[PVPS][country] == 0:
                 ref_value = reference_data_year[other][country]
