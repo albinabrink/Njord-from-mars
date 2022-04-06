@@ -150,21 +150,28 @@ def manufacturing(nation, year):  # Extract the manufacturing for a nation in a 
 # print(manufacturing(test, period))
 
 
-def calc_PV_factor(year, unit, nations_within, percentage):
+def calc_PV_factor(year, unit, nations_within, percentage, import_export):
     pv_share_unit = pd.read_excel("Share_in_PV_"+unit+".xlsx", index_col=0)  # Move out of loop?
     pv_share_unit_list = pv_share_unit.index.values
     cont = 0
     pv_factor = 0
-    for nation in nations_within:
-        # print(nation)
-        if nation == "DataType":
-            continue
-        if nation in pv_share_unit_list:
-            single_value = pv_share_unit[year][nation]*percentage[cont]
-        else:
+    if import_export == "Import":
+        for nation in nations_within:
+            # print(nation)
+            if nation == "DataType":
+                continue
+            if nation in pv_share_unit_list:
+                single_value = pv_share_unit[year][nation]*percentage[cont]
+            else:
+                single_value = pv_share_unit[year]["RoW"]*percentage[cont]
+            pv_factor += single_value
+            cont = cont+1
+    if import_export == "Export":  # Why is this different?
+        for nation in nations_within:
+            if nation == "DataType":
+                continue
             single_value = pv_share_unit[year]["RoW"]*percentage[cont]
-        pv_factor += single_value
-        cont = cont+1
+            pv_factor += single_value
     return pv_factor, pv_share_unit
 
 
@@ -188,7 +195,6 @@ def direct_or_mirror(data, unit, import_export, year, name):
     time_window = [word1+add1+str(year)]
     if import_export == "Export":
         time_window = [word2+add1+str(year)]
-    print(data)
     data_period = data[time_window]
     nations_within = data_period.index.values
     for letter in data_period.loc["DataType"]:
@@ -223,14 +229,9 @@ def direct_or_mirror(data, unit, import_export, year, name):
 
 def weight(input, period):
     unit = "Weight"
-    # path_input = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\Raw_data\\Final_database\\Weight\\"  # this is the path_out_final in the script From_html_to_db
-    # path_output = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\"  # this will be the folder from where the GUI will read the data
-    # pv_share_unit = pd.read_excel("Share_in_PV_"+unit+".xlsx", index_col=0)
-    # nations = name_clean_up(input)
     nations = os.listdir(input+"\\Export\\")
     module_weight = pd.read_excel("Module_weight.xlsx", index_col=0)
     ref_data = pd.read_excel("Reference_accumulated_2022.xlsx", index_col=0, na_values=['NA'])
-    # manufacturing_list = []
     previous_capacity_W = 0
     output_W_each_year = pd.DataFrame()
     for year_quarter in period:
@@ -252,14 +253,14 @@ def weight(input, period):
             import_source, imports_period, time_window_import, nations_within_imp = direct_or_mirror(input, unit, "Import", year_quarter, name)
             export_source, exports_period, time_window_export, nations_within_exp = direct_or_mirror(input, unit, "Export", year_quarter, name)
 
-            if import_source == export_source:
+            if import_source == export_source: # Can I remove this? Don't see how it is used in the original code?
                 source_data_total = export_source
             else:
                 source_data_total = "I_"+import_source+"-E_"+export_source
 
             percentage_imp, percentage_exp, sum_imports, sum_exports = calc_percentage_import_export(imports_period, exports_period, time_window_import, time_window_export)
-            PV_factor_imp, PV_share_unit = calc_PV_factor(year, unit, nations_within_imp, percentage_imp)
-            PV_factor_exp, PV_share_unit = calc_PV_factor(year, unit, nations_within_exp, percentage_exp)
+            PV_factor_imp, PV_share_unit = calc_PV_factor(year, unit, nations_within_imp, percentage_imp, "Import")
+            PV_factor_exp, PV_share_unit = calc_PV_factor(year, unit, nations_within_exp, percentage_exp, "Export")
 
             if sum(percentage_imp) < 1:
                 waste = 1-sum(percentage_imp)  # calc the wasted PV per year
@@ -268,11 +269,11 @@ def weight(input, period):
 
             net_trade = ((sum_imports * PV_factor_imp) - (sum_exports * PV_factor_exp)) * 1000
             previous_capacity_W, installed_capacity = weight_capacity_output(module_weight, year, manufacturing_value, net_trade, previous_capacity_W)
+
             if module_weight[year]["Value"] == 0:
                 installed_capacity = 0
             else:
-                installed_capacity = (((net_trade / 1000) / module_weight[year]["Value"]) / 10 ** 6) + (
-                            manufacturing_value / 4)
+                installed_capacity = (((net_trade/1000)/module_weight[year]["Value"])/10**6)+(manufacturing_value/4)  # Why divide with 10^6?
             name = name_cleanup(name, year)
             output_W_each_year = create_output_weight(ref_data, year_quarter, year, name, installed_capacity, output_W_each_year)
 
@@ -289,19 +290,18 @@ def weight_capacity_output(module_weight, year, manufacturing_value, net_trade, 
 
 
 def calc_percentage_import_export(imports, exports, time_window_import, time_window_export): # Should be built more generic, does the same thing twice.
-    if "World" in exports.index.values:
+    nations_within_imports = imports.index.values
+    nations_within_exports = exports.index.values
+    if "World" in nations_within_exports:
         sum_exports = exports.drop(
             ["DataType", "World"]).to_numpy().sum()  # Sum of all export in the time period
     else:
         sum_exports = exports.drop("DataType").to_numpy().sum()  # Sum of all export in the time period
-    if "World" in imports.index.values:
+    if "World" in nations_within_imports:
         sum_imports = imports.drop(
             ["DataType", "World"]).to_numpy().sum()  ## Sum of all import in the time period
     else:
         sum_imports = imports.drop("DataType").to_numpy().sum()  ## Sum of all import in the time period
-
-    nations_within_imports = imports.index.values
-    nations_within_exports = exports.index.values
 
     percentage_imp = []
     for item in nations_within_imports:
@@ -315,7 +315,7 @@ def calc_percentage_import_export(imports, exports, time_window_import, time_win
             continue
         else:
             # print(item, time_window_import, imports_period.loc[item, time_window_import])
-            value = (sum(imports.loc[item, time_window_import]) / sum_imports)  # percentage for each country
+            value = (sum(imports.loc[item, time_window_import])/sum_imports)  # percentage for each country
             percentage_imp.append(value)
 
     percentage_exp = []
@@ -330,7 +330,7 @@ def calc_percentage_import_export(imports, exports, time_window_import, time_win
             continue
         else:
             # print(item,time_window_export,sum_exports,exports_period.loc[item,time_window_export])
-            value = sum(exports.loc[item, time_window_export]) / sum_exports  # percentage for each country
+            value = sum(exports.loc[item, time_window_export])/sum_exports  # percentage for each country
             percentage_exp.append(value)
 
     return percentage_imp, percentage_exp, sum_imports, sum_exports
@@ -450,8 +450,8 @@ def price(input, period):
                                                                                                      exports_period,
                                                                                                      time_window_import,
                                                                                                      time_window_export)
-            PV_factor_imp, PV_share_unit = calc_PV_factor(year, unit, nations_within_imp, percentage_imp)
-            PV_factor_exp, PV_share_unit = calc_PV_factor(year, unit, nations_within_exp, percentage_exp)
+            PV_factor_imp, PV_share_unit = calc_PV_factor(year, unit, nations_within_imp, percentage_imp, "Import")
+            PV_factor_exp, PV_share_unit = calc_PV_factor(year, unit, nations_within_exp, percentage_exp, "Export")
 
             if sum(percentage_imp) < 1:
                 waste = 1-sum(percentage_imp)  # calc the wasted PV per year
@@ -467,7 +467,7 @@ def price(input, period):
                 installed_capacity_MF = 0
             else:
                 installed_capacity = ((net_trade/PV_market_price)/10**6)+(manufacturing_value/4)
-                installed_capacity_MF = (net_trade/(PV_market_price*market_factor)/10 **6)+manufacturing_value
+                installed_capacity_MF = ((net_trade/(PV_market_price*market_factor))/10**6)+manufacturing_value
 
             name = name_cleanup(name, year)
 

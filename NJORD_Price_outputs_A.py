@@ -19,5 +19,5 @@ period = ["2009-Q4", "2010-Q1", "2010-Q2", "2010-Q3", "2010-Q4", "2011-Q1", "201
              "2018-Q4", "2019-Q1", "2019-Q2", "2019-Q3", "2019-Q4", "2020-Q1", "2020-Q2", "2020-Q3", "2020-Q4"]
 
 output_P_each_year, output_P_MF_each_year = NJORD_function_test.price(path_input, period)
-output_P_each_year.to_excel(path_output+"Price_max_model_results.xlsx")
-output_P_MF_each_year.to_excel(path_output+"NJORD-Price_model_results.xlsx")
+output_P_each_year.to_excel(path_output+"Test_Price_max_model_results.xlsx")
+output_P_MF_each_year.to_excel(path_output+"Test_NJORD-Price_model_results.xlsx")

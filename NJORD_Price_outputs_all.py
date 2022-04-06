@@ -60,9 +60,9 @@ for year in desiderio:
             word1 = ""
             word2 = ""
         ### table with the parameters according to the "unit" selected THEN THE VARIABLE is the same for both calculaiton ####
-        pv_share_unit = pd.read_excel("Share_in_PV_"+unit+".xlsx",index_col=0)  #valid for both
+        pv_share_unit = pd.read_excel("Share_in_PV_"+unit+".xlsx", index_col=0)  #valid for both
         ###Manufacturing for each country [MW] (same for both units) ####
-        manufacturing = pd.read_excel("Manufacturing.xlsx",index_col=0,na_values=['NA'])
+        manufacturing = pd.read_excel("Manufacturing.xlsx", index_col=0, na_values=['NA'])
         manufacturing = manufacturing.fillna(0)
         if name in manufacturing.index.values:
             manufacturing_value = manufacturing[year_test][name]
@@ -152,15 +152,15 @@ for year in desiderio:
 
         source_data_total = []
         if source_data_import == source_data_export:
-            source_data_total=source_data_export
+            source_data_total = source_data_export
         if source_data_import != source_data_export:
-            source_data_total="I_"+source_data_import+"-E_"+source_data_export
+            source_data_total = "I_"+source_data_import+"-E_"+source_data_export
 
         #calculating the sum of export and import
         if "World" in exports_period.index.values:
-            sum_exports = exports_period.drop(["DataType","World"]).to_numpy().sum() ## Sum of all export in the time period
+            sum_exports = exports_period.drop(["DataType", "World"]).to_numpy().sum()  # Sum of all export in the time period
         else:
-            sum_exports = exports_period.drop("DataType").to_numpy().sum()       ## Sum of all export in the time period
+            sum_exports = exports_period.drop("DataType").to_numpy().sum()  # Sum of all export in the time period
 
         if "World" in imports_period.index.values:
             sum_imports = imports_period.drop(["DataType", "World"]).to_numpy().sum()       ## Sum of all import in the time period
@@ -206,7 +206,7 @@ for year in desiderio:
                 percentage_exp.append(value)
 
         # PVa factor
-        pv_share_unit = pd.read_excel("Share_in_PV_"+unit+".xlsx",index_col=0)
+        pv_share_unit = pd.read_excel("Share_in_PV_"+unit+".xlsx", index_col=0)
         pv_share_unit_list = pv_share_unit.index.values
         cont = 0
         PV_factor_imp = 0
@@ -298,7 +298,7 @@ for year in desiderio:
                 installed_capacity_MF = 0
             else:
                 installed_capacity = ((net_trade/PV_market_price)/10**6)+(manufacturing_value/4)
-                installed_capacity_MF = ((net_trade/(PV_market_price*market_factor)/10**6))+manufacturing_value
+                installed_capacity_MF = ((net_trade/(PV_market_price*market_factor))/10**6)+manufacturing_value
                 name = name.replace("_", " ")
                 print()
                 if name == "Bolivia  Plurinational State of":
@@ -467,7 +467,7 @@ previous_capacity_P = 0
 previous_capacity_P_MF = 0
 previous_capacity_W = 0
 for cat in nation_list:
-    zzz=cat.split(".")
+    zzz = cat.split(".")
     indici.append(zzz[0])
 
 output_P_each_year=pd.DataFrame()
@@ -500,14 +500,14 @@ for year in desiderio:
             word1 = ""
             word2 = ""
         ### table with the parameters according to the "unit" selected THEN THE VARIABLE is the same for both calculaiton ####
-        pv_share_unit=pd.read_excel("Share_in_PV_"+unit+".xlsx",index_col=0)  #valid for both
+        pv_share_unit = pd.read_excel("Share_in_PV_"+unit+".xlsx", index_col=0)  # valid for both
         ###Manufacturing for each country [MW] (same for both units) ####
-        manufacturing=pd.read_excel("Manufacturing.xlsx",index_col=0,na_values=['NA'])
-        manufacturing=manufacturing.fillna(0)
+        manufacturing = pd.read_excel("Manufacturing.xlsx", index_col=0, na_values=['NA'])
+        manufacturing = manufacturing.fillna(0)
         if name in manufacturing.index.values:
-            manufacturing_value=manufacturing[year_test][name]
+            manufacturing_value = manufacturing[year_test][name]
         else:
-            manufacturing_value=0
+            manufacturing_value = 0
 
         ###only used if Price
         change=pd.read_excel("PVxchange.xlsx",index_col=0)
