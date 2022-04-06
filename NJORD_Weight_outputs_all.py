@@ -692,16 +692,23 @@ South_America=["Argentina","Bolivia__Plurinational_State_of","Brazil","Colombia"
 Eurasia=["Armenia","Azerbaijan","Turkey"]
 Oceania=["Australia","Fiji","Guam","Micronesia__Federated_States_of","Norfolk_Island","New_Caledonia","New_Zealand","Papua_New_Guinea","Solomon_Islands","Kiribati","New_Caledonia"]
 Middle_East=["Bahrain","Iran__Islamic_Republic_of","Iraq","Israel","Jordan","Kuwait","Lebanon","Oman","Palau","Palestine__State_of","Qatar","Saudi_Arabia","Syrian_Arab_Republic","United_Arab_Emirates","Yemen","Kuwait","Lebanon","Jordan","Oman"]
-index=["Ref_country", "Asia", "Europe", "Africa", "North_America", "Central_America", "South_America", "Eurasia", "Oceania", "Middle_East"]
-reference_data_year=pd.read_excel("Reference_accumulated_2022.xlsx",index_col=0, na_values=['NA'])
+index = ["Ref_country", "Asia", "Europe", "Africa", "North_America", "Central_America", "South_America", "Eurasia",
+         "Oceania", "Middle_East"]
+reference_data_year = pd.read_excel("Reference_accumulated_2022.xlsx",index_col=0, na_values=['NA'])
 Combined = pd.read_excel("NJORD-Weight_model_results_year.xlsx",index_col=0, na_values=['NA'])
 
-period_col = ["NJORD 2010","Ref 2010","Source 2010","Diff 2010","NJORD 2011","Ref 2011","Source 2011","Diff 2011","NJORD 2012","Ref 2012","Source 2012","Diff 2012","NJORD 2013","Ref 2013","Source 2013","Diff 2013","NJORD 2014","Ref 2014","Source 2014","Diff 2014","NJORD 2015","Ref 2015","Source 2015","Diff 2015","NJORD 2016","Ref 2016","Source 2016","Diff 2016","NJORD 2017","Ref 2017","Source 2017","Diff 2017","NJORD 2018","Ref 2018","Source 2018","Diff 2018","NJORD 2019","Ref 2019","Source 2019","Diff 2019","NJORD 2020","Ref 2020","Source 2020","Diff 2020"]
-#period=["2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019","2020"]
-output_column = ["Absolut Country Average [%]","Total deviation for Data set [%]","Median [%]","Median [MW]","Standard deviation [MW]","Average deviation [MW]","T distribution [MW]"]
-#Ref_country=Combined.index
+period_col = ["NJORD 2010", "Ref 2010", "Source 2010", "Diff 2010", "NJORD 2011", "Ref 2011", "Source 2011",
+              "Diff 2011", "NJORD 2012", "Ref 2012", "Source 2012", "Diff 2012", "NJORD 2013", "Ref 2013",
+              "Source 2013", "Diff 2013", "NJORD 2014", "Ref 2014", "Source 2014", "Diff 2014", "NJORD 2015",
+              "Ref 2015", "Source 2015", "Diff 2015", "NJORD 2016", "Ref 2016", "Source 2016", "Diff 2016",
+              "NJORD 2017", "Ref 2017", "Source 2017", "Diff 2017", "NJORD 2018", "Ref 2018", "Source 2018",
+              "Diff 2018", "NJORD 2019", "Ref 2019", "Source 2019", "Diff 2019", "NJORD 2020", "Ref 2020", "Source 2020",
+              "Diff 2020"]
+# period=["2008","2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019","2020"]
+output_column = ["Absolut Country Average [%]", "Total deviation for Data set [%]", "Median [%]", "Median [MW]",
+                 "Standard deviation [MW]", "Average deviation [MW]", "T distribution [MW]"]
+# Ref_country=Combined.index
 Combined_region_results = pd.DataFrame()
-
 
 
 for year in period_col:
@@ -717,11 +724,11 @@ for year in period_col:
         ref_tot_other = 0
         for country in eval(region):
             # print(country)
-            #country=country.replace(" ","_")
+            # country=country.replace(" ","_")
             if country == "British_Indian_Ocean_Territory" or country == "Eswatini":
                 continue
-            only_year=year.split(" ")
-            only_year=only_year[1]
+            only_year = year.split(" ")
+            only_year = only_year[1]
             PVPS = only_year + " - PVPS"
             other = only_year + " - Other"
             Irena = only_year + " - IRENA"
@@ -783,8 +790,8 @@ for year in period_col:
                 ref_value = reference_data_year[PVPS][country]
                 source = "PVPS"
                 # print("PVPS not zero")
-            if NJORD_value <0:
-                NJORD_value=0
+            if NJORD_value < 0:
+                NJORD_value = 0
                 NJORD_value_sum = NJORD_value_sum + NJORD_value
             else:
                 NJORD_value_sum = NJORD_value_sum + NJORD_value
@@ -795,14 +802,13 @@ for year in period_col:
             ref_tot_pvps = ref_tot_pvps+reference_data_year[PVPS][country]
             ref_tot_other = ref_tot_other+reference_data_year[other][country]
         # print(NJORD_value_sum,"SOMMA!!!!!!!",region)
-        region=region.replace("_"," ")
+        region = region.replace("_", " ")
 
         Combined_region_results.at[region, "NJORD " + only_year] = NJORD_value_sum
         Combined_region_results.at[region, "Ref " + only_year] = ref_value_sum
         Combined_region_results.at[region, "IRENA " + only_year] = ref_tot_irena
         Combined_region_results.at[region, "PVPS " + only_year] = ref_tot_pvps
         Combined_region_results.at[region, "Other " + only_year] = ref_tot_other
-
 
 Combined_region_results.to_excel("NJORD-Weight_model_results_regions.xlsx")
 

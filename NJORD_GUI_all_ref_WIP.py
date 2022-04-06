@@ -1534,7 +1534,7 @@ def two_states_comparison(name_1,name_2,year,model):
                 x_axis = []
                 x_axis_ref = []
                 source_list = []
-                valore_y_1=0
+                valore_y_1 = 0
                 valore_y_1 = float(accumulated_installed_2009[name_1.replace("_", " ")])
                 print(valore_y_1)
                 (eval(name_1 + "_var_njord")).append(valore_y_1)

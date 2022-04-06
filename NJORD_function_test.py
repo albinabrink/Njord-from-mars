@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 
-unit = "weight"
+# unit = "weight"
 path_input = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\Raw_data\\Final_database\\Weight\\"  # this is the path_out_final in the script From_html_to_db
 path_output = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\"# this will be the folder from where the GUI will read the data
 
@@ -46,6 +46,7 @@ def name_clean_up(nation_list):  # Clean up the names of nations from the raw da
     nation_list = [name.replace("_", " ") for name in nation_list]
     # print(nation_list)
     return nation_list
+
 
 def name_cleanup(name, year):
     name = name.replace("_", " ")
@@ -95,7 +96,7 @@ def name_cleanup(name, year):
     return name
 
 
-def create_output(reference, year_quarter, year, name, installed_capacity, output_W_each_year):
+def create_output_weight(reference, year_quarter, year, name, installed_capacity, output_W_each_year):
     PVPS = year + " - PVPS"
     other = year + " - Other"
     Irena = year + " - IRENA"
@@ -135,22 +136,21 @@ def create_output(reference, year_quarter, year, name, installed_capacity, outpu
 
 
 def manufacturing(nation, year):  # Extract the manufacturing for a nation in a specific year
-    manufacturing_df = pd.read_excel("Manufacturing.xlsx", index_col=0, na_values=['NA'])
+    manufacturing_df = pd.read_excel("Manufacturing.xlsx", index_col=0, na_values=['NA'])  # Use as input so not in loop
     manufacturing_df = manufacturing_df.fillna(0)
-    print(manufacturing_df)
-    year = year.split("-")
-    year = year[0]
+    # print(manufacturing_df)
+    # year = year.split("-")
+    # year = year[0]
     if nation in manufacturing_df.index.values:
         manufacturing_value = manufacturing_df[year][nation]
-        return manufacturing_value
     else:
         manufacturing_value = 0
-        return manufacturing_value
+    return manufacturing_value
 # print(manufacturing(test, period))
 
 
 def calc_PV_factor(year, unit, nations_within, percentage):
-    pv_share_unit = pd.read_excel("Share_in_PV_" + unit + ".xlsx", index_col=0)
+    pv_share_unit = pd.read_excel("Share_in_PV_"+unit+".xlsx", index_col=0)  # Move out of loop?
     pv_share_unit_list = pv_share_unit.index.values
     cont = 0
     pv_factor = 0
@@ -164,7 +164,7 @@ def calc_PV_factor(year, unit, nations_within, percentage):
             single_value = pv_share_unit[year]["RoW"]*percentage[cont]
         pv_factor += single_value
         cont = cont+1
-    return pv_factor, pv_share_unit, cont
+    return pv_factor, pv_share_unit
 
 
 def direct_or_mirror(data, unit, import_export, year, name):
@@ -219,15 +219,15 @@ def direct_or_mirror(data, unit, import_export, year, name):
     return source_data, data_period, time_window, nations_within
 
 
-def weight(input, output):
+def weight(input, output, period):
     unit = "Weight"
     path_input = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\Raw_data\\Final_database\\Weight\\"  # this is the path_out_final in the script From_html_to_db
-    path_output = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\"  # this will be the folder from where the GUI will read the data
+    # path_output = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\"  # this will be the folder from where the GUI will read the data
     # pv_share_unit = pd.read_excel("Share_in_PV_"+unit+".xlsx", index_col=0)
     # nations = name_clean_up(input)
     nations = os.listdir(path_input+"\\Export\\")
     module_weight = pd.read_excel("Module_weight.xlsx", index_col=0)
-    ref_data = pd.read_excel("Reference_accumulated_2022.xlsx",index_col=0, na_values=['NA'])
+    ref_data = pd.read_excel("Reference_accumulated_2022.xlsx", index_col=0, na_values=['NA'])
     # manufacturing_list = []
     previous_capacity_W = 0
     output_W_each_year = pd.DataFrame()
@@ -256,8 +256,8 @@ def weight(input, output):
                 source_data_total = "I_"+import_source+"-E_"+export_source
 
             percentage_imp, percentage_exp, sum_imports, sum_exports = calc_percentage_import_export(imports_period, exports_period, time_window_import, time_window_export)
-            PV_factor_imp, PV_share_unit, cont = calc_PV_factor(year, unit, nations_within_imp, percentage_imp)
-            PV_factor_exp, PV_share_unit, cont = calc_PV_factor(year, unit, nations_within_exp, percentage_exp)
+            PV_factor_imp, PV_share_unit = calc_PV_factor(year, unit, nations_within_imp, percentage_imp)
+            PV_factor_exp, PV_share_unit = calc_PV_factor(year, unit, nations_within_exp, percentage_exp)
 
             if sum(percentage_imp) < 1:
                 waste = 1-sum(percentage_imp)  # calc the wasted PV per year
@@ -272,7 +272,7 @@ def weight(input, output):
                 installed_capacity = (((net_trade / 1000) / module_weight[year]["Value"]) / 10 ** 6) + (
                             manufacturing_value / 4)
             name = name_cleanup(name, year)
-            output_W_each_year = create_output(ref_data, year_quarter, year, name, installed_capacity, output_W_each_year)
+            output_W_each_year = create_output_weight(ref_data, year_quarter, year, name, installed_capacity, output_W_each_year)
 
     return output_W_each_year
 
@@ -334,8 +334,247 @@ def calc_percentage_import_export(imports, exports, time_window_import, time_win
     return percentage_imp, percentage_exp, sum_imports, sum_exports
 
 
-test1 = weight(nations_list, path_output)
-test1.to_excel(path_output+"test123.xlsx")
+def create_weight_models_result_region():
+    Combined = pd.read_excel("NJORD-Weight_model_results_year.xlsx", index_col=0, na_values=['NA'])  # Must change
+    reference_data_year = pd.read_excel("Reference_accumulated_2022.xlsx", index_col=0, na_values=['NA'])
+    index = ["Ref_country", "Asia", "Europe", "Africa", "North_America", "Central_America", "South_America", "Eurasia",
+             "Oceania", "Middle_East"]
+    period_col = ["NJORD 2010", "Ref 2010", "Source 2010", "Diff 2010", "NJORD 2011", "Ref 2011", "Source 2011",
+                  "Diff 2011", "NJORD 2012", "Ref 2012", "Source 2012", "Diff 2012", "NJORD 2013", "Ref 2013",
+                  "Source 2013", "Diff 2013", "NJORD 2014", "Ref 2014", "Source 2014", "Diff 2014", "NJORD 2015",
+                  "Ref 2015", "Source 2015", "Diff 2015", "NJORD 2016", "Ref 2016", "Source 2016", "Diff 2016",
+                  "NJORD 2017", "Ref 2017", "Source 2017", "Diff 2017", "NJORD 2018", "Ref 2018", "Source 2018",
+                  "Diff 2018", "NJORD 2019", "Ref 2019", "Source 2019", "Diff 2019", "NJORD 2020", "Ref 2020",
+                  "Source 2020", "Diff 2020"]
+    output_col = ["Absolut Country Average [%]", "Total deviation for Data set [%]", "Median [%]", "Median [MW]",
+                     "Standard deviation [MW]", "Average deviation [MW]", "T distribution [MW]"]
+    Combined_region_results = pd.DataFrame()
+
+    for year in period_col:
+        if "Ref" in year or "Source" in year or "Diff" in year:
+            continue
+        for region in index:
+            difference_sum = 0
+            NJORD_value_sum = 0
+            ref_value_sum = 0
+            ref_tot_irena = 0
+            ref_tot_pvps = 0
+            ref_tot_other = 0
+            for country in eval(region):
+                # print(country)
+                # country=country.replace(" ","_")
+                if country == "British_Indian_Ocean_Territory" or country == "Eswatini":
+                    continue
+                only_year = year.split(" ")
+                only_year = only_year[1]
+                PVPS = only_year + " - PVPS"
+                other = only_year + " - Other"
+                Irena = only_year + " - IRENA"
+                country = country.replace("_", " ")
+                country = name_cleanup(country, year)
+                NJORD_value = Combined[year][country]
+                ref_value = 0
+                if reference_data_year[PVPS][country] == 0:
+                    ref_value = reference_data_year[other][country]
+                    source = "Other"
+                    # print("PVPS zero used",reference_data_year[other][country])
+                    if reference_data_year[other][country] == 0:
+                        ref_value = reference_data_year[Irena][country]
+                        source = "Irena"
+                        if reference_data_year[Irena][country] == 0:
+                            ref_value = 0
+                            source = "No ref data"
+                    # print("PVPS e Other zero, while Irena=",reference_data_year[Irena][country])
+                else:
+                    ref_value = reference_data_year[PVPS][country]
+                    source = "PVPS"
+                    # print("PVPS not zero")
+                if NJORD_value < 0:
+                    NJORD_value = 0
+                    NJORD_value_sum = NJORD_value_sum + NJORD_value
+                else:
+                    NJORD_value_sum = NJORD_value_sum + NJORD_value
+                # print(ref_value,source,country,year,"Referenza")
+                ref_value_sum = ref_value_sum + ref_value
+                # print(ref_value_sum,"totale",region,"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+                ref_tot_irena = ref_tot_irena + reference_data_year[Irena][country]
+                ref_tot_pvps = ref_tot_pvps + reference_data_year[PVPS][country]
+                ref_tot_other = ref_tot_other + reference_data_year[other][country]
+                # print(NJORD_value_sum,"SOMMA!!!!!!!",region)
+        region = region.replace("_", " ")
+
+        Combined_region_results.at[region, "NJORD " + only_year] = NJORD_value_sum
+        Combined_region_results.at[region, "Ref " + only_year] = ref_value_sum
+        Combined_region_results.at[region, "IRENA " + only_year] = ref_tot_irena
+        Combined_region_results.at[region, "PVPS " + only_year] = ref_tot_pvps
+        Combined_region_results.at[region, "Other " + only_year] = ref_tot_other
+    return Combined_region_results
 
 
+def price(input, period):
+    unit = "Price"
+    nations_list = os.listdir(input + "\\Export\\")
+    reference = pd.read_excel("Reference_accumulated_2022.xlsx", index_col=0, na_values=['NA'])
+    output_P_each_year = pd.DataFrame()
+    output_P_MF_each_year = pd.DataFrame()
+    Europe = ["Albania", "Andorra", "Austria", "Belarus", "Belgium", "Bosnia_and_Herzegovina", "Bulgaria", "Croatia",
+              "Cyprus", "Czech_Republic", "Denmark", "Estonia", "Finland", "France", "Georgia", "Germany", "Greece",
+              "Greenland", "Hungary", "Iceland", "Ireland", "Italy", "Latvia", "Lithuania", "Luxembourg",
+              "Macedonia__North", "Malta", "Moldova__Republic_of", "Netherlands", "Norway", "Poland", "Portugal",
+              "Romania",
+              "Russian_Federation", "Serbia", "Slovakia", "Slovenia", "Spain", "Sweden", "Switzerland", "Ukraine",
+              "United_Kingdom"]
+
+    for year_quarter in period:
+        year = year_quarter.split("-")
+        year = year[0]
+        for name in nations_list:
+            name = name.split(".")
+            name = name[0]
+            if name == "American_Samoa" or name == "British_Indian_Ocean_Territory" or name == "Eswatini":
+                continue
+            if int(year) > 2016 and "before" in name:
+                # print("\n\nit is Sudan before so I stop\n\n", name)
+                continue
+            if int(year) <= 2016 and name == "Sudan":
+                # print("\n\n it is Sudan but before 2016 so I stop\n\n",name)
+                continue
+            manufacturing_value = manufacturing(name, year)
+            change1 = pd.read_excel("PVxchange.xlsx", index_col=0)
+            # change_list = change.index.values
+            import_source, imports_period, time_window_import, nations_within_imp = direct_or_mirror(path_input, unit, "Import", year_quarter, name)
+            export_source, exports_period, time_window_export, nations_within_exp = direct_or_mirror(path_input, unit, "Export", year_quarter, name)
+            percentage_imp, percentage_exp, sum_imports, sum_exports = calc_percentage_import_export(imports_period,
+                                                                                                     exports_period,
+                                                                                                     time_window_import,
+                                                                                                     time_window_export)
+            PV_factor_imp, PV_share_unit = calc_PV_factor(year, unit, nations_within_imp, percentage_imp)
+            PV_factor_exp, PV_share_unit = calc_PV_factor(year, unit, nations_within_exp, percentage_exp)
+
+            if sum(percentage_imp) < 1:
+                waste = 1-sum(percentage_imp)  # calc the wasted PV per year
+                lack_PV = waste*PV_share_unit[year]["RoW"]  # The lacking PV that comes from the waste
+                PV_factor_imp += lack_PV  # Update PV_factor_imp
+
+            net_trade = (sum_imports*PV_factor_imp)-(sum_exports*PV_factor_exp)*1000
+            PV_market_price = calc_PV_market_price(nations_within_imp, change1, percentage_imp, year_quarter, Europe)
+            market_factor = prel_market_size(net_trade, change1, year_quarter)
+
+            if PV_market_price == 0:
+                installed_capacity = 0
+                installed_capacity_MF = 0
+            else:
+                installed_capacity = ((net_trade/PV_market_price)/10**6)+(manufacturing_value/4)
+                installed_capacity_MF = (net_trade/(PV_market_price*market_factor)/10 **6)+manufacturing_value
+
+            name = name_cleanup(name, year)
+
+            output_P_each_year, output_P_MF_each_year = create_output_price(reference, year_quarter, year, name, installed_capacity, installed_capacity_MF, output_P_each_year, output_P_MF_each_year)
+
+    return output_P_each_year, output_P_MF_each_year
+
+
+def calc_PV_market_price(nations_within, change, percentage, year_quarter, Europe):
+    cont = 0
+    PV_market_price = 0
+    # single_value = 0
+    change_list = change.index.values
+    for item in nations_within:
+        if item == "DataType":
+            continue
+        if item in change_list:
+            single_value = change[year_quarter][item] * percentage[cont]  # value for each single nation
+            # print(item, change[year_quarter][item], percentage[cont], year_quarter)
+        else:
+            if item in Europe:
+                single_value = change[year_quarter]["EU"] * percentage[cont]  # value for each single nation
+                # print(item, change[year_quarter]["EU"], percentage[cont], year_quarter, "ENTRATO IN EUROPA!!!!!!!!!!!!!!")
+            else:
+                single_value = change[year_quarter]["RoW"] * percentage[cont]
+                # print(item, " entrato ma andato in ROW !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11")
+
+            # print(item, change[year_quarter]["RoW"], percentage[cont], year_quarter)
+
+        PV_market_price = PV_market_price + single_value
+        # print(PV_market_price,year,single_value,"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1")
+        cont = cont + 1
+
+    return PV_market_price
+
+
+
+
+def prel_market_size(net_trade, change, year):
+    # Preliminary Market size:
+    prel_MS = (net_trade/change[year]["RoW"])/10**6
+    all_market_factors = pd.read_excel("Market_size_factor.xlsx", index_col=0)
+
+    # print(prel_MS,"prel")
+    if prel_MS <= 1:
+        market_factor = all_market_factors["0-1MW"]["Factor"]
+    if 1 < prel_MS <= 5:
+        market_factor = all_market_factors["1-5MW"]["Factor"]
+    if 5 < prel_MS <= 10:
+        market_factor = all_market_factors["5-10MW"]["Factor"]
+    if 10 < prel_MS <= 100:
+        market_factor = all_market_factors["10-100MW"]["Factor"]
+    if prel_MS > 100:
+        market_factor = all_market_factors[">100 MW"]["Factor"]
+    return market_factor
+
+def create_output_price(reference, year_quarter, year, name, installed_capacity, installed_capacity_MF, output_P_each_year, output_P_MF_each_year):
+    PVPS = year + " - PVPS"
+    other = year + " - Other"
+    Irena = year + " - IRENA"
+    if reference[PVPS][name] == 0:
+        ref_value = reference[other][name]
+        source = "Other"
+        if reference[other][name] == 0:
+            ref_value = reference[Irena][name]
+            source = "Irena"
+            if reference[Irena][name] == 0:
+                ref_value = 0
+                source = "No Ref"
+    else:
+        ref_value = reference[PVPS][name]
+        source = "PVPS"
+
+    if "Q4" in year_quarter:
+        year_output = str(int(year) + 1) + "-Q1"
+    if "Q1" in year_quarter:
+        year_output = str(year) + "-Q2"
+    if "Q2" in year_quarter:
+        year_output = str(year) + "-Q3"
+    if "Q3" in year_quarter:
+        year_output = str(year) + "-Q4"
+
+    output_P_each_year.at[name, "NJORD " + year_output] = installed_capacity
+    output_P_each_year.at[name, "Ref " + year] = ref_value
+    output_P_each_year.at[name, "Source " + year] = source
+    output_P_MF_each_year.at[name, "NJORD " + year_output] = installed_capacity_MF
+    output_P_MF_each_year.at[name, "Ref " + year] = ref_value
+    output_P_MF_each_year.at[name, "Source " + year] = source
+    output_P_each_year.at[name, "IRENA " + year] = reference[Irena][name]
+    output_P_each_year.at[name, "IRENA s " + year] = reference[str(year) + " - IRENA s"][
+        name]
+    output_P_each_year.at[name, "PVPS " + year] = reference[PVPS][name]
+    output_P_each_year.at[name, "Other " + year] = reference[other][name]
+    output_P_MF_each_year.at[name, "IRENA " + year] = reference[Irena][name]
+    output_P_MF_each_year.at[name, "IRENA s " + year] = reference[str(year) + " - IRENA s"][
+        name]
+    output_P_MF_each_year.at[name, "PVPS " + year] = reference[PVPS][name]
+    output_P_MF_each_year.at[name, "Other " + year] = reference[other][name]
+    return output_P_each_year, output_P_MF_each_year
+
+
+# test1 = weight(nations_list, path_output)
+# test1.to_excel(path_output+"test123.xlsx")
+path_input = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\Raw_data\\Final_database\\Price\\"  # this is the path_out_final in the script From_html_to_db
+path_output = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\"# this will be the folder from where the GUI will read the data
+os.makedirs(path_output, exist_ok=True)
+# nations_list = os.listdir(path_input + "\\Export\\")
+test1, test2 = price(path_input, period)
+#test1.to_excel(path_output+"test2.xlsx")
+# test_price1, test_price2 = price(nations_list, period)
+test2.to_excel(path_output+"vadihelafriden.xlsx")
 
