@@ -14,6 +14,7 @@ period = ["2009-Q4", "2010-Q1", "2010-Q2", "2010-Q3", "2010-Q4", "2011-Q1", "201
              "2016-Q3", "2016-Q4", "2017-Q1", "2017-Q2", "2017-Q3", "2017-Q4", "2018-Q1", "2018-Q2", "2018-Q3",
              "2018-Q4", "2019-Q1", "2019-Q2", "2019-Q3", "2019-Q4", "2020-Q1", "2020-Q2", "2020-Q3", "2020-Q4"]
 
+
 def name_clean_up(nation_list):  # Clean up the names of nations from the raw database and return a list of countries
     # print(nation_list)
     nation_list = [sub.replace("Bolivia__Plurinational_State_of", "Bolivia") for sub in nation_list]
@@ -187,6 +188,7 @@ def direct_or_mirror(data, unit, import_export, year, name):
     time_window = [word1+add1+str(year)]
     if import_export == "Export":
         time_window = [word2+add1+str(year)]
+    print(data)
     data_period = data[time_window]
     nations_within = data_period.index.values
     for letter in data_period.loc["DataType"]:
@@ -219,13 +221,13 @@ def direct_or_mirror(data, unit, import_export, year, name):
     return source_data, data_period, time_window, nations_within
 
 
-def weight(input, output, period):
+def weight(input, period):
     unit = "Weight"
-    path_input = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\Raw_data\\Final_database\\Weight\\"  # this is the path_out_final in the script From_html_to_db
+    # path_input = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\Raw_data\\Final_database\\Weight\\"  # this is the path_out_final in the script From_html_to_db
     # path_output = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\"  # this will be the folder from where the GUI will read the data
     # pv_share_unit = pd.read_excel("Share_in_PV_"+unit+".xlsx", index_col=0)
     # nations = name_clean_up(input)
-    nations = os.listdir(path_input+"\\Export\\")
+    nations = os.listdir(input+"\\Export\\")
     module_weight = pd.read_excel("Module_weight.xlsx", index_col=0)
     ref_data = pd.read_excel("Reference_accumulated_2022.xlsx", index_col=0, na_values=['NA'])
     # manufacturing_list = []
@@ -247,8 +249,8 @@ def weight(input, output, period):
                 continue
             manufacturing_value = manufacturing(name, year)
 
-            import_source, imports_period, time_window_import, nations_within_imp = direct_or_mirror(path_input, unit, "Import", year_quarter, name)
-            export_source, exports_period, time_window_export, nations_within_exp = direct_or_mirror(path_input, unit, "Export", year_quarter, name)
+            import_source, imports_period, time_window_import, nations_within_imp = direct_or_mirror(input, unit, "Import", year_quarter, name)
+            export_source, exports_period, time_window_export, nations_within_exp = direct_or_mirror(input, unit, "Export", year_quarter, name)
 
             if import_source == export_source:
                 source_data_total = export_source
@@ -442,8 +444,8 @@ def price(input, period):
             manufacturing_value = manufacturing(name, year)
             change1 = pd.read_excel("PVxchange.xlsx", index_col=0)
             # change_list = change.index.values
-            import_source, imports_period, time_window_import, nations_within_imp = direct_or_mirror(path_input, unit, "Import", year_quarter, name)
-            export_source, exports_period, time_window_export, nations_within_exp = direct_or_mirror(path_input, unit, "Export", year_quarter, name)
+            import_source, imports_period, time_window_import, nations_within_imp = direct_or_mirror(input, unit, "Import", year_quarter, name)
+            export_source, exports_period, time_window_export, nations_within_exp = direct_or_mirror(input, unit, "Export", year_quarter, name)
             percentage_imp, percentage_exp, sum_imports, sum_exports = calc_percentage_import_export(imports_period,
                                                                                                      exports_period,
                                                                                                      time_window_import,
@@ -569,12 +571,12 @@ def create_output_price(reference, year_quarter, year, name, installed_capacity,
 
 # test1 = weight(nations_list, path_output)
 # test1.to_excel(path_output+"test123.xlsx")
-path_input = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\Raw_data\\Final_database\\Price\\"  # this is the path_out_final in the script From_html_to_db
-path_output = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\"# this will be the folder from where the GUI will read the data
-os.makedirs(path_output, exist_ok=True)
+# path_input = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\Raw_data\\Final_database\\Price\\"  # this is the path_out_final in the script From_html_to_db
+# path_output = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\"# this will be the folder from where the GUI will read the data
+# os.makedirs(path_output, exist_ok=True)
 # nations_list = os.listdir(path_input + "\\Export\\")
-test1, test2 = price(path_input, period)
-#test1.to_excel(path_output+"test2.xlsx")
+# test1, test2 = price(path_input, period)
+# test1.to_excel(path_output+"test2.xlsx")
 # test_price1, test_price2 = price(nations_list, period)
-test2.to_excel(path_output+"vadihelafriden.xlsx")
+# test2.to_excel(path_output+"vadihelafriden.xlsx")
 
