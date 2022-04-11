@@ -2712,31 +2712,32 @@ def refresh_2():
         pain.place(x=-100,y=-100)
 ###################################################
 
+
 ### buttons configuration and setting in the GUI
 #models=["Combined","Price","Price_MF","Price_max","Price_MF_max","Weight","Weight_max"]
-nation_list=pd.read_excel("Weight_model_results.xlsx",index_col=0)
-z=nation_list.index
-nations=li=[x.split('.')[0] for x in z]
-my_label=Label(root, text="Nation",font=("Helvetica",14),fg="green")
-my_label.grid(row = 0, column = 1,  pady = 2)
-my_entry=Entry(root,font=("Helvetica",20))
-my_entry.grid(row = 1, column = 1,  pady = 2)
-my_list=Listbox(root,width=50,height=5)
-my_list.grid(row = 2, column = 1,  pady = 2)
+nation_list = pd.read_excel("Weight_model_results.xlsx", index_col=0)
+z = nation_list.index
+nations = li = [x.split('.')[0] for x in z]
+my_label = Label(root, text="Nation", font=("Helvetica", 14), fg="green")
+my_label.grid(row=0, column=1,  pady=2)
+my_entry = Entry(root, font=("Helvetica", 20))
+my_entry.grid(row=1, column=1,  pady=2)
+my_list = Listbox(root, width=50, height=5)
+my_list.grid(row=2, column=1,  pady=2)
 update(nations)
 ##Create a binding on the list box ###
-my_list.bind("<<ListboxSelect>>",fillout)
+my_list.bind("<<ListboxSelect>>", fillout)
 ##Create a binding on the entry box ###
-my_entry.bind("<KeyRelease>",check)
+my_entry.bind("<KeyRelease>", check)
 valore_comma = IntVar()
-show_ref = Checkbutton(root, variable=valore_comma, text="Show best Ref.",font=("Helvetica",8),fg="gray")
-show_ref.grid(row = 13, column = 1)
-my_entry.bind("<KeyRelease>",check)
+show_ref = Checkbutton(root, variable=valore_comma, text="Show best Ref.", font=("Helvetica", 8), fg="gray")
+show_ref.grid(row=13, column=1)
+my_entry.bind("<KeyRelease>", check)
 valore_comma_irena = IntVar()
-show_ref_2 = Checkbutton(root, variable=valore_comma_irena, text="Show Irena Ref.",font=("Helvetica",8),fg="gray")
-show_ref_2.place(x=60,y=531)
+show_ref_2 = Checkbutton(root, variable=valore_comma_irena, text="Show Irena Ref.", font=("Helvetica", 8), fg="gray")
+show_ref_2.place(x=60, y=531)
 valore_comma_pvps = IntVar()
-show_ref_3 = Checkbutton(root, variable=valore_comma_pvps, text="Show PVPS Ref.",font=("Helvetica",8),fg="gray")
+show_ref_3 = Checkbutton(root, variable=valore_comma_pvps, text="Show PVPS Ref.", font=("Helvetica", 8), fg="gray")
 show_ref_3.place(x=60,y=555)
 valore_comma_other = IntVar()
 show_ref_4 = Checkbutton(root, variable=valore_comma_other, text="Show Other Ref.",font=("Helvetica",8),fg="gray")

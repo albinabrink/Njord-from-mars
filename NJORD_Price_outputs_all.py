@@ -73,12 +73,12 @@ for year in desiderio:
         change = pd.read_excel("PVxchange.xlsx", index_col=0)
         change_list = change.index.values
         #reading the import and export full raw data
-        imports = pd.read_excel(path_input+"Import"+"\\"+name+".xlsx",index_col=0, na_values=['NA'])
-        exports = pd.read_excel(path_input+"Export"+"\\"+name+".xlsx",index_col=0, na_values=['NA'])
+        imports = pd.read_excel(path_input+"Import"+"\\"+name+".xlsx", index_col=0, na_values=['NA'])
+        exports = pd.read_excel(path_input+"Export"+"\\"+name+".xlsx", index_col=0, na_values=['NA'])
         imports = imports.fillna(0) #filling empty spaces with 0
-        imports = imports.replace(to_replace="No Quantity",value=0) #replacing no quantity with 0
+        imports = imports.replace(to_replace="No Quantity", value=0) #replacing no quantity with 0
         exports = exports.fillna(0)#filling empty spaces with 0
-        exports = exports.replace(to_replace="No Quantity",value=0)
+        exports = exports.replace(to_replace="No Quantity", value=0)
         # Selecting the time period (Q4 previous year and 1-2-3 of current year)
         time_window_import = [word1+add2+str(year)]
         time_window_export = [word2+add2+str(year)]

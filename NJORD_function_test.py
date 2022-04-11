@@ -2,20 +2,23 @@ import os
 import pandas as pd
 
 # unit = "weight"
-path_input = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\Raw_data\\Final_database\\Weight\\"  # this is the path_out_final in the script From_html_to_db
-path_output = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\"# this will be the folder from where the GUI will read the data
+# path_input = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\Raw_data\\Final_database\\Weight\\"  # this is the path_out_final in the script From_html_to_db
+# path_output = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\"# this will be the folder from where the GUI will read the data
 
-os.makedirs(path_output, exist_ok=True)
-nations_list = os.listdir(path_input + "\\Export\\")
+# os.makedirs(path_output, exist_ok=True)
+# nations_list = os.listdir(path_input + "\\Export\\")
 
-period = ["2009-Q4", "2010-Q1", "2010-Q2", "2010-Q3", "2010-Q4", "2011-Q1", "2011-Q2", "2011-Q3", "2011-Q4",
-             "2012-Q1", "2012-Q2", "2012-Q3", "2012-Q4", "2013-Q1", "2013-Q2", "2013-Q3", "2013-Q4", "2014-Q1",
-             "2014-Q2", "2014-Q3", "2014-Q4", "2015-Q1", "2015-Q2", "2015-Q3", "2015-Q4", "2016-Q1", "2016-Q2",
-             "2016-Q3", "2016-Q4", "2017-Q1", "2017-Q2", "2017-Q3", "2017-Q4", "2018-Q1", "2018-Q2", "2018-Q3",
-             "2018-Q4", "2019-Q1", "2019-Q2", "2019-Q3", "2019-Q4", "2020-Q1", "2020-Q2", "2020-Q3", "2020-Q4"]
+# period = ["2009-Q4", "2010-Q1", "2010-Q2", "2010-Q3", "2010-Q4", "2011-Q1", "2011-Q2", "2011-Q3", "2011-Q4",
+#             "2012-Q1", "2012-Q2", "2012-Q3", "2012-Q4", "2013-Q1", "2013-Q2", "2013-Q3", "2013-Q4", "2014-Q1",
+#             "2014-Q2", "2014-Q3", "2014-Q4", "2015-Q1", "2015-Q2", "2015-Q3", "2015-Q4", "2016-Q1", "2016-Q2",
+#             "2016-Q3", "2016-Q4", "2017-Q1", "2017-Q2", "2017-Q3", "2017-Q4", "2018-Q1", "2018-Q2", "2018-Q3",
+#             "2018-Q4", "2019-Q1", "2019-Q2", "2019-Q3", "2019-Q4", "2020-Q1", "2020-Q2", "2020-Q3", "2020-Q4"]
+
+# Generic functions for both weight and price calculations, name_cleanup,
 
 
-def name_clean_up(nation_list):  # Clean up the names of nations from the raw database and return a list of countries
+def name_clean_up(nation_list):  # NOT USED!!!
+    # Clean up the names of nations from the raw database and return a list of countries
     # print(nation_list)
     nation_list = [sub.replace("Bolivia__Plurinational_State_of", "Bolivia") for sub in nation_list]
     nation_list = [sub.replace("Congo__Democratic_Republic_of", "Democratic Republic of the Congo") for sub in nation_list]
@@ -95,45 +98,6 @@ def name_cleanup(name, year):
         # print("\n\nit is Sudan before so I change name for the reference\n\n", name)
         name = "Sudan"
     return name
-
-
-def create_output_weight(reference, year_quarter, year, name, installed_capacity, output_W_each_year):
-    PVPS = year + " - PVPS"
-    other = year + " - Other"
-    Irena = year + " - IRENA"
-    if reference[PVPS][name] == 0:
-        ref_value = reference[other][name]
-        source = "Other"
-        if reference[other][name] == 0:
-            ref_value = reference[Irena][name]
-            source = "Irena"
-            if reference[Irena][name] == 0:
-                ref_value = 0
-                source = "No Ref"
-    else:
-        ref_value = reference[PVPS][name]
-        source = "PVPS"
-
-    if "Q4" in year_quarter:
-        year_output = str(int(year) + 1) + "-Q1"
-    if "Q1" in year_quarter:
-        year_output = str(year) + "-Q2"
-    if "Q2" in year_quarter:
-        year_output = str(year) + "-Q3"
-    if "Q3" in year_quarter:
-        year_output = str(year) + "-Q4"
-    output_W_each_year.at[name, "NJORD " + year_output] = installed_capacity
-    output_W_each_year.at[name, "Ref " + year] = ref_value
-    output_W_each_year.at[name, "Source " + year] = source
-    output_W_each_year.at[name, "IRENA " + year] = reference[Irena][name]
-    output_W_each_year.at[name, "IRENA s " + year] = reference[str(year) + " - IRENA s"][name]
-    output_W_each_year.at[name, "PVPS " + year] = reference[PVPS][name]
-    output_W_each_year.at[name, "Other " + year] = reference[other][name]
-    return output_W_each_year
-# print(name_clean_up(nations_list))
-# test = name_clean_up(nations_list)
-# test = "Algeria"
-# period = "2018-Q1"
 
 
 def manufacturing(nation, year):  # Extract the manufacturing for a nation in a specific year
@@ -227,6 +191,54 @@ def direct_or_mirror(data, unit, import_export, year, name):
     return source_data, data_period, time_window, nations_within
 
 
+def calc_percentage_import_export(imports, exports, time_window_import, time_window_export): # Should be built more generic, does the same thing twice.
+    nations_within_imports = imports.index.values
+    nations_within_exports = exports.index.values
+    if "World" in nations_within_exports:
+        sum_exports = exports.drop(
+            ["DataType", "World"]).to_numpy().sum()  # Sum of all export in the time period
+    else:
+        sum_exports = exports.drop("DataType").to_numpy().sum()  # Sum of all export in the time period
+    if "World" in nations_within_imports:
+        sum_imports = imports.drop(
+            ["DataType", "World"]).to_numpy().sum()  ## Sum of all import in the time period
+    else:
+        sum_imports = imports.drop("DataType").to_numpy().sum()  ## Sum of all import in the time period
+
+    percentage_imp = []
+    for item in nations_within_imports:
+        if item == "DataType":
+            continue
+        if sum_imports == 0:
+            percentage_imp.append(0)
+            continue
+        if item == "World":
+            percentage_imp.append(0)
+            continue
+        else:
+            # print(item, time_window_import, imports_period.loc[item, time_window_import])
+            value = (sum(imports.loc[item, time_window_import])/sum_imports)  # percentage for each country
+            percentage_imp.append(value)
+
+    percentage_exp = []
+    for item in nations_within_exports:
+        if item == "DataType":
+            continue
+        if sum_exports == 0:
+            percentage_exp.append(0)
+            continue
+        if item == "World":
+            percentage_exp.append(0)
+            continue
+        else:
+            # print(item,time_window_export,sum_exports,exports_period.loc[item,time_window_export])
+            value = sum(exports.loc[item, time_window_export])/sum_exports  # percentage for each country
+            percentage_exp.append(value)
+
+    return percentage_imp, percentage_exp, sum_imports, sum_exports
+
+
+# Functions only used in weight calculations
 def weight(input, period):
     unit = "Weight"
     nations = os.listdir(input+"\\Export\\")
@@ -280,6 +292,42 @@ def weight(input, period):
     return output_W_each_year
 
 
+def create_output_weight(reference, year_quarter, year, name, installed_capacity, output_W_each_year):
+    # Creates the output for calculations of weight.
+    PVPS = year + " - PVPS"
+    other = year + " - Other"
+    Irena = year + " - IRENA"
+    if reference[PVPS][name] == 0:
+        ref_value = reference[other][name]
+        source = "Other"
+        if reference[other][name] == 0:
+            ref_value = reference[Irena][name]
+            source = "Irena"
+            if reference[Irena][name] == 0:
+                ref_value = 0
+                source = "No Ref"
+    else:
+        ref_value = reference[PVPS][name]
+        source = "PVPS"
+
+    if "Q4" in year_quarter:
+        year_output = str(int(year) + 1) + "-Q1"
+    if "Q1" in year_quarter:
+        year_output = str(year) + "-Q2"
+    if "Q2" in year_quarter:
+        year_output = str(year) + "-Q3"
+    if "Q3" in year_quarter:
+        year_output = str(year) + "-Q4"
+    output_W_each_year.at[name, "NJORD " + year_output] = installed_capacity
+    output_W_each_year.at[name, "Ref " + year] = ref_value
+    output_W_each_year.at[name, "Source " + year] = source
+    output_W_each_year.at[name, "IRENA " + year] = reference[Irena][name]
+    output_W_each_year.at[name, "IRENA s " + year] = reference[str(year) + " - IRENA s"][name]
+    output_W_each_year.at[name, "PVPS " + year] = reference[PVPS][name]
+    output_W_each_year.at[name, "Other " + year] = reference[other][name]
+    return output_W_each_year
+
+
 def weight_capacity_output(module_weight, year, manufacturing_value, net_trade, previous_capacity_W):
     if module_weight[year]["Value"] == 0:
         installed_capacity = 0
@@ -287,53 +335,6 @@ def weight_capacity_output(module_weight, year, manufacturing_value, net_trade, 
         installed_capacity = (((net_trade/1000)/module_weight[year]["Value"])/10**6)+(manufacturing_value/4)
     previous_capacity_W = previous_capacity_W+installed_capacity
     return previous_capacity_W, installed_capacity
-
-
-def calc_percentage_import_export(imports, exports, time_window_import, time_window_export): # Should be built more generic, does the same thing twice.
-    nations_within_imports = imports.index.values
-    nations_within_exports = exports.index.values
-    if "World" in nations_within_exports:
-        sum_exports = exports.drop(
-            ["DataType", "World"]).to_numpy().sum()  # Sum of all export in the time period
-    else:
-        sum_exports = exports.drop("DataType").to_numpy().sum()  # Sum of all export in the time period
-    if "World" in nations_within_imports:
-        sum_imports = imports.drop(
-            ["DataType", "World"]).to_numpy().sum()  ## Sum of all import in the time period
-    else:
-        sum_imports = imports.drop("DataType").to_numpy().sum()  ## Sum of all import in the time period
-
-    percentage_imp = []
-    for item in nations_within_imports:
-        if item == "DataType":
-            continue
-        if sum_imports == 0:
-            percentage_imp.append(0)
-            continue
-        if item == "World":
-            percentage_imp.append(0)
-            continue
-        else:
-            # print(item, time_window_import, imports_period.loc[item, time_window_import])
-            value = (sum(imports.loc[item, time_window_import])/sum_imports)  # percentage for each country
-            percentage_imp.append(value)
-
-    percentage_exp = []
-    for item in nations_within_exports:
-        if item == "DataType":
-            continue
-        if sum_exports == 0:
-            percentage_exp.append(0)
-            continue
-        if item == "World":
-            percentage_exp.append(0)
-            continue
-        else:
-            # print(item,time_window_export,sum_exports,exports_period.loc[item,time_window_export])
-            value = sum(exports.loc[item, time_window_export])/sum_exports  # percentage for each country
-            percentage_exp.append(value)
-
-    return percentage_imp, percentage_exp, sum_imports, sum_exports
 
 
 def create_weight_models_result_region():
@@ -413,6 +414,7 @@ def create_weight_models_result_region():
     return Combined_region_results
 
 
+# Functions only used in Price calculations
 def price(input, period):
     unit = "Price"
     nations_list = os.listdir(input + "\\Export\\")
@@ -504,8 +506,6 @@ def calc_PV_market_price(nations_within, change, percentage, year_quarter, Europ
     return PV_market_price
 
 
-
-
 def prel_market_size(net_trade, change, year):
     # Preliminary Market size:
     prel_MS = (net_trade/change[year]["RoW"])/10**6
@@ -567,6 +567,33 @@ def create_output_price(reference, year_quarter, year, name, installed_capacity,
     output_P_MF_each_year.at[name, "PVPS " + year] = reference[PVPS][name]
     output_P_MF_each_year.at[name, "Other " + year] = reference[other][name]
     return output_P_each_year, output_P_MF_each_year
+
+# Functions for combined model
+
+def decide_ref(ref, name, year):
+    if ref[PVPS][name] == 0: #Check if there is data from PVPS, if there is use it as ref value else other, then IRENA, then No Ref.
+        ref_value = ref[other][name]
+        source = "Other"
+        if ref[other][name] == 0:
+            ref_value = ref[Irena][name]
+            source = "Irena"
+            if ref[Irena][name] == 0:
+                ref_value = 0
+                source = "No Ref"
+    else:
+        ref_value = ref[PVPS][name]
+        source = "PVPS"
+    combined_MF.at[name, "Ref " + str(2009)] = ref_value
+    combined_MF.at[name, "Source " + str(2009)] = source
+    combined_MF.at[name, "IRENA " + str(2009)] = reference_data_year[Irena][name]
+    combined_MF.at[name, "IRENA s " + str(2009)] = reference_data_year[str(2009) + " - IRENA s"][name]
+    combined_MF.at[name, "PVPS " + str(2009)] = reference_data_year[PVPS][name]
+    combined_MF.at[name, "Other " + str(2009)] = reference_data_year[other][name]
+
+
+
+
+
 
 
 # test1 = weight(nations_list, path_output)
