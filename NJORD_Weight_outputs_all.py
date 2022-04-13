@@ -42,7 +42,7 @@ for year in period:
         if int(year_test) <= 2016 and name == "Sudan":
             #print("\n\n it is Sudan but before 2016 so I stop\n\n",name)
             continue
-        print(name, year, year_test)
+        # print(name, year, year_test)
         ###
         ###correction needed for the format inside the table in the excel files ###
         if unit == "Price":
@@ -210,14 +210,14 @@ for year in period:
         cont = 0
         PV_factor_imp = 0
         for item in nations_within_imports:
-            print(len(nations_within_imports))
+            # print(len(nations_within_imports))
             if item == "DataType":
                 continue
             if item in pv_share_unit_list:
                 single_value = pv_share_unit[year_test][item]*percentage_imp[cont] #value for each single nation
             else:
                 single_value = pv_share_unit[year_test]["RoW"]*percentage_imp[cont]
-                print(cont)
+                # print(cont)
             PV_factor_imp = PV_factor_imp+single_value
             cont = cont+1
 
@@ -341,7 +341,7 @@ period = ["2009-Q4", "2010-Q1", "2010-Q2", "2010-Q3", "2010-Q4", "2011-Q1", "201
 
 #period=["2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019","2020"] #2008","2009","2010","2011","2012","2013","2014","2015","2016",
 index = []
-reference_data_year = pd.read_excel("Reference_accumulated_2022.xlsx",index_col=0, na_values=['NA'])
+reference_data_year = pd.read_excel("Reference_accumulated_2022.xlsx", index_col=0, na_values=['NA'])
 previous_capacity_P = 0
 previous_capacity_P_MF = 0
 previous_capacity_W = 0
@@ -352,9 +352,9 @@ for year in period:
         name = name.split(".")
         name = name[0]
         # no reference for these
-        year_test=year.split("-")
-        year_test=year_test[0]
-        if name=="American_Samoa" or name=="British_Indian_Ocean_Territory" or name =="Eswatini":
+        year_test = year.split("-")
+        year_test = year_test[0]
+        if name == "American_Samoa" or name == "British_Indian_Ocean_Territory" or name == "Eswatini":
             continue
         #solving the problem of the two reports in sudan and sudan before 2012
         if int(year_test) > 2016 and "before" in name:
@@ -363,7 +363,7 @@ for year in period:
         if int(year_test) <=2016 and name=="Sudan":
             #print("\n\n it is Sudan but before 2016 so I stop\n\n",name)
             continue
-        print(name, year, year_test)
+        # print(name, year, year_test)
         ###
         ###correction needed for the format inside the table in the excel files ###
         if unit == "Price":
@@ -650,13 +650,13 @@ for year in period:
 output_W_each_year.to_excel(path_output+"Weight_model_results.xlsx")
 
 
-quartly = pd.read_excel("NJORD-Weight_model_results.xlsx",index_col=0,)
+quartly = pd.read_excel("NJORD-Weight_model_results.xlsx", index_col=0,)
 yearly = pd.DataFrame()
 period = ["2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020"] #2008","2009","2010","2011","2012","2013","2014","2015","2016",
 # print(quartly.columns)
 for nation in quartly.index:
     for year in period:
-        q1=quartly.loc[nation, "NJORD "+year+"-Q1"]
+        q1 = quartly.loc[nation, "NJORD " + year + "-Q1"]
         q2 = quartly.loc[nation, "NJORD " + year + "-Q2"]
         q3 = quartly.loc[nation, "NJORD " + year + "-Q3"]
         q4 = quartly.loc[nation, "NJORD " + year + "-Q4"]
@@ -670,14 +670,15 @@ for nation in quartly.index:
             q4 = 0
         somma = q1+q2+q3+q4
         yearly.at[nation, "NJORD "+year] = somma
-
+    print(yearly.at["Australia", "NJORD 2015"])
 for column in quartly.columns:
     if "NJORD" in str(column):
         continue
     else:
         to_add = quartly[column]
+        print(to_add)
         yearly = yearly.join(to_add)
-
+        print(yearly)
 yearly.to_excel("NJORD-Weight_model_results_year.xlsx")
 
 

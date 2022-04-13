@@ -48,7 +48,7 @@ root = Tk()
 root.title("NJORD installed Capacity")
 root.geometry("1200x750")
 year = 2020
-regions = ["Africa","Asia","Central America","Eurasia","Europe","Middle East","North America","Oceania","Ref. country","South America","World"]
+regions = ["Africa","Asia","Central America","Eurasia","Europe","Middle East","North America","Oceania","Ref. country price", "Ref. country weight", "South America","World"]
 list_colors = [(15,100,90,10), (0,90,85,0), (0,80,95,0), (0,50,100,0), (0,35,85,0), (5,0,90,0), (20,0,100,0), (50,0,100,0), (75,0,100,0), (85,10,100,10), (90,30,95,30)]
 check_box_list = []
 check_box_list2 = []
@@ -99,46 +99,75 @@ desiderio_lab = ["Prev", "2010-Q1", "2010-Q2", "2010-Q3", "2010-Q4", "2011-Q1", 
 # also this line has to be changed when increasing years...just change 2022 with the desired final year
 #ax0.set_xticks((np.arange(2009, 2022, 1.0)))
 
-labels_NJORD=["2009 NJ [MW]","2010 NJ [MW]","2011 NJ [MW]","2012 NJ [MW]","2013 NJ [MW]","2014 NJ [MW]","2015 NJ [MW]","2016 NJ [MW]","2017 NJ [MW]","2018 NJ [MW]","2019 NJ [MW]","2020 NJ [MW]",]
-labels_reference=["2009 Ref. [MW]","2010 Ref. [MW]","2011 Ref. [MW]","2012 Ref. [MW]","2013 Ref. [MW]","2014 Ref. [MW]","2015 Ref. [MW]","2016 Ref. [MW]","2017 Ref. [MW]","2018 Ref. [MW]","2019 Ref. [MW]","2020 Ref. [MW]"]
-year_2009_2020=["2009","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019","2020",]
-year_2010_2020=["2010","2010","2011","2012","2013","2014","2015","2016","2017","2018","2019","2020",]
+labels_NJORD = ["2009 NJ [MW]", "2010 NJ [MW]", "2011 NJ [MW]", "2012 NJ [MW]", "2013 NJ [MW]", "2014 NJ [MW]",
+              "2015 NJ [MW]", "2016 NJ [MW]", "2017 NJ [MW]", "2018 NJ [MW]", "2019 NJ [MW]", "2020 NJ [MW]", ]
+labels_reference = ["2009 Ref. [MW]", "2010 Ref. [MW]", "2011 Ref. [MW]", "2012 Ref. [MW]", "2013 Ref. [MW]",
+                    "2014 Ref. [MW]", "2015 Ref. [MW]", "2016 Ref. [MW]", "2017 Ref. [MW]", "2018 Ref. [MW]",
+                    "2019 Ref. [MW]", "2020 Ref. [MW]"]
+year_2009_2020 = ["2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", ]
+year_2010_2020 = ["2010", "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", ]
 
 ################################################################################################
 
 
-list_color_bc=["#C30017","#FF1926","#FF330D","#FF8000","#FFA626","#F2FF19","#CCFF00","#80FF00","#40FF00","#22CF00","#127D09"]
-Ref_country=["Belgium","Chile","Denmark","Finland","France","Israel","Italy","Spain","Sweden","Switzerland"]
-Asia=["Afghanistan","Bangladesh","Bhutan","Brunei Darussalam","Cambodia","China","Hong Kong","India","Indonesia","Japan","Kazakhstan","Kyrgyzstan","Laos","Malaysia","Maldives","Mongolia","Myanmar","Nepal","North Korea","South Korea","Pakistan","Philippines","Singapore","Sri_Lanka","Taiwan","Tajikistan","Thailand","Turkmenistan","Uzbekistan","Vietnam",]
-Europe=["Albania","Andorra","Austria","Belarus","Belgium","Bosnia and Herzegovina","Bulgaria","Croatia","Cyprus","Czech Republic","Denmark","Estonia","Finland","France","Georgia","Germany","Greece","Greenland","Hungary","Iceland","Ireland","Italy","Latvia","Lithuania","Luxembourg","Macedonia","Malta","Moldova","Netherlands","Norway","Poland","Portugal","Romania","Russia","Serbia","Slovakia","Slovenia","Spain","Sweden","Switzerland","Ukraine","United Kingdom"]
-Africa=["Algeria","Angola","Benin","Botswana","Burkina Faso","Burundi","Cameroon","Cabo Verde","Central African Republic","Comoros","Congo","Democratic Republic of the Congo","Djibouti","Egypt","Equatorial Guinea","Eritrea","Ethiopia","Gabon","Gambia","Ghana","Guinea","Guinea_Bissau","Côte dIvoire","Kenya","Lesotho","Liberia","Libya","Mayotte","Madagascar","Malawi","Mali","Mauritania","Mauritius","Morocco","Mozambique","Namibia","Niger","Nigeria","Rwanda","Saint Helena","Sao Tome and Principe","Senegal","Seychelles","Sierra Leone","Somalia","South Africa","South Sudan","Sudan","Tanzania","Togo","Tunisia","Uganda","Western_Sahara","Zambia","Zimbabwe"]
-North_America=["Bermuda","Canada","United States of America","Mexico"]
-Central_America=["Anguilla","Barbados","Belize","Costa Rica","Cuba","Curaçao","Dominica","Dominican Republic","El Salvador","Grenada","Guatemala","Honduras","Nicaragua","Panama","Saint Lucia","Saint Vincent and the Grenadines","Trinidad and Tobago","Antigua and Barbuda","Bahamas","Haiti","Jamaica"]
-South_America=["Argentina","Bolivia","Brazil","Colombia","Chile","Ecuador","Guyana","Paraguay","Peru","Suriname","Uruguay","Venezuela"]
-Eurasia=["Armenia","Azerbaijan","Turkey"]
-Oceania=["Australia","Fiji","Guam","Micronesia","Norfolk Island","New_Caledonia","New Zealand","Papua New Guinea","Solomon Islands","Kiribati"]
-Middle_East=["Bahrain","Iran","Iraq","Israel","Jordan","Kuwait","Lebanon","Oman","Palau","Palestine","Qatar","Saudi Arabia","Syria","United Arab Emirates","Yemen","Kuwait","Lebanon","Jordan","Oman"]
-World=["Africa","Asia","Central America","Europe","North America","South America","Eurasia","Oceania","Middle East"]
+list_color_bc = ["#C30017", "#FF1926", "#FF330D", "#FF8000", "#FFA626", "#F2FF19", "#CCFF00", "#80FF00", "#40FF00",
+                 "#22CF00", "#127D09"]
+Ref_country_price = ["Australia", "Belgium", "Chile", "Denmark", "Finland", "France", "Israel", "Italy", "Japan",
+                     "Spain", "Sweden", "Switzerland", "United States of America"]
+Ref_country_weight = ["Belgium", "Chile", "Denmark", "Finland", "France", "Israel", "Italy", "Spain", "Sweden",
+                      "Switzerland"]
+Asia = ["Afghanistan", "Bangladesh", "Bhutan", "Brunei Darussalam", "Cambodia", "China", "Hong Kong", "India",
+        "Indonesia", "Japan", "Kazakhstan", "Kyrgyzstan", "Laos", "Malaysia", "Maldives", "Mongolia", "Myanmar",
+        "Nepal", "North Korea", "South Korea", "Pakistan", "Philippines", "Singapore", "Sri_Lanka", "Taiwan",
+        "Tajikistan", "Thailand", "Turkmenistan", "Uzbekistan", "Vietnam", ]
+Europe = ["Albania", "Andorra", "Austria", "Belarus", "Belgium", "Bosnia and Herzegovina", "Bulgaria", "Croatia",
+          "Cyprus", "Czech Republic", "Denmark", "Estonia", "Finland", "France", "Georgia", "Germany", "Greece",
+          "Greenland", "Hungary", "Iceland", "Ireland", "Italy", "Latvia", "Lithuania", "Luxembourg", "Macedonia",
+          "Malta", "Moldova", "Netherlands", "Norway", "Poland", "Portugal", "Romania", "Russia", "Serbia", "Slovakia",
+          "Slovenia", "Spain", "Sweden", "Switzerland", "Ukraine", "United Kingdom"]
+Africa = ["Algeria", "Angola", "Benin", "Botswana", "Burkina Faso", "Burundi", "Cameroon", "Cabo Verde",
+          "Central African Republic", "Comoros", "Congo", "Democratic Republic of the Congo", "Djibouti", "Egypt",
+          "Equatorial Guinea", "Eritrea", "Ethiopia", "Gabon", "Gambia", "Ghana", "Guinea", "Guinea_Bissau",
+          "Côte dIvoire", "Kenya", "Lesotho", "Liberia", "Libya", "Mayotte", "Madagascar", "Malawi", "Mali",
+          "Mauritania", "Mauritius", "Morocco", "Mozambique", "Namibia", "Niger", "Nigeria", "Rwanda", "Saint Helena",
+          "Sao Tome and Principe", "Senegal", "Seychelles", "Sierra Leone", "Somalia", "South Africa", "South Sudan",
+          "Sudan", "Tanzania", "Togo", "Tunisia", "Uganda", "Western_Sahara", "Zambia", "Zimbabwe"]
+North_America = ["Bermuda", "Canada", "United States of America", "Mexico"]
+Central_America = ["Anguilla", "Barbados", "Belize", "Costa Rica", "Cuba", "Curaçao", "Dominica", "Dominican Republic",
+                   "El Salvador", "Grenada", "Guatemala", "Honduras", "Nicaragua", "Panama", "Saint Lucia",
+                   "Saint Vincent and the Grenadines", "Trinidad and Tobago", "Antigua and Barbuda", "Bahamas", "Haiti",
+                   "Jamaica"]
+South_America = ["Argentina", "Bolivia", "Brazil", "Colombia", "Chile", "Ecuador", "Guyana", "Paraguay", "Peru",
+                 "Suriname", "Uruguay", "Venezuela"]
+Eurasia = ["Armenia", "Azerbaijan", "Turkey"]
+Oceania = ["Australia", "Fiji", "Guam", "Micronesia", "Norfolk Island", "New_Caledonia", "New Zealand",
+           "Papua New Guinea", "Solomon Islands", "Kiribati"]
+Middle_East = ["Bahrain", "Iran", "Iraq", "Israel", "Jordan", "Kuwait", "Lebanon", "Oman", "Palau", "Palestine",
+               "Qatar", "Saudi Arabia", "Syria", "United Arab Emirates", "Yemen", "Kuwait", "Lebanon", "Jordan", "Oman"]
+World = ["Africa", "Asia", "Central America", "Europe", "North America", "South America", "Eurasia", "Oceania",
+         "Middle East"]
 
-dict_ref_country={}
-dict_asia={}
-dict_africa={}
-dict_central_america={}
-dict_north_america={}
-dict_south_america={}
-dict_europe={}
-dict_oceania={}
-dict_eurasia={}
-dict_middle_east={}
+dict_ref_country_price = {}
+dict_ref_country_weight = {}
+dict_asia = {}
+dict_africa = {}
+dict_central_america = {}
+dict_north_america = {}
+dict_south_america = {}
+dict_europe = {}
+dict_oceania = {}
+dict_eurasia = {}
+dict_middle_east = {}
 output_table = pd.DataFrame()
 ref_table = pd.DataFrame()
 
 # In the visualization function are presented comments to explain the code. The other functions are similar.
 # The only difference is in the plotting step, where in the two_model_comparison will be printed the results
-# of the two different model for a single nation/region an in the two_states_comparison will be shown the result using the same model
+# of the two different model for a single nation/region and in the two_states_comparison will be shown the result using the same model
 # for two different nations/regions
 
-def visualization(name,year,model):    #this is the part that plots the single nation or group using only 1 model
+
+def visualization(name, year, model):  # this is the part that plots the single nation or group using only 1 model
     output_table = pd.DataFrame()
     ref_table = pd.DataFrame()
     ref_table_irena = pd.DataFrame()
@@ -147,8 +176,8 @@ def visualization(name,year,model):    #this is the part that plots the single n
     ref_table_im = pd.DataFrame()
     ref_table_irena_sour = pd.DataFrame()
     cont_col = 0
-    if my_entry_0.get() != "":  #check the input to decide if a single nation or more nation at the same time have to be presented
-        if my_entry_0.get() == "World": # if World is selected
+    if my_entry_0.get() != "":  # check the input to decide if a single nation or more nation at the same time have to be presented
+        if my_entry_0.get() == "World":  # if World is selected
             posizione_testo = 0
             nation_order = []
             stacking = []
@@ -160,14 +189,14 @@ def visualization(name,year,model):    #this is the part that plots the single n
             aggiornamento_ref_pvps = [0, 0, 0, 0, 0, 0, 0,0,0,0,0,0]#needed to stack the single nations references one on top of each other
 
             fig, ax = plt.subplots(figsize=(18, 32))
-            G = gridspec.GridSpec(2, 1) #divide the figure in a 2x2 matrix
-            ax0 = plt.subplot(G[0, :]) # first row both columns
-            ax1 = plt.subplot(G[1, :])# second row both column (in the other visualization options this is changed
+            G = gridspec.GridSpec(2, 1)  # divide the figure in a 2x2 matrix
+            ax0 = plt.subplot(G[0, :])  # first row both columns
+            ax1 = plt.subplot(G[1, :])  # second row both column (in the other visualization options this is changed
             row_table = []
             for name in World:
-                    NJORD = pd.read_excel(model + "_model_results_regions.xlsx", index_col=0) #read the NJORD value according to the model
-                    accumulated_reference_data = pd.read_excel("Reference_accumulated_2022.xlsx", index_col=0) #read the reference
-                    accumulated_installed_2009 = accumulated_reference_data["2009 - Total"] #read the reference for 2009 that will be the starting point for the accumulated installed capacity
+                    NJORD = pd.read_excel(model + "_model_results_regions.xlsx", index_col=0)  # read the NJORD value according to the model
+                    accumulated_reference_data = pd.read_excel("Reference_accumulated_2022.xlsx", index_col=0)  # read the reference
+                    accumulated_installed_2009 = accumulated_reference_data["2009 - Total"]  # read the reference for 2009 that will be the starting point for the accumulated installed capacity
                     x_axis = []
                     x_axis_ref = []
                     source_list = []
@@ -181,7 +210,7 @@ def visualization(name,year,model):    #this is the part that plots the single n
                     exec("%s_var_ref_im = []" % (name))  # create the variable used to store the data for each nation
                     exec("%s_var_ = []" % (name))  # create the variable used to store the data for each nation
                     exec("%s_var_njord = []" % (name)) #create the variable used to store the data for each nation
-                    valore_y = round(float(accumulated_installed_2009[name.replace("_", " ")]),2)
+                    valore_y = round(float(accumulated_installed_2009[name.replace("_", " ")]), 2)
                     print(valore_y)
                     (eval(name + "_var_njord")).append(valore_y)
                     x_axis.append(2009)
@@ -200,15 +229,15 @@ def visualization(name,year,model):    #this is the part that plots the single n
                     #(eval(name + "_var_ref_im")).append(accumulated_reference_data["2009 - IM"][name.replace("_", " ")])
                     x_axis_ref.append(2009)
 
-                    for anno in range(2010, int(year) + 1): #NJORD values, reference and reference source are extrapolated from 2010 till 2020 for each nation
+                    for anno in range(2010, int(year) + 1):  # NJORD values, reference and reference source are extrapolated from 2010 till 2020 for each nation
                         valore_NJORD = NJORD["NJORD " + str(anno)][name.replace("_", " ")]
                         valore_reference = accumulated_reference_data[str(anno) + " - Total"][name.replace("_", " ")]
 
                         print(valore_reference, "valore", source_list)
-                        if valore_NJORD < 0: #if NJORD value is 0 it is not added to the sum
+                        if valore_NJORD < 0:  # if NJORD value is 0 it is not added to the sum
                             valore_y = float(valore_y)
                         else:
-                            valore_y = float(valore_y) + float(NJORD["NJORD " + str(anno)][name.replace("_", " ")]) #increment of the NJORD variable
+                            valore_y = float(valore_y) + float(NJORD["NJORD " + str(anno)][name.replace("_", " ")])  # increment of the NJORD variable
                         (eval(name + "_var_njord")).append(valore_y)
                         (eval(name + "_var_ref")).append(valore_reference)
                         (eval(name + "_var_ref_irena")).append(accumulated_reference_data[str(anno) + " - IRENA"][name.replace("_", " ")])
@@ -220,15 +249,15 @@ def visualization(name,year,model):    #this is the part that plots the single n
                         #output_table.at[name, str(anno) + " Ref."] = round(valore_reference, 2)
                         x_axis.append(int(anno))
                         x_axis_ref.append((int(anno)))
-                    shifts = [0.12, 0.12, 0.12, 0.12, 0.12, 0.12, 0.12, 0.12, 0.12, 0.12, 0.12, 0.12] #needed to plot the reference data close to NJORD data
+                    shifts = [0.12, 0.12, 0.12, 0.12, 0.12, 0.12, 0.12, 0.12, 0.12, 0.12, 0.12, 0.12]  # needed to plot the reference data close to NJORD data
                     print(x_axis)
-                    x_ax1 = np.add(x_axis, shifts) #needed to plot the reference data close to NJORD data
-                    x_ax2 = np.subtract(x_axis, shifts) #needed to plot the reference data close to NJORD data
-                    referenza = valore_comma.get() #option in the GUI to plot or not reference data
+                    x_ax1 = np.add(x_axis, shifts)  # needed to plot the reference data close to NJORD data
+                    x_ax2 = np.subtract(x_axis, shifts)  # needed to plot the reference data close to NJORD data
+                    referenza = valore_comma.get()  # option in the GUI to plot or not reference data
                     referenza_irena = valore_comma_irena.get()  # option in the GUI to plot or not reference data
                     referenza_other = valore_comma_other.get()  # option in the GUI to plot or not reference data
                     referenza_pvps = valore_comma_pvps.get()  # option in the GUI to plot or not reference data
-                    if referenza ==1:
+                    if referenza == 1:
                         ax0.bar(x_ax1, eval(name + "_var_njord"), width=0.2, label=name.replace("_", " "),bottom=aggiornamento, color=list_color_bc[cont_col], edgecolor='black', linewidth=1.2)
                         ax0.bar(x_ax2, eval(name + "_var_ref"), width=0.2,bottom=aggiornamento_ref, color=list_color_bc[cont_col], edgecolor='black', linewidth=1.2,alpha=0.3)
                         print("REFERENZA massima")
@@ -257,25 +286,25 @@ def visualization(name,year,model):    #this is the part that plots the single n
                         print("REFERENZA NESSUNA")
 
 
-                    #creation of the bar plot stacking each new nation/region on top of each other
+                    # creation of the bar plot stacking each new nation/region on top of each other
                     print(aggiornamento, "aggiornamento 0")
                     posizione_testo = posizione_testo + 1
-                    ripartenza = eval(name + "_var_njord") #new NJORD value of single nation
-                    aggiornamento = [x + y for x, y in zip(aggiornamento, ripartenza)] #old value plus the new value to continue the stacking of values
-                    ripartenza_ref = eval(name + "_var_ref") #new ref value
-                    aggiornamento_ref = [x + y for x, y in zip(aggiornamento_ref, ripartenza_ref)] #stacking reference
-                    ripartenza_ref_irena = eval(name + "_var_ref_irena") #new ref value
-                    aggiornamento_ref_irena = [x + y for x, y in zip(aggiornamento_ref_irena, ripartenza_ref_irena)] #stacking reference
-                    ripartenza_ref_other = eval(name + "_var_ref_other") #new ref value
-                    aggiornamento_ref_other = [x + y for x, y in zip(aggiornamento_ref_other, ripartenza_ref_other)] #stacking reference
-                    ripartenza_ref_pvps = eval(name + "_var_ref_pvps") #new ref value
-                    aggiornamento_ref_pvps = [x + y for x, y in zip(aggiornamento_ref_pvps, ripartenza_ref_pvps)] #stacking reference
+                    ripartenza = eval(name + "_var_njord")  # new NJORD value of single nation
+                    aggiornamento = [x + y for x, y in zip(aggiornamento, ripartenza)]  # old value plus the new value to continue the stacking of values
+                    ripartenza_ref = eval(name + "_var_ref")  # new ref value
+                    aggiornamento_ref = [x + y for x, y in zip(aggiornamento_ref, ripartenza_ref)]  # stacking reference
+                    ripartenza_ref_irena = eval(name + "_var_ref_irena")  # new ref value
+                    aggiornamento_ref_irena = [x + y for x, y in zip(aggiornamento_ref_irena, ripartenza_ref_irena)]  # stacking reference
+                    ripartenza_ref_other = eval(name + "_var_ref_other")  # new ref value
+                    aggiornamento_ref_other = [x + y for x, y in zip(aggiornamento_ref_other, ripartenza_ref_other)]  # stacking reference
+                    ripartenza_ref_pvps = eval(name + "_var_ref_pvps")  # new ref value
+                    aggiornamento_ref_pvps = [x + y for x, y in zip(aggiornamento_ref_pvps, ripartenza_ref_pvps)]  # stacking reference
                     print(ripartenza, "rip")
                     print(aggiornamento, "aggiornamento 2")
                     print(posizione_testo, "posizione testo")
                     cont_col = cont_col + 1
-            if referenza == 1 or referenza_irena==1 or referenza_other==1 or referenza_pvps==1:
-                ax0.bar(2020, 0, width=0.2, label="References", color="blue",alpha=0.1)
+            if referenza == 1 or referenza_irena == 1 or referenza_other == 1 or referenza_pvps == 1:
+                ax0.bar(2020, 0, width=0.2, label="References", color="blue", alpha=0.1)
 
             # plotting the total value in the figure
             ax0.text(x_ax1[0], aggiornamento[0], round(aggiornamento[0], 2), verticalalignment='bottom',horizontalalignment='left')
@@ -309,7 +338,7 @@ def visualization(name,year,model):    #this is the part that plots the single n
             ax0.legend(loc='center left', bbox_to_anchor=(1, 0.5))
             ax0.set_xticks((np.arange(2009, 2021, 1.0)))
             plt.tight_layout()
-            a = ScrollableWindow(fig) #if Wor #
+            a = ScrollableWindow(fig)  # if Wor #
         else:
             ### similar with the World plot, commented only the differences
             posizione_testo = 0
@@ -346,8 +375,10 @@ def visualization(name,year,model):    #this is the part that plots the single n
                 dictionary = dict_north_america
             if my_list_0.get(ANCHOR) == "Oceania":
                 dictionary = dict_oceania
-            if my_list_0.get(ANCHOR) == "Ref. country":
-                dictionary = dict_ref_country
+            if my_list_0.get(ANCHOR) == "Ref. country price":
+                dictionary = dict_ref_country_price
+            if my_list_0.get(ANCHOR) == "Ref. country weight":
+                dictionary = dict_ref_country_weight
             if my_list_0.get(ANCHOR) == "South America":
                 dictionary = dict_south_america
             fig, ax = plt.subplots(figsize=(20, 40))
@@ -659,7 +690,7 @@ def visualization(name,year,model):    #this is the part that plots the single n
         ref_pvps.append(accumulated_reference_data["2009 - PVPS"][name.replace("_", " ")])
         ref_other.append(accumulated_reference_data["2009 - Other"][name.replace("_", " ")])
         # (eval(name + "_var_ref_im")).append(accumulated_reference_data["2009 - IM"][name.replace("_", " ")])
-        source_0=(NJORD["Source 2009"][name])
+        source_0 = (NJORD["Source 2009"][name])
         if source_0 == "Irena":
             lettera = "Irena"
         if source_0 == "No Ref":
@@ -792,11 +823,12 @@ def visualization(name,year,model):    #this is the part that plots the single n
         #plt.show()
         root.mainloop()
 
-def two_model_comparison(name,year,model_1,model_2):
+
+def two_model_comparison(name, year, model_1, model_2):
     output_table_model1 = pd.DataFrame()
     output_table_model2 = pd.DataFrame()
-    output_table_ref=pd.DataFrame()
-    cont_col=0
+    output_table_ref = pd.DataFrame()
+    cont_col = 0
     ref_table = pd.DataFrame()
     ref_table_irena = pd.DataFrame()
     ref_table_other = pd.DataFrame()
@@ -980,8 +1012,10 @@ def two_model_comparison(name,year,model_1,model_2):
                 dictionary = dict_north_america
             if my_list_0.get(ANCHOR) == "Oceania":
                 dictionary = dict_oceania
-            if my_list_0.get(ANCHOR) == "Ref. country":
-                dictionary = dict_ref_country
+            if my_list_0.get(ANCHOR) == "Ref. country price":
+                dictionary = dict_ref_country_price
+            if my_list_0.get(ANCHOR) == "Ref. country weight":
+                dictionary = dict_ref_country_weight
             if my_list_0.get(ANCHOR) == "South America":
                 dictionary = dict_south_america
             fig, ax = plt.subplots(figsize=(20, 40))
@@ -1498,8 +1532,10 @@ def two_states_comparison(name_1,name_2,year,model):
             dictionary = dict_north_america
         if my_list_0.get(ANCHOR) == "Oceania":
             dictionary = dict_oceania
-        if my_list_0.get(ANCHOR) == "Ref. country":
-            dictionary = dict_ref_country
+        if my_list_0.get(ANCHOR) == "Ref. country price":
+            dictionary = dict_ref_country_price
+        if my_list_0.get(ANCHOR) == "Ref. country weight":
+            dictionary = dict_ref_country_weight
         if my_list_0.get(ANCHOR) == "South America":
             dictionary = dict_south_america
         fig, ax = plt.subplots(figsize=(20, 40))
@@ -1578,12 +1614,14 @@ def two_states_comparison(name_1,name_2,year,model):
             dictionary = dict_north_america
         if my_list_7.get(ANCHOR) == "Oceania":
             dictionary = dict_oceania
-        if my_list_7.get(ANCHOR) == "Ref. country":
-            dictionary = dict_ref_country
+        if my_list_7.get(ANCHOR) == "Ref. country price":
+            dictionary = dict_ref_country_price
+        if my_list_7.get(ANCHOR) == "Ref. country weight":
+            dictionary = dict_ref_country_weight
         if my_list_7.get(ANCHOR) == "South America":
             dictionary = dict_south_america
-        cont_col =0
-        value=0
+        cont_col = 0
+        value = 0
         for name_2, value in zip(dictionary, dictionary.values()):
             # print(name,value.get())
             # print(dict_asia[name])
@@ -1744,22 +1782,22 @@ def two_states_comparison(name_1,name_2,year,model):
         if cont_col >= 10:
             ax0.text(x_ax1[0], aggiornamento_1[0] + aggiornamento_new_1[0],
                      round(aggiornamento_1[0] + aggiornamento_new_1[0], 2), verticalalignment='bottom',
-                     horizontalalignment='left',color=color_21,alpha=alpha_21)
+                     horizontalalignment='left', color=color_21, alpha=alpha_21)
             ax0.text(x_ax1[1], aggiornamento_1[1] + aggiornamento_new_1[1],
                      round(aggiornamento_1[1] + aggiornamento_new_1[1], 2), verticalalignment='bottom',
-                     horizontalalignment='left',color=color_21,alpha=alpha_21)
+                     horizontalalignment='left', color=color_21, alpha=alpha_21)
             ax0.text(x_ax1[2], aggiornamento_1[2] + aggiornamento_new_1[2],
                      round(aggiornamento_1[2] + aggiornamento_new_1[2], 2), verticalalignment='bottom',
-                     horizontalalignment='left',color=color_21,alpha=alpha_21)
+                     horizontalalignment='left', color=color_21, alpha=alpha_21)
             ax0.text(x_ax1[3], aggiornamento_1[3] + aggiornamento_new_1[3],
                      round(aggiornamento_1[3] + aggiornamento_new_1[3], 2), verticalalignment='bottom',
-                     horizontalalignment='left',color=color_21,alpha=alpha_21)
+                     horizontalalignment='left', color=color_21, alpha=alpha_21)
             ax0.text(x_ax1[4], aggiornamento_1[4] + aggiornamento_new_1[4],
                      round(aggiornamento_1[4] + aggiornamento_new_1[4], 2), verticalalignment='bottom',
-                     horizontalalignment='left',color=color_21,alpha=alpha_21)
+                     horizontalalignment='left', color=color_21, alpha=alpha_21)
             ax0.text(x_ax1[5], aggiornamento_1[5] + aggiornamento_new_1[5],
                      round(aggiornamento_1[5] + aggiornamento_new_1[5], 2), verticalalignment='bottom',
-                     horizontalalignment='left',color=color_21,alpha=alpha_21)
+                     horizontalalignment='left', color=color_21, alpha=alpha_21)
 
             ax0.text(x_ax1[6], aggiornamento_1[6] + aggiornamento_new_1[6],round(aggiornamento_1[6] + aggiornamento_new_1[6], 2), verticalalignment='bottom',horizontalalignment='left',color=color_21,alpha=alpha_21)
             ax0.text(x_ax1[7], aggiornamento_1[7] + aggiornamento_new_1[7],round(aggiornamento_1[7] + aggiornamento_new_1[7], 2), verticalalignment='bottom',horizontalalignment='left',color=color_21,alpha=alpha_21)
@@ -2118,16 +2156,16 @@ def two_states_comparison(name_1,name_2,year,model):
 
 def model_comparison():
     try:
-        name=my_entry_0.get()
-        #year = my_entry_1.get()
+        name = my_entry_0.get()
+        # year = my_entry_1.get()
         model_1 = my_entry_5.get()
         model_2 = my_entry_2.get()
         two_model_comparison(name, year, model_1, model_2)
     except KeyError:
-        print("I use single nation") # Why is this thrown every run?
+        print("I use single nation")  # Why is this thrown every run?
     else:
         name = my_entry.get()
-        #year = my_entry_1.get()
+        # year = my_entry_1.get()
         model_1 = my_entry_5.get()
         model_2 = my_entry_2.get()
         two_model_comparison(name, year, model_1, model_2)
@@ -2139,8 +2177,8 @@ def model_comparison():
 
 def nations_comparison():
     try:
-        name_1=my_entry_0.get()
-        name_2=my_entry_7.get()
+        name_1 = my_entry_0.get()
+        name_2 = my_entry_7.get()
         # year = my_entry_1.get()
         model = my_entry_2.get()
         two_states_comparison(name_1, name_2, year, model)
@@ -2148,7 +2186,7 @@ def nations_comparison():
         print("I use single nation")
     else:
         name_1 = my_entry.get()
-        name_2=my_entry_4.get()
+        name_2 = my_entry_4.get()
         # year = my_entry_1.get()
         model = my_entry_2.get()
         two_states_comparison(name_1, name_2, year, model)
@@ -2183,7 +2221,7 @@ def update15(data):
         my_list_15.insert(END, item)
 def update7(data):
     ### Clear list box ##
-    my_list_7.delete(0,END)
+    my_list_7.delete(0, END)
     ### add Nations ###
     for item in data:
         my_list_7.insert(END, item)
@@ -2219,7 +2257,7 @@ def update3(data):
         my_list_3.insert(END, item)
 def update4(data):
     ### Clear list box ##
-    my_list_4.delete(0,END)
+    my_list_4.delete(0, END)
     ### add Nations ###
     for item in data:
         my_list_4.insert(END, item)
@@ -2388,30 +2426,39 @@ def check6(event):
     ##########################################
 
 def nation_in_region(event):
-    if my_list_0.get(ANCHOR) == "Ref_country":
-        var=0
-        for item in Ref_country:
+    if my_list_0.get(ANCHOR) == "Ref_country_price":
+        var = 0
+        for item in Ref_country_price:
             exec("group" + str(item) + "= self.getGroup(selected, header + i)")
-            l=Checkbutton(root, text=str(item), variable=exec("group" + str(item) + "= self.getGroup(selected, header + i)"), onvalue=1, offvalue=0)
-            l.grid(row=var,column=5)
+            l = Checkbutton(root, text=str(item), variable=exec("group" + str(item) + "= self.getGroup(selected, header + i)"), onvalue=1, offvalue=0)
+            l.grid(row=var, column=5)
             var = var + 1
 
-box_list=[]
-totale_ref=IntVar()
+box_list = []
+totale_ref = IntVar()
 
 ### functions to create the dictionaries used in program
 def liste(event):
-    if my_list_0.get(ANCHOR) == "Ref. country":
+    if my_list_0.get(ANCHOR) == "Ref. country price":
         var = 0
-        for item in Ref_country:
-            dict_ref_country[item] = IntVar()
-        for item in dict_ref_country:
+        for item in Ref_country_price:
+            dict_ref_country_price[item] = IntVar()
+        for item in dict_ref_country_price:
             # print(item)
-            l = Checkbutton(root, text=item, variable=dict_ref_country[item])
+            l = Checkbutton(root, text=item, variable=dict_ref_country_price[item])
             l.place(x=360,y=2+var*20)
             var = var + 1
             check_box_list.append(l)
-
+    if my_list_0.get(ANCHOR) == "Ref. country weight":
+        var = 0
+        for item in Ref_country_weight:
+            dict_ref_country_weight[item] = IntVar()
+        for item in dict_ref_country_weight:
+            # print(item)
+            l = Checkbutton(root, text=item, variable=dict_ref_country_weight[item])
+            l.place(x=360,y=2+var*20)
+            var = var + 1
+            check_box_list.append(l)
     if my_list_0.get(ANCHOR) == "Asia":
         print("Asia")
         cont=0
@@ -2549,17 +2596,26 @@ def liste(event):
 
 
 def liste2(event):
-    if my_list_7.get(ANCHOR) == "Ref. country":
+    if my_list_7.get(ANCHOR) == "Ref. country price":
         var = 0
-        for item in Ref_country:
-            dict_ref_country[item] = IntVar()
-        for item in dict_ref_country:
+        for item in Ref_country_price:
+            dict_ref_country_price[item] = IntVar()
+        for item in dict_ref_country_price:
             # print(item)
-            l = Checkbutton(root, text=item, variable=dict_ref_country[item])
+            l = Checkbutton(root, text=item, variable=dict_ref_country_price[item])
             l.place(x=900,y=2+var*20)
             var = var + 1
             check_box_list2.append(l)
-
+    if my_list_7.get(ANCHOR) == "Ref. country weight":
+        var = 0
+        for item in Ref_country_weight:
+            dict_ref_country_weight[item] = IntVar()
+        for item in dict_ref_country_weight:
+            # print(item)
+            l = Checkbutton(root, text=item, variable=dict_ref_country_weight[item])
+            l.place(x=900,y=2+var*20)
+            var = var + 1
+            check_box_list2.append(l)
     if my_list_7.get(ANCHOR) == "Asia":
         print("Asia")
         cont=0
@@ -2771,7 +2827,7 @@ my_entry_2.bind("<KeyRelease>",check2)
 enter_button = Button(root, text="Single region/nation", command=single_models)
 enter_button.grid(row = 12, column = 1, pady = 2)
 ### start two models
-info=Label(root)
+info = Label(root)
 info.grid(row = 17, column = 1,  pady = 2)
 
 info=Label(root, text="\nDescription of the Models:",font=("Helvetica",12,'bold'),fg="Red")
@@ -2786,8 +2842,8 @@ my_entry_0.grid(row = 1, column = 2,  pady = 2,columnspan = 1)
 my_list_0=Listbox(root,width=50,height=5)
 my_list_0.grid(row = 2, column = 2,  pady = 2,columnspan = 1)
 update0(regions)
-my_list_0.bind("<<ListboxSelect>>",fillout0)
-my_entry_0.bind("<KeyRelease>",check0)
+my_list_0.bind("<<ListboxSelect>>", fillout0)
+my_entry_0.bind("<KeyRelease>", check0)
 my_label_4=Label(root, text="Nation 2 ",font=("Helvetica",14),fg="green")
 my_label_4.grid(row = 3, column = 1,  pady = 2)
 my_entry_4=Entry(root,font=("Helvetica",20))
@@ -2805,7 +2861,7 @@ my_entry_7=Entry(root,font=("Helvetica",20))
 my_entry_7.grid(row = 4, column = 2,  pady = 2,columnspan = 1)
 my_list_7=Listbox(root,width=50,height=5)
 my_list_7.grid(row = 5, column = 2,  pady = 2,columnspan = 1)
-regions=["Africa","Asia","Central America","Eurasia","Europe","Middle East","North America","Oceania","Ref. country","South America","World"]
+regions=["Africa","Asia","Central America","Eurasia","Europe","Middle East","North America","Oceania","Ref. country price", "Ref. country weight","South America","World"]
 update7(regions)
 my_list_7.bind("<<ListboxSelect>>",fillout7)
 my_entry_7.bind("<KeyRelease>",check7)
