@@ -24,16 +24,9 @@ reference_countries = ["Australia", "Belgium", "Chile", "Denmark", "Finland", "F
 def Pearson_coef(input, reference_countries, unit):
     # Calculates the Pearson Coefficient between NJORDs data and reference data (IRENA and PVPS)
     # Only for reference countries from thesis and PVPS now, will add check for emerging markets later
-    Njord = pd.DataFrame()
-    Irena = pd.DataFrame()
-    PVPS = pd.DataFrame()
-    for data_source in input:
-        if "NJORD" in data_source:
-            Njord[data_source] = input[data_source]
-        if "IRENA" in data_source:
-            Irena[data_source] = input[data_source]
-        if "PVPS" in data_source:
-            PVPS[data_source] = input[data_source]
+    Njord = input.loc[:, ["NJORD" in i for i in input.columns]]
+    PVPS = input.loc[:, ["PVPS" in i for i in input.columns]]
+    Irena = input.loc[:, ["IRENA" in i for i in input.columns]]
     # print(Njord)
     # print(Irena)
     # print(PVPS)
@@ -51,8 +44,8 @@ def Pearson_coef(input, reference_countries, unit):
         else:
             ref_Njord = ref_Njord.append(Njord.loc[country])
             ref_PVPS = ref_PVPS.append(PVPS.loc[country])
-    print(ref_Njord)
-    print(ref_PVPS)
+    # print(ref_Njord)
+    # print(ref_PVPS)
     for year in range(2010, 2021):
         corr_Njord_Irena.append({str(year): Njord["NJORD "+str(year)].corr(Irena["IRENA "+str(year)])})
         corr_Njord_PVPS.append({str(year): Njord["NJORD "+str(year)].corr(PVPS["PVPS "+str(year)])})  # For all countries P-cor
@@ -101,10 +94,7 @@ def plot_figure_pearson(price, weight):  # Plots the correlation value between N
 
 
 def calc_acc_cap(input, data_sources):
-    data = pd.DataFrame()
-    for data_source in input:
-        if data_sources in data_source:
-            data[data_source] = input[data_source]
+    data = input.loc[:, [data_sources in i for i in input]]
     data_acc = pd.DataFrame(index=data.index, columns=data.columns)
     for row in data.index.values:
         N_acc = 0
@@ -118,15 +108,11 @@ def calc_acc_cap(input, data_sources):
 
 
 def plot_acc_cap(input, reference_countries):
-    PVPS = pd.DataFrame()
-    Njord = pd.DataFrame()
     ref_PVPS = pd.DataFrame()
     ref_Njord = pd.DataFrame()
-    for data_source in input:
-        if "PVPS" in data_source:
-            PVPS[data_source] = input[data_source]
-        if "NJORD" in data_source:
-            Njord[data_source] = input[data_source]
+    Njord = input.loc[:, ["NJORD" in i for i in input.columns]]
+    PVPS = input.loc[:, ["PVPS" in i for i in input.columns]]
+    Irena = input.loc[:, ["IRENA" in i for i in input.columns]]
     for country in reference_countries:
         ref_Njord = ref_Njord.append(Njord.loc[country])
         ref_PVPS = ref_PVPS.append(PVPS.loc[country])
@@ -136,14 +122,14 @@ def plot_acc_cap(input, reference_countries):
     for col in ref_Njord:
         test = sum(njord_acc_price[col])
         ref_Njord_sum.append(test)
-    print(ref_Njord_sum)
+    # print(ref_Njord_sum)
     plt.plot(ref_Njord_sum, label="NJORD")
     ref_PVPS_sum = []
     test = 0
     for col in ref_PVPS:
         test = sum(ref_PVPS[col])
         ref_PVPS_sum.append(test)
-    print(ref_PVPS_sum)
+    # print(ref_PVPS_sum)
     plt.plot(ref_PVPS_sum, label="PVPS")
     plt.legend()
     plt.show()
@@ -154,16 +140,9 @@ plot_acc_cap(price_model_results, reference_countries)
 
 
 def calc_mean_abs_dev(input, reference_countries):
-    Njord = pd.DataFrame()
-    Irena = pd.DataFrame()
-    PVPS = pd.DataFrame()
-    for data_source in input:
-        if "NJORD" in data_source:
-            Njord[data_source] = input[data_source]
-        if "IRENA" in data_source:
-            Irena[data_source] = input[data_source]
-        if "PVPS" in data_source:
-            PVPS[data_source] = input[data_source]
+    Njord = input.loc[:, ["NJORD" in i for i in input.columns]]
+    PVPS = input.loc[:, ["PVPS" in i for i in input.columns]]
+    Irena = input.loc[:, ["IRENA" in i for i in input.columns]]
     ref_Njord = pd.DataFrame()
     ref_PVPS = pd.DataFrame()
     sum = 0
@@ -186,32 +165,18 @@ def calc_mean_abs_dev(input, reference_countries):
 
 
 def calc_tot_dev(input):
-    Njord = pd.DataFrame()
-    Irena = pd.DataFrame()
-    PVPS = pd.DataFrame()
-    for data_source in input:
-        if "NJORD" in data_source:
-            Njord[data_source] = input[data_source]
-        if "IRENA" in data_source:
-            Irena[data_source] = input[data_source]
-        if "PVPS" in data_source:
-            PVPS[data_source] = input[data_source]
+    Njord = input.loc[:, ["NJORD" in i for i in input.columns]]
+    PVPS = input.loc[:, ["PVPS" in i for i in input.columns]]
+    Irena = input.loc[:, ["IRENA" in i for i in input.columns]]
     # print(Njord)
     # print(Irena)
     # print(PVPS)
     return
 
 def histogram(input):
-    Njord = pd.DataFrame()
-    Irena = pd.DataFrame()
-    PVPS = pd.DataFrame()
-    for data_source in input:
-        if "NJORD" in data_source:
-            Njord[data_source] = input[data_source]
-        if "IRENA" in data_source:
-            Irena[data_source] = input[data_source]
-        if "PVPS" in data_source:
-            PVPS[data_source] = input[data_source]
+    Njord = input.loc[:, ["NJORD" in i for i in input.columns]]
+    PVPS = input.loc[:, ["PVPS" in i for i in input.columns]]
+    Irena = input.loc[:, ["IRENA" in i for i in input.columns]]
     # sns.set_style('white')
     # sns.set_context("paper", font_scale=2)
     # sns.displot(Njord, x="NJORD 2019", kind="hist", bins=100)
@@ -244,8 +209,42 @@ def standard_deviation_all_countries(data):
     # print(stdev_year)
     return stdev_countries, stdev_year
 
-standard_deviation_all_countries(price_model_results)
 
-calc_mean_abs_dev(price_model_results, reference_countries)
-# histogram(price_model_results)
+stdev_test_countries, stdev_test_year = standard_deviation_all_countries(price_model_results)
 
+# calc_mean_abs_dev(price_model_results, reference_countries)
+
+
+def mean_difference_from_ref_data(input):
+    Njord = input.loc[:, ["NJORD" in i for i in input.columns]]
+    PVPS = input.loc[:, ["PVPS" in i for i in input.columns]]
+    Irena = input.loc[:, ["IRENA" in i for i in input.columns]]
+    diff_Njord_Irena = pd.DataFrame()
+    for country in Njord.index:
+        Njord_value = 0
+        for year in Njord:
+            Njord_value += Njord.loc[country, year]
+            year = year.split(" ")[1]
+            PVPS_value = PVPS.loc[country, "PVPS "+year]  # Should only be used in comparison with reference countries
+            Irena_value = Irena.loc[country, "IRENA "+year]
+            diff_Njord_Irena.loc[country, year] = Njord_value-Irena_value
+    mean_difference_Njord_Irena = pd.DataFrame()
+    for country in diff_Njord_Irena.index:
+        mean_difference_Njord_Irena.loc[country, "Mean"] = diff_Njord_Irena.loc[country].mean()
+    return mean_difference_Njord_Irena, diff_Njord_Irena
+
+
+mean_diff, diff = mean_difference_from_ref_data(price_model_results)
+diff_1 = diff.transpose()
+diff_1.plot()
+print(diff)
+print(diff_1)
+plt.show()
+
+
+def get_specific_values(input, string):  # Not used, found faster way
+    data = pd.DataFrame()
+    for data_source in input:
+        if string in data_source:
+            data[data_source] = input[data_source]
+    return data

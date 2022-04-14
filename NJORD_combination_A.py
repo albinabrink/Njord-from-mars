@@ -2,6 +2,7 @@ import NJORD_function_test
 import pandas as pd
 import os
 
+
 path_input = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Feb\\Raw_data\\Final_database\\Price\\" # this is the path_out_final in the script From_html_to_db
 path_output = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Feb\\"# this will be the folder from where the GUI will read the data
 
@@ -23,4 +24,33 @@ outlier_Price = pd.read_excel("outlier_price_quarter.xlsx", index_col=0)
 outlier_Weight = pd.read_excel("outlier_weight_quarter.xlsx", index_col=0)
 
 def combination(input, outlier, period):
+    combined_MF = pd.DataFrame()
+    reference_data_year = pd.read_excel("Reference_accumulated_2022.xlsx", index_col=0, na_values=['NA'])
+    for name in input:
+        name = NJORD_function_test.namecleanup(name, 2009)
+        PVPS = str(2009) + " - PVPS"
+        other = str(2009) + " - Other"
+        Irena = str(2009) + " - IRENA"
+        if reference_data_year[PVPS][name] == 0:  # Check if there is data from PVPS, if there is use it as ref value else other, then IRENA, then No Ref.
+            ref_value = reference_data_year[other][name]
+            source = "Other"
+            if reference_data_year[other][name] == 0:
+                ref_value = reference_data_year[Irena][name]
+                source = "Irena"
+                if reference_data_year[Irena][name] == 0:
+                    ref_value = 0
+                    source = "No Ref"
+        else:
+            ref_value = reference_data_year[PVPS][name]
+            source = "PVPS"
+        combined_MF.at[name, "Ref " + str(2009)] = ref_value
+        combined_MF.at[name, "Source " + str(2009)] = source
+        combined_MF.at[name, "IRENA " + str(2009)] = reference_data_year[Irena][name]
+        combined_MF.at[name, "IRENA s " + str(2009)] = reference_data_year[str(2009) + " - IRENA s"][name]
+        combined_MF.at[name, "PVPS " + str(2009)] = reference_data_year[PVPS][name]
+        combined_MF.at[name, "Other " + str(2009)] = reference_data_year[other][name]
+
+    for year in period:
+        for country in input:
+
 
