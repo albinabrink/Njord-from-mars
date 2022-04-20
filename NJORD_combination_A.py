@@ -23,7 +23,7 @@ Europe = ["Albania", "Andorra", "Austria", "Belarus", "Belgium", "Bosnia and Her
 outlier_Price = pd.read_excel("outlier_price_quarter.xlsx", index_col=0)
 outlier_Weight = pd.read_excel("outlier_weight_quarter.xlsx", index_col=0)
 
-def combination(input, outlier, period):
+def combination_setup(input):
     combined_MF = pd.DataFrame()
     reference_data_year = pd.read_excel("Reference_accumulated_2022.xlsx", index_col=0, na_values=['NA'])
     for name in input:
@@ -49,8 +49,18 @@ def combination(input, outlier, period):
         combined_MF.at[name, "IRENA s " + str(2009)] = reference_data_year[str(2009) + " - IRENA s"][name]
         combined_MF.at[name, "PVPS " + str(2009)] = reference_data_year[PVPS][name]
         combined_MF.at[name, "Other " + str(2009)] = reference_data_year[other][name]
+    return combined_MF
 
+
+def combined(input, outlier, period):
+    combined_MF = combination_setup(input)
     for year in period:
-        for country in input:
+        for name in input:
+            manufacturing = NJORD_function_test.manufacturing(name, year)
+            installed_capacity_price = NJORD_function_test.price(input, period)
+
+
+
+    return
 
 

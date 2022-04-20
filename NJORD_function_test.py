@@ -107,7 +107,10 @@ def manufacturing(nation, year):  # Extract the manufacturing for a nation in a 
     # year = year.split("-")
     # year = year[0]
     if nation in manufacturing_df.index.values:
-        manufacturing_value = manufacturing_df[year][nation]
+        if year == "2009":
+            manufacturing_value = manufacturing_df[year][nation]
+        else:
+            manufacturing_value = manufacturing_df[year][nation]/4
     else:
         manufacturing_value = 0
     return manufacturing_value
@@ -282,10 +285,10 @@ def weight(input, period):
             net_trade = ((sum_imports * PV_factor_imp) - (sum_exports * PV_factor_exp)) * 1000
             previous_capacity_W, installed_capacity = weight_capacity_output(module_weight, year, manufacturing_value, net_trade, previous_capacity_W)
 
-            if module_weight[year]["Value"] == 0:
-                installed_capacity = 0
-            else:
-                installed_capacity = (((net_trade/1000)/module_weight[year]["Value"])/10**6)+(manufacturing_value/4)  # Why divide with 10^6?
+            # if module_weight[year]["Value"] == 0:
+            #     installed_capacity = 0
+            # else:
+            #    installed_capacity = (((net_trade/1000)/module_weight[year]["Value"])/10**6)+(manufacturing_value/4)  # Why divide with 10^6?
             name = name_cleanup(name, year)
             output_W_each_year = create_output_weight(ref_data, year_quarter, year, name, installed_capacity, output_W_each_year)
 
@@ -524,6 +527,7 @@ def prel_market_size(net_trade, change, year):
         market_factor = all_market_factors[">100 MW"]["Factor"]
     return market_factor
 
+
 def create_output_price(reference, year_quarter, year, name, installed_capacity, installed_capacity_MF, output_P_each_year, output_P_MF_each_year):
     PVPS = year + " - PVPS"
     other = year + " - Other"
@@ -569,6 +573,7 @@ def create_output_price(reference, year_quarter, year, name, installed_capacity,
     return output_P_each_year, output_P_MF_each_year
 
 # Functions for combined model
+
 
 def decide_ref(ref, name, year):
     if ref[PVPS][name] == 0: #Check if there is data from PVPS, if there is use it as ref value else other, then IRENA, then No Ref.

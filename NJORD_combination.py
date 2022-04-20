@@ -140,7 +140,7 @@ for year in desiderio:
             print("\n\nit is Sudan before so I stop\n\n", name)
             continue
         if int(year_test) <= 2016 and name == "Sudan":
-            print("\n\n it is Sudan but before 2016 so I stop\n\n",name)
+            print("\n\n it is Sudan but before 2016 so I stop\n\n", name)
             continue
         if unit == "Price":
             add2 = "value in "
@@ -152,9 +152,9 @@ for year in desiderio:
             word1 = ""
             word2 = ""
         ### table with the parameters according to the "unit" selected THEN THE VARIABLE is the same for both calculation ####
-        pv_share_unit = pd.read_excel("Share_in_PV_"+unit+".xlsx",index_col=0)  #valid for both
+        pv_share_unit = pd.read_excel("Share_in_PV_"+unit+".xlsx", index_col=0)  #valid for both
         ### Manufacturing for each country [MW] (same for both units) ####
-        manufacturing = pd.read_excel("Manufacturing.xlsx",index_col=0,na_values=['NA'])
+        manufacturing = pd.read_excel("Manufacturing.xlsx", index_col=0, na_values=['NA'])
         manufacturing = manufacturing.fillna(0)
         if name in manufacturing.index.values:
             if year_test == "2009":
@@ -164,11 +164,11 @@ for year in desiderio:
         else:
             manufacturing_value = 0
         ### only used if Price
-        change = pd.read_excel("PVxchange.xlsx",index_col=0)
+        change = pd.read_excel("PVxchange.xlsx", index_col=0)
         change_list = change.index.values
         ### reading the import and export full raw data
-        imports = pd.read_excel(path_input+"Import"+"\\"+name+".xlsx",index_col=0, na_values=['NA'])
-        exports = pd.read_excel(path_input+"Export"+"\\"+name+".xlsx",index_col=0, na_values=['NA'])
+        imports = pd.read_excel(path_input+"Import"+"\\"+name+".xlsx", index_col=0, na_values=['NA'])
+        exports = pd.read_excel(path_input+"Export"+"\\"+name+".xlsx", index_col=0, na_values=['NA'])
         imports = imports.fillna(0)  # filling empty spaces with 0
         imports = imports.replace(to_replace="No Quantity", value=0)  # replacing no quantity with 0
         exports = exports.fillna(0)  # filling empty spaces with 0
@@ -338,7 +338,7 @@ for year in desiderio:
                 installed_capacity_MF_price = 0
             else:
                 installed_capacity_price = ((net_trade_price/PV_market_price)/10**6)+manufacturing_value
-                installed_capacity_MF_price = (net_trade_price/(PV_market_price*market_factor)/10**6) + manufacturing_value
+                installed_capacity_MF_price = (net_trade_price/(PV_market_price*market_factor)/10**6)+manufacturing_value
 
         if int(year_test) <= 2016 and "before" in name:
            # print("\n\nit is Sudan before so I change name for the reference\n\n", name)

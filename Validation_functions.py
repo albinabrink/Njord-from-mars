@@ -21,6 +21,7 @@ weight_model_results = pd.read_excel("NJORD-Weight_model_results_year.xlsx", ind
 reference_countries = ["Australia", "Belgium", "Chile", "Denmark", "Finland", "France", "Israel", "Italy", "Japan",
                        "Spain", "Sweden", "Switzerland", "United States of America"]
 
+
 def Pearson_coef(input, reference_countries, unit):
     # Calculates the Pearson Coefficient between NJORDs data and reference data (IRENA and PVPS)
     # Only for reference countries from thesis and PVPS now, will add check for emerging markets later
@@ -67,6 +68,8 @@ corr_Njord_Irena_weight, corr_Njord_PVPS_weight, corr_Njord_PVPS_ref_weight = Pe
 def plot_figure_pearson(price, weight):  # Plots the correlation value between NJORD and ? for the two different models
     x_all_p = []
     y_all_p = []
+    print(price)
+    print(weight)
     for i in price:
         mylist = i.items()
         x, y = zip(*mylist)
@@ -107,7 +110,7 @@ def calc_acc_cap(input, data_sources):
 # Njord_acc_price = calc_acc_cap(price_model_results, "NJORD")
 
 
-def plot_acc_cap(input, reference_countries):
+def plot_acc_cap(input, reference_countries):  # Not done in the smoothest way, look into making it less complicated
     ref_PVPS = pd.DataFrame()
     ref_Njord = pd.DataFrame()
     Njord = input.loc[:, ["NJORD" in i for i in input.columns]]
@@ -118,19 +121,24 @@ def plot_acc_cap(input, reference_countries):
         ref_PVPS = ref_PVPS.append(PVPS.loc[country])
     njord_acc_price = calc_acc_cap(ref_Njord, "NJORD")
     njord_acc_price.to_excel(path_output+"test_accumulated1.xlsx")
-    ref_Njord_sum = []
-    for col in ref_Njord:
-        test = sum(njord_acc_price[col])
-        ref_Njord_sum.append(test)
-    # print(ref_Njord_sum)
-    plt.plot(ref_Njord_sum, label="NJORD")
     ref_PVPS_sum = []
+    year_columns = []
     test = 0
     for col in ref_PVPS:
         test = sum(ref_PVPS[col])
         ref_PVPS_sum.append(test)
+        year_columns.append(col.split(" ")[1])
+    ref_PVPS_sum = pd.DataFrame(ref_PVPS_sum, index=year_columns, columns=["Sum PVPS"])
     # print(ref_PVPS_sum)
     plt.plot(ref_PVPS_sum, label="PVPS")
+    ref_Njord_sum = []
+    year_columns = []
+    for col in ref_Njord:
+        test = sum(njord_acc_price[col])
+        ref_Njord_sum.append(test)
+        year_columns.append(col.split(" ")[1])
+    ref_Njord_sum = pd.DataFrame(ref_Njord_sum, index=year_columns, columns=["Sum Njord"])
+    plt.plot(ref_Njord_sum, label="NJORD")
     plt.legend()
     plt.show()
     return
@@ -190,13 +198,17 @@ def calculate_standard_deviation(data):
     standard_deviation = statistics.stdev(data)
     return standard_deviation
 
-def standard_deviation_all_countries(data):
+def standard_deviation_all_countries(data, data_sources=""):  # send in more specific data, so only Njord, or only the data you want to look at.
     stdev_year = []
     stdev_countries = []
     for country in data.index:
         stdev_country = []
         for col in data:
-            if "NJORD" in col:
+            if data_sources != "":
+                if data_sources in col:
+                    stdev_country.append(data.loc[country][col])
+                    stdev_year.append([str(col), statistics.stdev(data[col])])
+            else:
                 stdev_country.append(data.loc[country][col])
                 stdev_year.append([str(col), statistics.stdev(data[col])])
         stdev_country = statistics.stdev(stdev_country)
@@ -210,7 +222,7 @@ def standard_deviation_all_countries(data):
     return stdev_countries, stdev_year
 
 
-stdev_test_countries, stdev_test_year = standard_deviation_all_countries(price_model_results)
+stdev_test_countries, stdev_test_year = standard_deviation_all_countries(price_model_results, "NJORD")
 
 # calc_mean_abs_dev(price_model_results, reference_countries)
 
@@ -220,6 +232,7 @@ def mean_difference_from_ref_data(input):
     PVPS = input.loc[:, ["PVPS" in i for i in input.columns]]
     Irena = input.loc[:, ["IRENA" in i for i in input.columns]]
     diff_Njord_Irena = pd.DataFrame()
+    percentual_diff_Njord_Irena = pd.DataFrame()
     for country in Njord.index:
         Njord_value = 0
         for year in Njord:
@@ -228,23 +241,23 @@ def mean_difference_from_ref_data(input):
             PVPS_value = PVPS.loc[country, "PVPS "+year]  # Should only be used in comparison with reference countries
             Irena_value = Irena.loc[country, "IRENA "+year]
             diff_Njord_Irena.loc[country, year] = Njord_value-Irena_value
+            if Irena_value != 0:
+                percentual_diff_Njord_Irena.loc[country, year] = (Njord_value-Irena_value)/Irena_value
+    percentual_diff_Njord_Irena.replace([np.inf, -np.inf], np.nan, inplace=True)
     mean_difference_Njord_Irena = pd.DataFrame()
     for country in diff_Njord_Irena.index:
         mean_difference_Njord_Irena.loc[country, "Mean"] = diff_Njord_Irena.loc[country].mean()
-    return mean_difference_Njord_Irena, diff_Njord_Irena
+    return mean_difference_Njord_Irena, diff_Njord_Irena, percentual_diff_Njord_Irena
 
 
-mean_diff, diff = mean_difference_from_ref_data(price_model_results)
-diff_1 = diff.transpose()
-diff_1.plot()
-print(diff)
-print(diff_1)
-plt.show()
+mean_diff, diff, perc_diff = mean_difference_from_ref_data(price_model_results)
+std_diff_countries, std_diff_year = standard_deviation_all_countries(diff)
+print(std_diff_countries)
+print(std_diff_year)
 
-
-def get_specific_values(input, string):  # Not used, found faster way
-    data = pd.DataFrame()
-    for data_source in input:
-        if string in data_source:
-            data[data_source] = input[data_source]
-    return data
+perc_diff.to_excel(path_output+"Njord_percentual_diff_Irena.xlsx")
+diff.to_excel(path_output+"Njord_diff_Irena.xlsx")
+# diff_1 = perc_diff# .transpose()
+# print(diff_1)
+# diff_1.plot()#hist(bins=50)
+# plt.show()

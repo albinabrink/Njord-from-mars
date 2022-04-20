@@ -216,10 +216,10 @@ def visualization(name, year, model):  # this is the part that plots the single 
                     x_axis.append(2009)
                     output_table.at[name, "2009 NJ [MW]"] = valore_y
                     ref_table.at[name, "2009 Ref. [MW]"] = valore_y
-                    ref_table_irena.at[name,"2009 Irena [MW]"]=accumulated_reference_data["2009 - IRENA"][name.replace("_", " ")]
+                    ref_table_irena.at[name,"2009 Irena [MW]"] = accumulated_reference_data["2009 - IRENA"][name.replace("_", " ")]
                     ref_table_irena.at[name, "2009 Irena "] = accumulated_reference_data["2009 - IRENA"][name.replace("_", " ")]
-                    ref_table_other.at[name,"2009 other [MW]"]=accumulated_reference_data["2009 - Other"][name.replace("_", " ")]
-                    ref_table_pvps.at[name,"2009 PVPS [MW]"]=accumulated_reference_data["2009 - PVPS"][name.replace("_", " ")]
+                    ref_table_other.at[name,"2009 other [MW]"] = accumulated_reference_data["2009 - Other"][name.replace("_", " ")]
+                    ref_table_pvps.at[name,"2009 PVPS [MW]"] = accumulated_reference_data["2009 - PVPS"][name.replace("_", " ")]
                     #ref_table_im.at[name, "2009 IM [MW]"]=accumulated_reference_data["2009 - IM"][name.replace("_", " ")]
                     #source_list_irena.append(str(["2009 - IRENA s"][name.replace("_", " ")]))
                     (eval(name + "_var_ref")).append(accumulated_reference_data["2009 - Total"][name.replace("_", " ")])
@@ -1138,8 +1138,8 @@ def two_model_comparison(name, year, model_1, model_2):
                 final_order_2[treno] = max(eval(treno + "_diff"))
             final_order_2 = sorted(final_order_2.items(), key=operator.itemgetter(1), reverse=True)
             final_order_2_sorted = collections.OrderedDict(final_order_2)
-            print(final_order_1_sorted,"Primo")
-            print(final_order_2_sorted,"Secondo")
+            print(final_order_1_sorted, "Primo")
+            print(final_order_2_sorted, "Secondo")
             # print(max(diff),"massimo")
             cont_col = 0
             aggiornamento_new = [0, 0, 0, 0, 0, 0, 0,0,0,0,0,0]
@@ -1168,11 +1168,11 @@ def two_model_comparison(name, year, model_1, model_2):
                     aggiornamento_new_2 = [x + y for x, y in zip(aggiornamento_new_2, ripartenza_2)]
                     num_other = num_other + 1
 
-            if cont_col >=10:
-                color_1="gray"
-                alpha_1=0.8
-                color_2="black"
-                alpha_2=1
+            if cont_col >= 10:
+                color_1 = "gray"
+                alpha_1 = 0.8
+                color_2 = "black"
+                alpha_2 = 1
             else:
                 color_1="black"
                 alpha_1=1
@@ -1313,7 +1313,6 @@ def two_model_comparison(name, year, model_1, model_2):
             #plt.show()
             root.mainloop()
     else:
-
         NJORD_model_1 = pd.read_excel(model_1 + "_model_results.xlsx", index_col=0)
         NJORD_model_2 = pd.read_excel(model_2 + "_model_results.xlsx", index_col=0)
         accumulated_reference_data = pd.read_excel("Reference_accumulated_2022.xlsx", index_col=0)
@@ -2213,12 +2212,12 @@ def single_models():
 
 
         #### functions used to update the input boxes and to do the auto-filling
-def update15(data):
+# def update15(data):
     ### Clear list box ##
-    my_list_15.delete(0, END)
+   # my_list_15.delete(0, END)
     ### add Nations ###
-    for item in data:
-        my_list_15.insert(END, item)
+    #for item in data:
+    #    my_list_15.insert(END, item)
 def update7(data):
     ### Clear list box ##
     my_list_7.delete(0, END)
@@ -2237,24 +2236,24 @@ def update(data):
     ### add Nations ###
     for item in data:
         my_list.insert(END, item)
-def update1(data):
+#def update1(data):
     ### Clear list box ##
     #my_list_1.delete(0,END)
     ### add Nations ###
-    for item in data:
-        my_list_1.insert(END, item)
+    #for item in data:
+    #    my_list_1.insert(END, item)
 def update2(data):
     ### Clear list box ##
     my_list_2.delete(0,END)
     ### add Nations ###
     for item in data:
         my_list_2.insert(END, item)
-def update3(data):
+# def update3(data):
     ### Clear list box ##
-    my_list_3.delete(0,END)
+  #  my_list_3.delete(0,END)
     ### add Nations ###
-    for item in data:
-        my_list_3.insert(END, item)
+   # for item in data:
+    #    my_list_3.insert(END, item)
 def update4(data):
     ### Clear list box ##
     my_list_4.delete(0, END)
@@ -2267,12 +2266,12 @@ def update5(data):
     ### add Nations ###
     for item in data:
         my_list_5.insert(END, item)
-def update6(data):
+# def update6(data):
     ### Clear list box ##
-    my_list_6.delete(0,END)
+    #  my_list_6.delete(0,END)
     ### add Nations ###
-    for item in data:
-        my_list_6.insert(END, item)
+    #  for item in data:
+    #      my_list_6.insert(END, item)
 def fillout7(event):
     my_entry_7.delete(0, END)
     my_entry_7.insert(0,my_list_7.get(ACTIVE))
@@ -2284,18 +2283,18 @@ def fillout0(event):
 def fillout(event):
     my_entry.delete(0, END)
     my_entry.insert(0,my_list.get(ACTIVE))
-def fillout1(event):
-    my_entry_1.delete(0, END)
-    my_entry_1.insert(0,my_list_1.get(ACTIVE))
+#def fillout1(event):
+#   my_entry_1.delete(0, END)
+#   my_entry_1.insert(0,my_list_1.get(ACTIVE))
 def fillout2(event):
     my_entry_2.delete(0, END)
     my_entry_2.insert(0,my_list_2.get(ACTIVE))
 def fillout2(event):
     my_entry_2.delete(0, END)
     my_entry_2.insert(0,my_list_2.get(ACTIVE))
-def fillout3(event):
-    my_entry_3.delete(0, END)
-    my_entry_3.insert(0,my_list_3.get(ACTIVE))
+# def fillout3(event):
+#    my_entry_3.delete(0, END)
+#    my_entry_3.insert(0,my_list_3.get(ACTIVE))
 def fillout4(event):
     my_entry_4.delete(0, END)
     my_entry_4.insert(0,my_list_4.get(ACTIVE))
@@ -2305,9 +2304,9 @@ def fillout5(event):
 def fillout15(event):
     my_entry_5.delete(0, END)
     my_entry_5.insert(0,my_list_5.get(ACTIVE))
-def fillout6(event):
-    my_entry_6.delete(0, END)
-    my_entry_6.insert(0,my_list_6.get(ACTIVE))
+# def fillout6(event):
+#    my_entry_6.delete(0, END)
+#    my_entry_6.insert(0,my_list_6.get(ACTIVE))
 def check7(event):
     #what is typed#
     typed=my_entry_7.get()
@@ -2329,7 +2328,7 @@ def check0(event):
         checklist = ChecklistBox(root, choices, bd=1, relief="sunken", background="white")
         checklist.grid(row=2, column=3)
     else:
-        data=[]
+        data = []
         for item in regions:
             if typed.lower() in item.lower():
                 data.append(item)
@@ -2345,20 +2344,20 @@ def check(event):
             if typed.lower() in item.lower():
                 data.append(item)
     update(data)
-def check1(event):
+# def check1(event):
     #what is typed#
-    typed=my_entry_1.get()
-    if typed == '':
-        data = period
-    else:
-        data=[]
-        for item in period:
-            if typed.lower() in item.lower():
-                data.append(item)
-    update1(data)
+#    typed=my_entry_1.get()
+#    if typed == '':
+#        data = period
+#    else:
+#        data=[]
+#        for item in period:
+#            if typed.lower() in item.lower():
+#                data.append(item)
+#    update1(data)
 def check2(event):
     #what is typed#
-    typed=my_entry_2.get()
+    typed = my_entry_2.get()
     if typed == '':
         data = models
     else:
@@ -2367,24 +2366,24 @@ def check2(event):
             if typed.lower() in item.lower():
                 data.append(item)
     update2(data)
-def check3(event):
-    #what is typed#
-    typed=my_entry_3.get()
-    if typed == '':
-        data = models
-    else:
-        data=[]
-        for item in period:
-            if typed.lower() in item.lower():
-                data.append(item)
-    update3(data)
+#def check3(event):
+#    #what is typed#
+#    typed=my_entry_3.get()
+#    if typed == '':
+#        data = models
+#    else:
+#        data=[]
+#        for item in period:
+#            if typed.lower() in item.lower():
+#                data.append(item)
+#    update3(data)
 def check4(event):
     #what is typed#
     typed = my_entry_4.get()
     if typed == '':
         data = nations
     else:
-        data=[]
+        data = []
         for item in nations:
             if typed.lower() in item.lower():
                 data.append(item)
@@ -2805,18 +2804,18 @@ valore_comma_IM = IntVar()
 # 0 = not clicked
 refresh_button = Button(root, text="Refresh", command=refresh)
 refresh_button.place(x=440,y=560)
-sel_all_button = Button(root, text="Selelct all", command=sel_all)
+sel_all_button = Button(root, text="Select all", command=sel_all)
 sel_all_button.place(x=440,y=500)
 refresh_button_2 = Button(root, text="Deselect all", command=des_all)
 refresh_button_2.place(x=440,y=530)
 refresh_button_2 = Button(root, text="Refresh", command=refresh_2)
-refresh_button_2.place(x=1040,y=560)
-sel_all_button = Button(root, text="Selelct all", command=sel_all2)
-sel_all_button.place(x=1040,y=500)
+refresh_button_2.place(x=1040, y=560)
+sel_all_button = Button(root, text="Select all", command=sel_all2)
+sel_all_button.place(x=1040, y=500)
 refresh_button_2 = Button(root, text="Deselect all", command=des_all2)
 refresh_button_2.place(x=1040,y=530)
-my_label_2=Label(root, text="Model 1",font=("Helvetica",14),fg="blue")
-my_label_2.grid(row = 6, column = 1,  pady = 2)
+my_label_2=Label(root, text="Model 1", font=("Helvetica", 14), fg="blue")
+my_label_2.grid(row=6, column=1,  pady=2)
 my_entry_2=Entry(root,font=("Helvetica",20))
 my_entry_2.grid(row = 7, column = 1,  pady = 2,padx=20)
 my_list_2=Listbox(root,width=50,height=5)
@@ -2832,7 +2831,7 @@ info.grid(row = 17, column = 1,  pady = 2)
 
 info=Label(root, text="\nDescription of the Models:",font=("Helvetica",12,'bold'),fg="Red")
 info.grid(row = 18, column = 1,  pady = 2)
-info_expl=info0="Price: use the price data without taking into account the Market factor (MF) of the nation.\nPrice_MF: uses the price data and takes into account the market factor (MF) size.           \nWeight: use the weight data                                                                                                \nThe modelS withouth the label _max use mainly direct data and fill gaps with Mirror data.\nThe models with _max label use always a Mirror and Direct data combination if possible."
+info_expl=info0="Price: use the price data without taking into account the Market factor (MF) of the nation.\nPrice_MF: uses the price data and takes into account the market factor (MF) size. \nWeight: use the weight data \nThe models without the label _max use mainly direct data and fill gaps with Mirror data.\nThe models with _max label use always a Mirror and Direct data combination if possible."
 info0=Label(root, text=info_expl,font=("Helvetica",8),fg="black",justify="left")
 info0.grid(row = 19, column = 1,  pady = 2)
 my_label_0=Label(root, text="Region",font=("Helvetica",14),fg="purple")
