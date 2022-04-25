@@ -739,8 +739,8 @@ for year in desiderio:
                 installed_capacity=0
                 installed_capacity_MF=0
             else:
-                installed_capacity=((net_trade/PV_market_price)/10**6)+(manufacturing_value/4)
-                installed_capacity_MF=((net_trade/(PV_market_price*market_factor)/10**6))+manufacturing_value
+                installed_capacity = ((net_trade/PV_market_price)/10**6)+(manufacturing_value/4)
+                installed_capacity_MF = ((net_trade/(PV_market_price*market_factor)/10**6))+manufacturing_value
                 name = name.replace("_", " ")
                 print()
                 if name == "Bolivia  Plurinational State of":
@@ -858,13 +858,13 @@ for year in desiderio:
                 name = "Vietnam"
 
             if "Q4" in year:
-                year_output=str(int(year_test)+1)+"-Q1"
+                year_output = str(int(year_test)+1)+"-Q1"
             if "Q1" in year:
-                year_output=str(year_test)+"-Q2"
+                year_output = str(year_test)+"-Q2"
             if "Q2" in year:
-                year_output=str(year_test)+"-Q3"
+                year_output = str(year_test)+"-Q3"
             if "Q3" in year:
-                year_output=str(year_test)+"-Q4"
+                year_output = str(year_test)+"-Q4"
 
             output_P_each_year.at[name, "NJORD " + year_output] = installed_capacity
             output_P_each_year.at[name, "Ref " + year_test] = ref_value

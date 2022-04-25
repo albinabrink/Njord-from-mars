@@ -19,10 +19,11 @@ class ScrollableWindow(QtWidgets.QMainWindow):
         self.widget = QtWidgets.QWidget()
         self.setCentralWidget(self.widget)
         self.widget.setLayout(QtWidgets.QVBoxLayout())
-        self.widget.layout().setContentsMargins(0,0,0,0)
+        self.widget.layout().setContentsMargins(0, 0, 0, 0)
         self.widget.layout().setSpacing(0)
 
         self.fig = fig
+        self.fig.tight_layout()
         self.canvas = FigureCanvas(self.fig)
         self.canvas.draw()
         self.scroll = QtWidgets.QScrollArea(self.widget)
@@ -38,6 +39,8 @@ class ScrollableWindow(QtWidgets.QMainWindow):
 
 
 matplotlib.use('Qt5Agg')
+
+
 ###############################################################################################################
 
 #           This is the graphic interface to explore NJORD predictions. It is possible to plot the accumulated
@@ -67,13 +70,18 @@ class ChecklistBox(Frame):
                                 relief="flat", highlightthickness=0
             )
             cb.pack(side="top", fill="x", anchor="w")
+
     def getCheckedItems(self):
         values = []
         for var in self.vars:
-            value =  var.get()
+            value = var.get()
             if value:
                 values.append(value)
         return values
+
+    def resize(self):
+        return
+
 
 #models=["NJORD-Weight","NJORD-Price","NJORD-Combined","Price","Price_MF","Price_max","Weight"]
 models=["NJORD-Weight","NJORD-Price","NJORD-Combined"]
@@ -182,11 +190,11 @@ def visualization(name, year, model):  # this is the part that plots the single 
             nation_order = []
             stacking = []
             stacking.append(0)
-            aggiornamento = [0, 0, 0, 0, 0, 0, 0,0,0,0,0,0] #needed to stack the single nations NJORD output one on top of each other
-            aggiornamento_ref = [0, 0, 0, 0, 0, 0, 0,0,0,0,0,0]#needed to stack the single nations references one on top of each other
-            aggiornamento_ref_irena = [0, 0, 0, 0, 0, 0, 0,0,0,0,0,0]#needed to stack the single nations references one on top of each other
-            aggiornamento_ref_other = [0, 0, 0, 0, 0, 0, 0,0,0,0,0,0]#needed to stack the single nations references one on top of each other
-            aggiornamento_ref_pvps = [0, 0, 0, 0, 0, 0, 0,0,0,0,0,0]#needed to stack the single nations references one on top of each other
+            aggiornamento = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] #needed to stack the single nations NJORD output one on top of each other
+            aggiornamento_ref = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]#needed to stack the single nations references one on top of each other
+            aggiornamento_ref_irena = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]#needed to stack the single nations references one on top of each other
+            aggiornamento_ref_other = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]#needed to stack the single nations references one on top of each other
+            aggiornamento_ref_pvps = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]#needed to stack the single nations references one on top of each other
 
             fig, ax = plt.subplots(figsize=(18, 32))
             G = gridspec.GridSpec(2, 1)  # divide the figure in a 2x2 matrix
@@ -2793,95 +2801,95 @@ show_ref_2 = Checkbutton(root, variable=valore_comma_irena, text="Show Irena Ref
 show_ref_2.place(x=60, y=531)
 valore_comma_pvps = IntVar()
 show_ref_3 = Checkbutton(root, variable=valore_comma_pvps, text="Show PVPS Ref.", font=("Helvetica", 8), fg="gray")
-show_ref_3.place(x=60,y=555)
+show_ref_3.place(x=60, y=555)
 valore_comma_other = IntVar()
-show_ref_4 = Checkbutton(root, variable=valore_comma_other, text="Show Other Ref.",font=("Helvetica",8),fg="gray")
-show_ref_4.place(x=220,y=531)
+show_ref_4 = Checkbutton(root, variable=valore_comma_other, text="Show Other Ref.",font=("Helvetica", 8), fg="gray")
+show_ref_4.place(x=220, y=531)
 valore_comma_IM = IntVar()
 #show_ref_4 = Checkbutton(root, variable=valore_comma_IM, text="Show Imagery Ref. (only for 2018)",font=("Helvetica",8),fg="gray")
 #show_ref_4.place(x=220,y=555)
 # 1 = clicked
 # 0 = not clicked
 refresh_button = Button(root, text="Refresh", command=refresh)
-refresh_button.place(x=440,y=560)
+refresh_button.place(x=440, y=560)
 sel_all_button = Button(root, text="Select all", command=sel_all)
-sel_all_button.place(x=440,y=500)
+sel_all_button.place(x=440, y=500)
 refresh_button_2 = Button(root, text="Deselect all", command=des_all)
-refresh_button_2.place(x=440,y=530)
+refresh_button_2.place(x=440, y=530)
 refresh_button_2 = Button(root, text="Refresh", command=refresh_2)
 refresh_button_2.place(x=1040, y=560)
 sel_all_button = Button(root, text="Select all", command=sel_all2)
 sel_all_button.place(x=1040, y=500)
 refresh_button_2 = Button(root, text="Deselect all", command=des_all2)
-refresh_button_2.place(x=1040,y=530)
-my_label_2=Label(root, text="Model 1", font=("Helvetica", 14), fg="blue")
-my_label_2.grid(row=6, column=1,  pady=2)
-my_entry_2=Entry(root,font=("Helvetica",20))
-my_entry_2.grid(row = 7, column = 1,  pady = 2,padx=20)
-my_list_2=Listbox(root,width=50,height=5)
-my_list_2.grid(row = 8, column = 1,  pady = 2)
-my_list_2.bind("<<ListboxSelect>>",fillout2)
+refresh_button_2.place(x=1040, y=530)
+my_label_2 = Label(root, text="Model 1", font=("Helvetica", 14), fg="blue")
+my_label_2.grid(row=6, column=1, pady=2)
+my_entry_2 = Entry(root, font=("Helvetica", 20))
+my_entry_2.grid(row=7, column=1, pady=2, padx=20)
+my_list_2 = Listbox(root, width=50, height=5)
+my_list_2.grid(row=8, column=1, pady=2)
+my_list_2.bind("<<ListboxSelect>>", fillout2)
 update2(models)
-my_entry_2.bind("<KeyRelease>",check2)
+my_entry_2.bind("<KeyRelease>", check2)
 enter_button = Button(root, text="Single region/nation", command=single_models)
-enter_button.grid(row = 12, column = 1, pady = 2)
+enter_button.grid(row=12, column=1, pady=2)
 ### start two models
 info = Label(root)
-info.grid(row = 17, column = 1,  pady = 2)
+info.grid(row=17, column=1, pady=2)
 
-info=Label(root, text="\nDescription of the Models:",font=("Helvetica",12,'bold'),fg="Red")
-info.grid(row = 18, column = 1,  pady = 2)
-info_expl=info0="Price: use the price data without taking into account the Market factor (MF) of the nation.\nPrice_MF: uses the price data and takes into account the market factor (MF) size. \nWeight: use the weight data \nThe models without the label _max use mainly direct data and fill gaps with Mirror data.\nThe models with _max label use always a Mirror and Direct data combination if possible."
-info0=Label(root, text=info_expl,font=("Helvetica",8),fg="black",justify="left")
-info0.grid(row = 19, column = 1,  pady = 2)
-my_label_0=Label(root, text="Region",font=("Helvetica",14),fg="purple")
-my_label_0.grid(row = 0, column = 2,  pady = 2,columnspan = 1)
-my_entry_0=Entry(root,font=("Helvetica",20))
-my_entry_0.grid(row = 1, column = 2,  pady = 2,columnspan = 1)
-my_list_0=Listbox(root,width=50,height=5)
-my_list_0.grid(row = 2, column = 2,  pady = 2,columnspan = 1)
+info = Label(root, text="\nDescription of the Models:", font=("Helvetica", 12, 'bold'), fg="Red")
+info.grid(row=18, column=1, pady=2)
+info_expl = info0="Price: use the price data without taking into account the Market factor (MF) of the nation.\nPrice_MF: uses the price data and takes into account the market factor (MF) size. \nWeight: use the weight data \nThe models without the label _max use mainly direct data and fill gaps with Mirror data.\nThe models with _max label use always a Mirror and Direct data combination if possible."
+info0 = Label(root, text=info_expl, font=("Helvetica", 8), fg="black", justify="left")
+info0.grid(row=19, column=1, pady=2)
+my_label_0 = Label(root, text="Region", font=("Helvetica", 14), fg="purple")
+my_label_0.grid(row=0, column=2, pady=2, columnspan=1)
+my_entry_0 = Entry(root, font=("Helvetica", 20))
+my_entry_0.grid(row=1, column=2, pady=2, columnspan=1)
+my_list_0 = Listbox(root, width=50, height=5)
+my_list_0.grid(row=2, column=2, pady=2, columnspan=1)
 update0(regions)
 my_list_0.bind("<<ListboxSelect>>", fillout0)
 my_entry_0.bind("<KeyRelease>", check0)
-my_label_4=Label(root, text="Nation 2 ",font=("Helvetica",14),fg="green")
-my_label_4.grid(row = 3, column = 1,  pady = 2)
-my_entry_4=Entry(root,font=("Helvetica",20))
-my_entry_4.grid(row = 4, column = 1,  pady = 2)
-my_list_4=Listbox(root,width=50,height=5)
-my_list_4.grid(row = 5, column = 1,  pady = 2)
+my_label_4 = Label(root, text="Nation 2 ", font=("Helvetica", 14), fg="green")
+my_label_4.grid(row=3, column=1, pady=2)
+my_entry_4 = Entry(root, font=("Helvetica", 20))
+my_entry_4.grid(row=4, column=1, pady=2)
+my_list_4 = Listbox(root, width=50, height=5)
+my_list_4.grid(row=5, column=1, pady=2)
 update4(nations)
 ##Create a binding on the list box ###
-my_list_4.bind("<<ListboxSelect>>",fillout4)
+my_list_4.bind("<<ListboxSelect>>", fillout4)
 ##Create a binding on the entry box ###
-my_entry_4.bind("<KeyRelease>",check4)
-my_label_7=Label(root, text="Region 2 ",font=("Helvetica",14),fg="Purple")
-my_label_7.grid(row =3 , column = 2,  pady = 2,columnspan = 1)
-my_entry_7=Entry(root,font=("Helvetica",20))
-my_entry_7.grid(row = 4, column = 2,  pady = 2,columnspan = 1)
-my_list_7=Listbox(root,width=50,height=5)
-my_list_7.grid(row = 5, column = 2,  pady = 2,columnspan = 1)
-regions=["Africa","Asia","Central America","Eurasia","Europe","Middle East","North America","Oceania","Ref. country price", "Ref. country weight","South America","World"]
+my_entry_4.bind("<KeyRelease>", check4)
+my_label_7 = Label(root, text="Region 2 ", font=("Helvetica", 14), fg="Purple")
+my_label_7.grid(row=3, column=2,  pady=2, columnspan=1)
+my_entry_7 = Entry(root, font=("Helvetica", 20))
+my_entry_7.grid(row=4, column=2, pady=2, columnspan=1)
+my_list_7 = Listbox(root, width=50, height=5)
+my_list_7.grid(row=5, column=2, pady=2, columnspan=1)
+regions = ["Africa", "Asia", "Central America", "Eurasia", "Europe", "Middle East", "North America", "Oceania", "Ref. country price", "Ref. country weight", "South America", "World"]
 update7(regions)
-my_list_7.bind("<<ListboxSelect>>",fillout7)
-my_entry_7.bind("<KeyRelease>",check7)
-my_label_5=Label(root, text="Model 2 for comparison",font=("Helvetica",14),fg="blue")
-my_label_5.grid(row = 6, column = 2,  pady = 2)
-my_entry_5=Entry(root,font=("Helvetica",20))
-my_entry_5.grid(row = 7, column = 2,  pady = 2)
-my_list_5=Listbox(root,width=50,height=5)
-my_list_5.grid(row = 8, column = 2,  pady = 2)
-my_list_5.bind("<<ListboxSelect>>",fillout5)
+my_list_7.bind("<<ListboxSelect>>", fillout7)
+my_entry_7.bind("<KeyRelease>", check7)
+my_label_5 = Label(root, text="Model 2 for comparison", font=("Helvetica", 14), fg="blue")
+my_label_5.grid(row=6, column=2,  pady=2)
+my_entry_5 = Entry(root, font=("Helvetica", 20))
+my_entry_5.grid(row=7, column=2, pady=2)
+my_list_5 = Listbox(root, width=50, height=5)
+my_list_5.grid(row=8, column=2, pady=2)
+my_list_5.bind("<<ListboxSelect>>", fillout5)
 #models=["NJORD-Weight","NJORD-Price","NJORD-Combined","Price","Price_MF","Price_max","Weight"]
-my_entry_5.bind("<KeyRelease>",check5)
+my_entry_5.bind("<KeyRelease>", check5)
 update5(models)
 enter_button_2 = Button(root, text="Comparison of 2 models", command=model_comparison)
-enter_button_2.grid(row = 12, column = 2, pady = 0,columnspan = 1)
+enter_button_2.grid(row=12, column=2, pady=0, columnspan=1)
 enter_button_3 = Button(root, text="Comparison of 2 regions/nations ", command=nations_comparison)
-enter_button_3.grid(row = 13, column = 2, pady = 0,columnspan = 1)
-model_explaination="Single region/nation: show the predicted installed capacity [MW] with the model selected in Single model.\nTo display the data for a nation, the region space has to be empty.\nComparison of two models: compare the result obtained with two models (Model 1 and 2) for the same region/nation\n\n"
-info1=Label(root, text="\nDescription of the Functions:",font=("Helvetica",12,'bold'),fg="red")
-info1.grid(row = 17, column = 2,  pady = 2)
-info2=Label(root, text=model_explaination,font=("Helvetica",8),fg="black",justify="left",textvariable=True,relief="flat")
-info2.grid(row = 18, column = 2,  pady = 2)
+enter_button_3.grid(row=13, column=2, pady=0, columnspan=1)
+model_explanation="Single region/nation: show the predicted installed capacity [MW] with the model selected in Single model.\nTo display the data for a nation, the region space has to be empty.\nComparison of two models: compare the result obtained with two models (Model 1 and 2) for the same region/nation\n\n"
+info1 = Label(root, text="\nDescription of the Functions:", font=("Helvetica", 12, 'bold'), fg="red")
+info1.grid(row=17, column=2, pady=2)
+info2 = Label(root, text=model_explanation, font=("Helvetica", 8), fg="black", justify="left", textvariable=True, relief="flat")
+info2.grid(row=18, column=2,  pady=2)
 
 root.mainloop()

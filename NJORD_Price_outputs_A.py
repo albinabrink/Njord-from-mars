@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 import NJORD_function_test
-#### This script calculate the installed capacity
+#### This script calculates the installed capacity
 unit = "Price"
 
 ### change path also in lines  453 -454####

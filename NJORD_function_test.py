@@ -471,7 +471,7 @@ def price(input, period):
                 installed_capacity = 0
                 installed_capacity_MF = 0
             else:
-                installed_capacity = ((net_trade/PV_market_price)/10**6)+(manufacturing_value/4)
+                installed_capacity = ((net_trade/PV_market_price)/10**6)+(manufacturing_value)  # /4 on manufacturing value, check if should be removed?
                 installed_capacity_MF = ((net_trade/(PV_market_price*market_factor))/10**6)+manufacturing_value
 
             name = name_cleanup(name, year)

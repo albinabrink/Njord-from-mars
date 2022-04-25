@@ -96,8 +96,8 @@ def plot_figure_pearson(price, weight):  # Plots the correlation value between N
 # plot_figure_pearson(corr_Njord_PVPS_ref_price, corr_Njord_PVPS_ref_weight)
 
 
-def calc_acc_cap(input, data_sources):
-    data = input.loc[:, [data_sources in i for i in input]]
+def calc_acc_cap(input_data, data_sources):
+    data = input_data.loc[:, [data_sources in i for i in input_data]]
     data_acc = pd.DataFrame(index=data.index, columns=data.columns)
     for row in data.index.values:
         N_acc = 0
@@ -107,8 +107,10 @@ def calc_acc_cap(input, data_sources):
     return data_acc
 
 
-# Njord_acc_price = calc_acc_cap(price_model_results, "NJORD")
-
+Njord_acc_price = calc_acc_cap(price_model_results, "NJORD")
+Njord_acc_price.to_excel(path_output+"Njord-Price_acc_all.xlsx")
+Njord_acc_weight = calc_acc_cap(weight_model_results, "NJORD")
+Njord_acc_weight.to_excel(path_output+"NJORD-Weight_acc_all.xlsx")
 
 def plot_acc_cap(input, reference_countries):  # Not done in the smoothest way, look into making it less complicated
     ref_PVPS = pd.DataFrame()
@@ -252,12 +254,19 @@ def mean_difference_from_ref_data(input):
 
 mean_diff, diff, perc_diff = mean_difference_from_ref_data(price_model_results)
 std_diff_countries, std_diff_year = standard_deviation_all_countries(diff)
-print(std_diff_countries)
-print(std_diff_year)
-
+perc_std_diff_countries, perc_std_diff_year = standard_deviation_all_countries(perc_diff)
+perc_std_diff_countries_df = pd.DataFrame(perc_std_diff_countries).set_index(0)
+std_diff_countries_df = pd.DataFrame(std_diff_countries).set_index(0)
 perc_diff.to_excel(path_output+"Njord_percentual_diff_Irena.xlsx")
 diff.to_excel(path_output+"Njord_diff_Irena.xlsx")
 # diff_1 = perc_diff# .transpose()
 # print(diff_1)
 # diff_1.plot()#hist(bins=50)
 # plt.show()
+
+def calc_median(data_input, datasources=""):  # Takes a DataFrame as input and returns the median for all rows and columns in the DataFrame. Returns it as Series.
+    median_rows = data_input.median(axis="columns")
+    median_columns = data_input.median()
+    return median_rows, median_columns
+
+calc_median(price_model_results)
