@@ -1,10 +1,10 @@
+import ssl
 import requests
 import urllib3
 from urllib3.exceptions import InsecureRequestWarning
 from requests.structures import CaseInsensitiveDict
 
 urllib3.disable_warnings(InsecureRequestWarning)
-
 def import_access_token():
     url = "https://idserv.marketanalysis.intracen.org/connect/token"
     username = "njord@becquerelsweden.se"
@@ -15,16 +15,16 @@ def import_access_token():
 
 
 token_test = import_access_token()
-# print(token_test)
+
 
 def access_yearly_data(token):
     url = "https://www.trademap.org/api/data/yearly"
-    header = CaseInsensitiveDict() # {"Authorization": "Bearer"+token["access_token"]}
-    header["accept"] = "application/json"
-    header["Authorization"] = "Bearer "+token["access_token"]
-    data = {"product_cd": "854140", "years": "2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020", "hs_level": "6"}
-    result = requests.post(url,  headers=header, data=data)
-    print(result.json())
+    header = {"Authorization": "Bearer "+token["access_token"]}
+    # header["accept"] = "application/json"
+    # header["Authorization"] = "Bearer ".format(token["access_token"])
+    params = {"country_cd": "004", "product_cd": "854140", "years": "2019", "hs_level": "6"}
+    result = requests.get(url,  headers=header, params=params)# context=ssl.create_default_context(cafile=certifi.where()))  # , verify=False)
+    print(result.text)
     return result
 
 test = access_yearly_data(token_test)
@@ -37,4 +37,4 @@ def get_countries():
     return countries.json()
 
 
-
+# hahe = get_countries()
