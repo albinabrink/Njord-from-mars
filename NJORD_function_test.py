@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import API_download
 
 # unit = "weight"
 # path_input = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\Raw_data\\Final_database\\Weight\\"  # this is the path_out_final in the script From_html_to_db
@@ -420,7 +421,7 @@ def create_weight_models_result_region():
 # Functions only used in Price calculations
 def price(input, period):
     unit = "Price"
-    nations_list = os.listdir(input + "\\Export\\")
+    # nations_list = os.listdir(input + "\\Export\\")
     reference = pd.read_excel("Reference_accumulated_2022.xlsx", index_col=0, na_values=['NA'])
     output_P_each_year = pd.DataFrame()
     output_P_MF_each_year = pd.DataFrame()
@@ -428,13 +429,15 @@ def price(input, period):
               "Cyprus", "Czech_Republic", "Denmark", "Estonia", "Finland", "France", "Georgia", "Germany", "Greece",
               "Greenland", "Hungary", "Iceland", "Ireland", "Italy", "Latvia", "Lithuania", "Luxembourg",
               "Macedonia__North", "Malta", "Moldova__Republic_of", "Netherlands", "Norway", "Poland", "Portugal",
-              "Romania",
-              "Russian_Federation", "Serbia", "Slovakia", "Slovenia", "Spain", "Sweden", "Switzerland", "Ukraine",
-              "United_Kingdom"]
+              "Romania", "Russian_Federation", "Serbia", "Slovakia", "Slovenia", "Spain", "Sweden", "Switzerland",
+              "Ukraine", "United_Kingdom"]
+    nations_list = API_download.get_countries()
+    access_token = API_download.import_access_token()
 
     for year_quarter in period:
         year = year_quarter.split("-")
         year = year[0]
+        API_download.access_yearly_data(access_token, nations_list[0], str(year), '6')
         for name in nations_list:
             name = name.split(".")
             name = name[0]
