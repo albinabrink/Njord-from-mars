@@ -1,11 +1,15 @@
 import ssl
+import pandas as pd
 import requests
 import urllib3
 from urllib3.exceptions import InsecureRequestWarning
 import json
-from requests.structures import CaseInsensitiveDict
+
+path_output = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\"
 
 urllib3.disable_warnings(InsecureRequestWarning)
+
+
 def import_access_token():
     url = "https://idserv.marketanalysis.intracen.org/connect/token"
     username = "njord@becquerelsweden.se"
@@ -15,20 +19,18 @@ def import_access_token():
     return token.json()
 
 
-token_test = import_access_token()
+# token_test = import_access_token()
 
 
-def access_yearly_data(token, country_cd, years, level):
+def access_yearly_data(token, years, level):  # country_cd,
     url = "https://www.trademap.org/api/data/yearly"
-    header = {"Authorization": "Bearer "+token["access_token"]}
-    # header["accept"] = "application/json"
-    # header["Authorization"] = "Bearer ".format(token["access_token"])
-    params = {"country_cd": country_cd, "product_cd": "854140", "years": years, "hs_level": level}
-    result = requests.get(url,  headers=header, params=params)# context=ssl.create_default_context(cafile=certifi.where()))  # , verify=False)
-    print(result.json())
+    header = {"Authorization": "Bearer " + token["access_token"]}
+    params = {"product_cd": "854140", "years": years, "hs_level": level}  # "country_cd": country_cd,
+    result = requests.get(url, headers=header, params=params)
     return result.json()
 
-test = access_yearly_data(token_test, '004', '2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021', '6')
+# test = access_yearly_data(token_test, '004', '2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021', '6')
+
 
 def get_countries():
     url = "https://www.trademap.org/api/common/countries"
@@ -42,4 +44,70 @@ def get_countries():
     return country_list
 
 
-hahe = get_countries()
+def access_monthly_data(token, year, month, level):
+    url = "https://www.trademap.org/api/data/monthly"
+    header = {"Authorization": "Bearer " + token["access_token"]}
+    params = {"product_cd": "854140", "months": str(year)+str(month), "hs_level": level}  # "country_cd": country_cd,
+    result = requests.get(url, headers=header, params=params)
+    return result.json()
+
+
+def download_yearly_data():
+    # Download the data from ITC using the API
+    access_token = import_access_token()
+    country_list = pd.DataFrame(get_countries()).set_index(0)
+    # Has to go through yearly data.
+    years = [2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021]
+    yearly_data_all = pd.DataFrame()
+    for year in years:
+        yearly_data = access_yearly_data(access_token, str(year), '6')  # Important to keep reporterCd, partnerCd, exportValue, importValue
+        yearly_data_all = yearly_data_all.append(yearly_data, ignore_index=True)
+    yearly_data_all.rename(columns={'reporterCd': 'Reporting Country', "partnerCd": 'Partner Country'}, inplace=True)
+    for code in country_list.index:  # Rename the codes to country names for easier understanding in the document.
+        yearly_data_all['Reporting Country'].replace(code, country_list.loc[code][1], inplace=True)
+        yearly_data_all['Partner Country'].replace(code, country_list.loc[code][1], inplace=True)
+    return yearly_data_all
+
+
+# yearly_data_all = download_yearly_data()
+# yearly_data_all.to_csv(path_output+"ITC_yearly_data_HS_6.csv")
+
+
+def download_monthly_data():
+    # Download the data from ITC using the API
+    access_token = import_access_token()
+    country_list = pd.DataFrame(get_countries()).set_index(0)
+    # Has to go through yearly data.
+    years = [2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021]
+    months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
+    monthly_data_all = pd.DataFrame()
+    for year in years:
+        for month in months:
+            monthly_data = access_monthly_data(access_token, str(year), month, '6')  # Important to keep reporterCd, partnerCd, exportValue, importValue
+            monthly_data_all = monthly_data_all.append(monthly_data)
+    monthly_data_all.rename(columns={'reporterCd': 'Reporting Country', "partnerCd": 'Partner Country'}, inplace=True)
+    for code in country_list.index:
+        monthly_data_all['Reporting Country'].replace(code, country_list.loc[code][1], inplace=True)
+        monthly_data_all['Partner Country'].replace(code, country_list.loc[code][1], inplace=True)
+    return monthly_data_all
+
+
+# monthly = download_monthly_data()
+# monthly.to_csv(path_output+"ITC_Monthly_data_HS_6.csv")
+
+
+def download_quantity_units():
+    url = "https://www.trademap.org/api/common/quantity-units"
+    quantity_units = requests.get(url, verify=False)
+    quantity_units = pd.DataFrame(quantity_units.json())
+    return quantity_units
+
+# quantity_units = download_quantity_units()
+# quantity_units.to_excel(path_output+"ITC_Quantity_units.xlsx")
+
+
+def download_all_NTL_codes():  # Way too big, don't use for all countries.
+    url = "https://www.trademap.org/api/common/products-ntl"
+    NTL = requests.get(url, verify=False)
+    NTL = pd.DataFrame(NTL.json())
+    return NTL
