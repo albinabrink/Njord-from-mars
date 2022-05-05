@@ -186,6 +186,7 @@ for year in desiderio:
                 #print(time_window_import)
                 #print(sum_imports,"somma")
                 #print(imports_period.loc[item,time_window_import],"valori")
+                print(imports_period.loc[item, time_window_import])
                 value = (sum(imports_period.loc[item, time_window_import])/sum_imports)   #percentage for each country
                 percentage_imp.append(value)
 
@@ -261,7 +262,7 @@ for year in desiderio:
         PV_market_price = 0
         single_value = 0
 
-        print(change_list, "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        # print(change_list, "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         #####################################################
         #### HERE INSERT THE QUARTERS PRICE DIVISION ########
         #####################################################
@@ -270,16 +271,16 @@ for year in desiderio:
                 continue
             if item in change_list:
                 single_value = change[year][item]*percentage_imp[cont] #value for each single nation
-                print(item, change[year][item], percentage_imp[cont], year)
+                # print(item, change[year][item], percentage_imp[cont], year)
             else:
                 if item in Europe:
                     single_value = change[year]["EU"] * percentage_imp[cont]  # value for each single nation
-                    print(item, change[year]["EU"], percentage_imp[cont], year, "ENTRATO IN EUROPA!!!!!!!!!!!!!!")
+                    # print(item, change[year]["EU"], percentage_imp[cont], year, "ENTRATO IN EUROPA!!!!!!!!!!!!!!")
                 else:
                     single_value = change[year]["RoW"]*percentage_imp[cont]
-                    print(item, " entrato ma andato in ROW !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11")
+                    # print(item, " entrato ma andato in ROW !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11")
 
-                print(item, change[year]["RoW"], percentage_imp[cont], year)
+                # print(item, change[year]["RoW"], percentage_imp[cont], year)
 
             PV_market_price = PV_market_price+single_value
             #print(PV_market_price,year,single_value,"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1")
@@ -289,7 +290,8 @@ for year in desiderio:
 
 
         if unit=="Price":
-            print(net_trade, "net trade", PV_market_price, "price factor", market_factor, "market factor")
+            print("Hej")
+            # print(net_trade, "net trade", PV_market_price, "price factor", market_factor, "market factor")
 
 
         if unit == "Price":
@@ -300,7 +302,6 @@ for year in desiderio:
                 installed_capacity = ((net_trade/PV_market_price)/10**6)+(manufacturing_value/4)
                 installed_capacity_MF = ((net_trade/(PV_market_price*market_factor))/10**6)+manufacturing_value
                 name = name.replace("_", " ")
-                print()
                 if name == "Bolivia  Plurinational State of":
                     name = "Bolivia"
                 if name == "Congo  Democratic Republic of the":
@@ -344,10 +345,10 @@ for year in desiderio:
                 if name == "Viet Nam":
                     name = "Vietnam"
                 if int(year_test) <= 2016 and "before" in name:
-                    print("\n\nit is Sudan before so I change name for the reference\n\n", name)
+                    # print("\n\nit is Sudan before so I change name for the reference\n\n", name)
                     name="Sudan"
                 if int(year_test) <= 2016 and "before" in name:
-                    print("\n\nit is Sudan before so I change name for the reference\n\n", name)
+                    # print("\n\nit is Sudan before so I change name for the reference\n\n", name)
                     name="Sudan"
 
                 PVPS = year_test + " - PVPS"
@@ -438,8 +439,8 @@ for year in desiderio:
             output_P_MF_each_year.at[name, "IRENA s " + year_test] = reference_data_year[str(year_test) + " - IRENA s"][name]
             output_P_MF_each_year.at[name, "PVPS " + year_test] = reference_data_year[PVPS][name]
             output_P_MF_each_year.at[name, "Other " + year_test] = reference_data_year[other][name]
-            print(installed_capacity, "Installed capacity [MW] of "+name+" for the year "+year+" without Market Factor, Price ",source_data_total)
-            print(installed_capacity_MF, "Installed capacity [MW] of "+name+" for the year "+year+" with Market Factor, Price ",source_data_total,export_source,import_source)
+            # print(installed_capacity, "Installed capacity [MW] of "+name+" for the year "+year+" without Market Factor, Price ",source_data_total)
+            # print(installed_capacity_MF, "Installed capacity [MW] of "+name+" for the year "+year+" with Market Factor, Price ",source_data_total,export_source,import_source)
 
 
 output_P_MF_each_year.to_excel(path_output+"Price_MF_max_model_results.xlsx")
@@ -476,19 +477,19 @@ for year in desiderio:
     for name in nation_list:
         name=name.split(".")
         name=name[0]
-        print(name,year)
+        # print(name,year)
         if name=="American_Samoa" or name=="British_Indian_Ocean_Territory" or name =="Eswatini" :
             continue
         ###
         year_test=year.split("-")
         year_test=year_test[0]
-        print(year_test)
+        # print(year_test)
         ###correction needed for the format inside the table in the excel files ###
         if int(year_test) > 2016 and "before" in name:
-            print("\n\nit is Sudan before so I stop\n\n", name)
+            # print("\n\nit is Sudan before so I stop\n\n", name)
             continue
         if int(year_test) <=2016 and name=="Sudan":
-            print("\n\n it is Sudan but before 2016 so I stop\n\n",name)
+            # print("\n\n it is Sudan but before 2016 so I stop\n\n",name)
             continue
         if unit=="Price":
             add2="value in "
@@ -628,7 +629,8 @@ for year in desiderio:
                 #print(time_window_import)
                 #print(sum_imports,"somma")
                 #print(imports_period.loc[item,time_window_import],"valori")
-                value=(sum(imports_period.loc[item,time_window_import])/sum_imports)   #percentage for each country
+                print(imports_period)
+                value = (sum(imports_period.loc[item, time_window_import])/sum_imports)   #percentage for each country
                 percentage_imp.append(value)
 
 

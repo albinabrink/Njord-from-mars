@@ -1,4 +1,6 @@
 import os
+
+import numpy as np
 import pandas as pd
 
 # unit = "weight"
@@ -54,43 +56,43 @@ def name_clean_up(nation_list):  # NOT USED!!!
 
 def name_cleanup(name, year):
     name = name.replace("_", " ")
-    if name == "Bolivia  Plurinational State of":
+    if name == "Bolivia, Plurinational State of":
         name = "Bolivia"
-    if name == "Congo  Democratic Republic of the":
+    if name == "Congo, Democratic Republic of the":
         name = "Democratic Republic of the Congo"
     if name == "Côte d'Ivoire":
         name = "Côte dIvoire"
     if name == "Falkland Islands Malvinas":
         name = "Falkland Islands"
-    if name == "Hong Kong  China":
+    if name == "Hong Kong, China":
         name = "Hong Kong"
-    if name == "Iran  Islamic Republic of":
+    if name == "Iran, Islamic Republic of":
         name = "Iran"
-    if name == "Korea  Democratic People's Republic of":
+    if name == "Korea, Democratic People's Republic of":
         name = "North Korea"
-    if name == "Korea  Republic of":
+    if name == "Korea, Republic of":
         name = "South Korea"
     if name == "Lao People's Democratic Republic":
         name = "Laos"
-    if name == "Libya  State of":
+    if name == "Libya, State of":
         name = "Libya"
-    if name == "Macedonia  North":
+    if name == "Macedonia, North":
         name = "Macedonia"
-    if name == "Micronesia  Federated States of":
+    if name == "Micronesia, Federated States of":
         name = "Micronesia"
-    if name == "Moldova  Republic of":
+    if name == "Moldova, Republic of":
         name = "Moldova"
-    if name == "Palestine  State of":
+    if name == "Palestine, State of":
         name = "Palestine"
     if name == "Russian Federation":
         name = "Russia"
     if name == "Syrian Arab Republic":
         name = "Syria"
-    if name == "Taipei  Chinese":
+    if name == "Taipei, Chinese":
         name = "Taiwan"
-    if name == "Tanzania  United Republic of":
+    if name == "Tanzania, United Republic of":
         name = "Tanzania"
-    if name == "Venezuela  Bolivarian Republic of":
+    if name == "Venezuela, Bolivarian Republic of":
         name = "Venezuela"
     if name == "Viet Nam":
         name = "Vietnam"
@@ -142,9 +144,9 @@ def calc_PV_factor(year, unit, nations_within, percentage, import_export):
     return pv_factor, pv_share_unit
 
 
-def direct_or_mirror(data, unit, import_export, year, name):
+def direct_or_mirror(data, unit, import_export, year, name):  # Do not need to check direct or mirror data, rewritten in ...
     # print(data+import_export+"\\"+name+".xlsx")
-    print(data)
+    # print(data)
     data = pd.read_excel(data+import_export+"\\"+name+".xlsx", index_col=0, na_values=['NA'])  # Needs to be changed now.
     data = data.fillna(0)  # filling empty spaces with 0
     data = data.replace(to_replace="No Quantity", value=0)  # replacing no quantity with 0
@@ -164,6 +166,7 @@ def direct_or_mirror(data, unit, import_export, year, name):
     if import_export == "Export":
         time_window = [word2+add1+str(year)]
     data_period = data[time_window]
+    # print(data_period)
     nations_within = data_period.index.values
     # print(nations_within)
     for letter in data_period.loc["DataType"]:
@@ -442,13 +445,16 @@ def create_weight_models_result_region():
 #    combined_MF.at[name, "Other " + str(2009)] = reference_data_year[other][name]
 
 
-def extract_one_country():
-    data = pd.read_csv("C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\"+"ITC_yearly_data_HS_6.csv")
-        # print(year)
-    # print(data["Reporting Country"])
-    return
+def extract_one_country(country):
+    data = pd.read_csv("ITC_yearly_data_HS_6.csv")
+    country_data = data.loc[(data["Reporting Country"] == country)]
+    country_data = country_data.loc[(country_data["period"] == 2012)]
+    country_data_import = country_data["exportValue"]
+    print(country_data_import)
+    return country_data
 
-extract_one_country()
+# country = "Sweden"
+# extract_one_country(country)
 
 
 

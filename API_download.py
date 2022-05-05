@@ -69,8 +69,8 @@ def download_yearly_data():
     return yearly_data_all
 
 
-# yearly_data_all = download_yearly_data()
-# yearly_data_all.to_csv(path_output+"ITC_yearly_data_HS_6.csv")
+yearly_data_all = download_yearly_data()
+yearly_data_all.to_csv(path_output+"ITC_yearly_data_HS_6.csv")
 
 
 def download_monthly_data():
@@ -106,8 +106,13 @@ def download_quantity_units():
 # quantity_units.to_excel(path_output+"ITC_Quantity_units.xlsx")
 
 
-def download_all_NTL_codes():  # Way too big, don't use for all countries.
+def download_NTL_codes():  # Way too big, don't use for all countries.
     url = "https://www.trademap.org/api/common/products-ntl"
-    NTL = requests.get(url, verify=False)
+    params = {"product_cd": "854140"}
+    NTL = requests.get(url, params=params, verify=False)
     NTL = pd.DataFrame(NTL.json())
     return NTL
+
+
+# NTL_codes = download_NTL_codes()
+# NTL_codes.to_csv("NTL_codes.csv")

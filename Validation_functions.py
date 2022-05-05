@@ -61,8 +61,8 @@ def Pearson_coef(input, reference_countries, unit):
     # countries, should find emerging markets from report and compare there as well.
 
 
-corr_Njord_Irena_price, corr_Njord_PVPS_price, corr_Njord_PVPS_ref_price = Pearson_coef(price_model_results, reference_countries, "Price")
-corr_Njord_Irena_weight, corr_Njord_PVPS_weight, corr_Njord_PVPS_ref_weight = Pearson_coef(weight_model_results, reference_countries, "Weight")
+# corr_Njord_Irena_price, corr_Njord_PVPS_price, corr_Njord_PVPS_ref_price = Pearson_coef(price_model_results, reference_countries, "Price")
+# corr_Njord_Irena_weight, corr_Njord_PVPS_weight, corr_Njord_PVPS_ref_weight = Pearson_coef(weight_model_results, reference_countries, "Weight")
 
 
 def plot_figure_pearson(price, weight):  # Plots the correlation value between NJORD and ? for the two different models
@@ -107,10 +107,10 @@ def calc_acc_cap(input_data, data_sources):
     return data_acc
 
 
-Njord_acc_price = calc_acc_cap(price_model_results, "NJORD")
-Njord_acc_price.to_excel(path_output+"Njord-Price_acc_all.xlsx")
-Njord_acc_weight = calc_acc_cap(weight_model_results, "NJORD")
-Njord_acc_weight.to_excel(path_output+"NJORD-Weight_acc_all.xlsx")
+# Njord_acc_price = calc_acc_cap(price_model_results, "NJORD")
+# Njord_acc_price.to_excel(path_output+"Njord-Price_acc_all.xlsx")
+# Njord_acc_weight = calc_acc_cap(weight_model_results, "NJORD")
+# Njord_acc_weight.to_excel(path_output+"NJORD-Weight_acc_all.xlsx")
 
 def plot_acc_cap(input, reference_countries):  # Not done in the smoothest way, look into making it less complicated
     ref_PVPS = pd.DataFrame()
@@ -146,7 +146,7 @@ def plot_acc_cap(input, reference_countries):  # Not done in the smoothest way, 
     return
 
 
-plot_acc_cap(price_model_results, reference_countries)
+# plot_acc_cap(price_model_results, reference_countries)
 
 
 def calc_mean_abs_dev(input, reference_countries):
@@ -183,19 +183,6 @@ def calc_tot_dev(input):
     # print(PVPS)
     return
 
-def histogram(input):
-    Njord = input.loc[:, ["NJORD" in i for i in input.columns]]
-    PVPS = input.loc[:, ["PVPS" in i for i in input.columns]]
-    Irena = input.loc[:, ["IRENA" in i for i in input.columns]]
-    # sns.set_style('white')
-    # sns.set_context("paper", font_scale=2)
-    # sns.displot(Njord, x="NJORD 2019", kind="hist", bins=100)
-
-    # (Njord.apply(stats.zscore))
-    plt.hist(Njord["NJORD 2019"], bins=100)
-    plt.show()
-
-
 def calculate_standard_deviation(data):
     standard_deviation = statistics.stdev(data)
     return standard_deviation
@@ -224,7 +211,7 @@ def standard_deviation_all_countries(data, data_sources=""):  # send in more spe
     return stdev_countries, stdev_year
 
 
-stdev_test_countries, stdev_test_year = standard_deviation_all_countries(price_model_results, "NJORD")
+# stdev_test_countries, stdev_test_year = standard_deviation_all_countries(price_model_results, "NJORD")
 
 # calc_mean_abs_dev(price_model_results, reference_countries)
 
@@ -252,13 +239,13 @@ def mean_difference_from_ref_data(input):
     return mean_difference_Njord_Irena, diff_Njord_Irena, percentual_diff_Njord_Irena
 
 
-mean_diff, diff, perc_diff = mean_difference_from_ref_data(price_model_results)
-std_diff_countries, std_diff_year = standard_deviation_all_countries(diff)
-perc_std_diff_countries, perc_std_diff_year = standard_deviation_all_countries(perc_diff)
-perc_std_diff_countries_df = pd.DataFrame(perc_std_diff_countries).set_index(0)
-std_diff_countries_df = pd.DataFrame(std_diff_countries).set_index(0)
-perc_diff.to_excel(path_output+"Njord_percentual_diff_Irena.xlsx")
-diff.to_excel(path_output+"Njord_diff_Irena.xlsx")
+# mean_diff, diff, perc_diff = mean_difference_from_ref_data(price_model_results)
+# std_diff_countries, std_diff_year = standard_deviation_all_countries(diff)
+# perc_std_diff_countries, perc_std_diff_year = standard_deviation_all_countries(perc_diff)
+# perc_std_diff_countries_df = pd.DataFrame(perc_std_diff_countries).set_index(0)
+# std_diff_countries_df = pd.DataFrame(std_diff_countries).set_index(0)
+# perc_diff.to_excel(path_output+"Njord_percentual_diff_Irena.xlsx")
+# diff.to_excel(path_output+"Njord_diff_Irena.xlsx")
 # diff_1 = perc_diff# .transpose()
 # print(diff_1)
 # diff_1.plot()#hist(bins=50)
@@ -269,4 +256,35 @@ def calc_median(data_input, datasources=""):  # Takes a DataFrame as input and r
     median_columns = data_input.median()
     return median_rows, median_columns
 
-calc_median(price_model_results)
+# calc_median(price_model_results)
+
+def check_missing_countries(data1, data2):
+    downloaded_countries = data1["Reporting Country"]
+    downloaded_countries = list(downloaded_countries)
+    downloaded_countries = list(dict.fromkeys(downloaded_countries))
+    country_list = data2[1]
+    name_not_in_reporting = list()
+    for name in country_list:
+        if name not in downloaded_countries:
+            name_not_in_reporting.append(name)
+
+    downloaded_countries = data1["Partner Country"]
+    downloaded_countries = list(downloaded_countries)
+    downloaded_countries = list(dict.fromkeys(downloaded_countries))
+    name_not_in_partner = []
+    for name in country_list:
+        if name not in downloaded_countries:
+            name_not_in_partner.append(name)
+
+    not_in_reporting_or_partner = [x for x in name_not_in_reporting if x in set(name_not_in_partner)]
+    testhaah = [x for x in name_not_in_partner if x in set(name_not_in_reporting)]
+    # print(not_in_reporting_or_partner)
+    # print(testhaah)
+    # print(name_not_in_reporting)
+    # print(name_not_in_partner)
+    return not_in_reporting_or_partner
+
+test1 = pd.read_csv("ITC_yearly_data_HS_6.csv")
+test2 = pd.read_excel("Country_code_list.xlsx")
+check_missing_countries(test1, test2)
+
