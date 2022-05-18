@@ -51,14 +51,16 @@ root = Tk()
 root.title("NJORD installed Capacity")
 root.geometry("1200x750")
 year = 2020
-regions = ["Africa","Asia","Central America","Eurasia","Europe","Middle East","North America","Oceania","Ref. country price", "Ref. country weight", "South America","World"]
+regions = ["Africa", "Asia", "Central America", "Eurasia", "Europe", "Middle East", "North America", "Oceania",
+           "Ref. country price", "Ref. country weight", "South America", "World"]
 list_colors = [(15,100,90,10), (0,90,85,0), (0,80,95,0), (0,50,100,0), (0,35,85,0), (5,0,90,0), (20,0,100,0), (50,0,100,0), (75,0,100,0), (85,10,100,10), (90,30,95,30)]
 check_box_list = []
 check_box_list2 = []
+
+
 class ChecklistBox(Frame):
     def __init__(self, parent, choices, **kwargs):
         Frame.__init__(self, parent, **kwargs)
-
         self.vars = []
         bg = self.cget("background")
         for choice in choices:

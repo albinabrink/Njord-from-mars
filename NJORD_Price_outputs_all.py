@@ -128,7 +128,7 @@ for year in desiderio:
                 t = False
                 continue
 
-        q=True
+        q = True
         while q is True:    # very stupid solution for the problem!!!!
             if d_count_export == 4:
                 source_data_export="D"
@@ -140,11 +140,11 @@ for year in desiderio:
                 continue
             if m_count_export < d_count_export:
                 source_data_export="D*"
-                q=False
+                q = False
                 continue
             if m_count_export > d_count_export:
-                source_data_export="M*"
-                q=False
+                source_data_export = "M*"
+                q = False
             if m_count_export == d_count_export:
                 source_data_export = "M*"
                 q = False
@@ -203,7 +203,7 @@ for year in desiderio:
                 percentage_exp.append(0)
                 continue
             else:
-                value=sum(exports_period.loc[item, time_window_export])/sum_exports  # percentage for each country
+                value = sum(exports_period.loc[item, time_window_export])/sum_exports  # percentage for each country
                 percentage_exp.append(value)
 
         # PVa factor
@@ -932,7 +932,7 @@ Eurasia=["Armenia","Azerbaijan","Turkey"]
 Oceania=["Australia","Fiji","Guam","Micronesia__Federated_States_of","Norfolk_Island","New_Caledonia","New_Zealand","Papua_New_Guinea","Solomon_Islands","Kiribati","New_Caledonia"]
 Middle_East=["Bahrain","Iran__Islamic_Republic_of","Iraq","Israel","Jordan","Kuwait","Lebanon","Oman","Palau","Palestine__State_of","Qatar","Saudi_Arabia","Syrian_Arab_Republic","United_Arab_Emirates","Yemen","Kuwait","Lebanon","Jordan","Oman"]
 indici=["Ref_country","Asia","Europe","Africa","North_America","Central_America","South_America","Eurasia","Oceania","Middle_East"]
-reference_data_year=pd.read_excel("Reference_accumulated_2022.xlsx",index_col=0, na_values=['NA'])
+reference_data_year = pd.read_excel("Reference_accumulated_2022.xlsx",index_col=0, na_values=['NA'])
 Combined = pd.read_excel("NJORD-Price_model_results_year.xlsx",index_col=0, na_values=['NA'])
 
 period_col=["NJORD 2010","Ref 2010","Source 2010","Diff 2010","NJORD 2011","Ref 2011","Source 2011","Diff 2011","NJORD 2012","Ref 2012","Source 2012","Diff 2012","NJORD 2013","Ref 2013","Source 2013","Diff 2013","NJORD 2014","Ref 2014","Source 2014","Diff 2014","NJORD 2015","Ref 2015","Source 2015","Diff 2015","NJORD 2016","Ref 2016","Source 2016","Diff 2016","NJORD 2017","Ref 2017","Source 2017","Diff 2017","NJORD 2018","Ref 2018","Source 2018","Diff 2018","NJORD 2019","Ref 2019","Source 2019","Diff 2019","NJORD 2020","Ref 2020","Source 2020","Diff 2020"]

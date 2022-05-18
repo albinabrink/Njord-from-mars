@@ -1,9 +1,8 @@
-import ssl
+
 import pandas as pd
 import requests
 import urllib3
 from urllib3.exceptions import InsecureRequestWarning
-import json
 
 path_output = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\"
 
@@ -111,8 +110,12 @@ def download_NTL_codes():  # Way too big, don't use for all countries.
     params = {"product_cd": "854140"}
     NTL = requests.get(url, params=params, verify=False)
     NTL = pd.DataFrame(NTL.json())
+    # Rename the codes to country names
+    country_list = pd.DataFrame(get_countries()).set_index(0)
+    for code in country_list.index:
+        NTL['countryCd'].replace(code, country_list.loc[code][1], inplace=True)
     return NTL
 
 
-# NTL_codes = download_NTL_codes()
-# NTL_codes.to_csv("NTL_codes.csv")
+NTL_codes = download_NTL_codes()
+NTL_codes.to_csv("NTL_codes.csv")

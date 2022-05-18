@@ -5,9 +5,9 @@ import pandas as pd
 
 # unit = "weight"
 # path_input = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\Raw_data\\Final_database\\Weight\\"  # this is the path_out_final in the script From_html_to_db
-# path_output = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\"# this will be the folder from where the GUI will read the data
+path_output = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\"# this will be the folder from where the GUI will read the data
 
-# os.makedirs(path_output, exist_ok=True)
+os.makedirs(path_output, exist_ok=True)
 # nations_list = os.listdir(path_input + "\\Export\\")
 
 # period = ["2009-Q4", "2010-Q1", "2010-Q2", "2010-Q3", "2010-Q4", "2011-Q1", "2011-Q2", "2011-Q3", "2011-Q4",
@@ -102,9 +102,7 @@ def name_cleanup(name, year):
     return name
 
 
-def manufacturing(nation, year):  # Extract the manufacturing for a nation in a specific year
-    manufacturing_df = pd.read_excel("Manufacturing.xlsx", index_col=0, na_values=['NA'])  # Use as input so not in loop
-    manufacturing_df = manufacturing_df.fillna(0)
+def manufacturing(nation, year, manufacturing_df):  # Extract the manufacturing for a nation in a specific year
     # print(manufacturing_df)
     # year = year.split("-")
     # year = year[0]
@@ -119,8 +117,50 @@ def manufacturing(nation, year):  # Extract the manufacturing for a nation in a 
 # print(manufacturing(test, period))
 
 
-def calc_PV_factor(year, unit, nations_within, percentage, import_export):
-    pv_share_unit = pd.read_excel("Share_in_PV_"+unit+".xlsx", index_col=0)  # Move out of loop?
+def imports_or_export_in_period(dataset, country, year, export_import, value_or_quantity):
+    data = dataset.loc[dataset["Reporting Country"] == country]
+    datatest = data.loc[data["period"] == year]
+    trade_data = datatest[export_import + value_or_quantity]
+    trade_data = trade_data.set_axis(datatest["Partner Country"])
+    return trade_data
+
+
+def create_mirror_data(data, country, year, import_export, value_or_quantity):
+    data = data.loc[data["Partner Country"] == country]
+    data = data.loc[data["period"] == year]
+    mirror_data = data[import_export + value_or_quantity]
+    mirror_data = mirror_data.set_axis(data["Reporting Country"])
+    return mirror_data
+
+
+def combine_reported_and_mirror(reported, mirror):
+    merged = reported.combine_first(mirror).fillna(0)
+    return merged
+
+
+def calc_percentage_import_or_export(nations_within, imp_or_exp):
+    if "World" in nations_within:
+        sum_trade = imp_or_exp.drop(["World"]).to_numpy().sum()
+    else:
+        sum_trade = imp_or_exp.to_numpy().sum()
+    percentage_trade = []
+    for item in imp_or_exp.index:
+        # print(item)
+        if item == "DataType":
+            continue
+        if sum_trade == 0:
+            percentage_trade.append(0)
+            continue
+        if item == "World":
+            percentage_trade.append(0)
+            continue
+        else:
+            value = (imp_or_exp.loc[item] / sum_trade)  # percentage for each country
+            percentage_trade.append(value)
+    return percentage_trade, sum_trade
+
+
+def calc_PV_factor(year, pv_share_unit, nations_within, percentage, import_export):
     pv_share_unit_list = pv_share_unit.index.values
     cont = 0
     pv_factor = 0
@@ -130,18 +170,59 @@ def calc_PV_factor(year, unit, nations_within, percentage, import_export):
             if nation == "DataType":
                 continue
             if nation in pv_share_unit_list:
-                single_value = pv_share_unit[year][nation]*percentage[cont]
+                single_value = pv_share_unit[year][nation] * percentage[cont]
             else:
-                single_value = pv_share_unit[year]["RoW"]*percentage[cont]
+                single_value = pv_share_unit[year]["RoW"] * percentage[cont]
             pv_factor += single_value
-            cont = cont+1
+            cont = cont + 1
     if import_export == "Export":  # Why is this different?
         for nation in nations_within:
             if nation == "DataType":
                 continue
-            single_value = pv_share_unit[year]["RoW"]*percentage[cont]
+            single_value = pv_share_unit[year]["RoW"] * percentage[cont]
             pv_factor += single_value
     return pv_factor, pv_share_unit
+
+
+def add_quarter(year, month):
+    if int(month) <= 3:
+        quarter = "-Q1"
+    elif int(month) <= 6:
+        quarter = "-Q2"
+    elif int(month) <= 9:
+        quarter = "-Q3"
+    else:
+        quarter = "-Q4"
+    return year + quarter
+
+
+def add_time_shift(months_shift, year, month):
+    if month+months_shift > 12:
+        month = months_shift-(12-month)
+        year = year+1
+    else:
+        month = month+months_shift
+    if month < 10:
+        month = f"0{str(month)}"
+    return str(year), str(month)
+
+
+def create_quarterly_data(data):
+    for name in data.columns:
+        if "NJORD" in name:
+            if int(name[-2:]) <= 3:
+                temp_name = name[:-2]+"-Q1"
+            elif 3 < int(name[-2:]) <= 6:
+                temp_name = name[:-2]+"-Q2"
+            elif 6 < int(name[-2:]) <= 9:
+                temp_name = name[:-2]+"-Q3"
+            else:
+                temp_name = name[:-2]+"-Q4"
+            if temp_name in data.columns:
+                data[temp_name] += data[name]
+            else:
+                data[temp_name] = data[name]
+    return data
 
 
 def direct_or_mirror(data, unit, import_export, year, name):  # Do not need to check direct or mirror data, rewritten in ...
@@ -199,228 +280,6 @@ def direct_or_mirror(data, unit, import_export, year, name):  # Do not need to c
     return source_data, data_period, time_window, nations_within
 
 
-def calc_percentage_import_export(imports, exports, time_window_import, time_window_export): # Should be built more generic, does the same thing twice.
-    nations_within_imports = imports.index.values
-    nations_within_exports = exports.index.values
-    if "World" in nations_within_exports:
-        sum_exports = exports.drop(
-            ["DataType", "World"]).to_numpy().sum()  # Sum of all export in the time period
-    else:
-        sum_exports = exports.drop("DataType").to_numpy().sum()  # Sum of all export in the time period
-    if "World" in nations_within_imports:
-        sum_imports = imports.drop(
-            ["DataType", "World"]).to_numpy().sum()  ## Sum of all import in the time period
-    else:
-        sum_imports = imports.drop("DataType").to_numpy().sum()  ## Sum of all import in the time period
-
-    percentage_imp = []
-    for item in nations_within_imports:
-        if item == "DataType":
-            continue
-        if sum_imports == 0:
-            percentage_imp.append(0)
-            continue
-        if item == "World":
-            percentage_imp.append(0)
-            continue
-        else:
-            # print(item, time_window_import, imports_period.loc[item, time_window_import])
-            value = (sum(imports.loc[item, time_window_import])/sum_imports)  # percentage for each country
-            percentage_imp.append(value)
-
-    percentage_exp = []
-    for item in nations_within_exports:
-        if item == "DataType":
-            continue
-        if sum_exports == 0:
-            percentage_exp.append(0)
-            continue
-        if item == "World":
-            percentage_exp.append(0)
-            continue
-        else:
-            # print(item,time_window_export,sum_exports,exports_period.loc[item,time_window_export])
-            value = sum(exports.loc[item, time_window_export])/sum_exports  # percentage for each country
-            percentage_exp.append(value)
-
-    return percentage_imp, percentage_exp, sum_imports, sum_exports
-
-
-# Functions only used in weight calculations
-def weight(input, period):
-    unit = "Weight"
-    nations = os.listdir(input+"\\Export\\")
-    module_weight = pd.read_excel("Module_weight.xlsx", index_col=0)
-    ref_data = pd.read_excel("Reference_accumulated_2022.xlsx", index_col=0, na_values=['NA'])
-    previous_capacity_W = 0
-    output_W_each_year = pd.DataFrame()
-    for year_quarter in period:
-        year = year_quarter.split("-")
-        year = year[0]
-        for name in nations:
-            name = name.split(".")
-            name = name[0]
-            if name == "American_Samoa" or name == "British_Indian_Ocean_Territory" or name == "Eswatini":
-                continue
-            if int(year) > 2016 and "before" in name:
-                # print("\n\nit is Sudan before so I stop\n\n", name)
-                continue
-            if int(year) <= 2016 and name == "Sudan":
-                # print("\n\n it is Sudan but before 2016 so I stop\n\n",name)
-                continue
-            manufacturing_value = manufacturing(name, year)
-
-            import_source, imports_period, time_window_import, nations_within_imp = direct_or_mirror(input, unit, "Import", year_quarter, name)
-            export_source, exports_period, time_window_export, nations_within_exp = direct_or_mirror(input, unit, "Export", year_quarter, name)
-
-            if import_source == export_source: # Can I remove this? Don't see how it is used in the original code?
-                source_data_total = export_source
-            else:
-                source_data_total = "I_"+import_source+"-E_"+export_source
-
-            percentage_imp, percentage_exp, sum_imports, sum_exports = calc_percentage_import_export(imports_period, exports_period, time_window_import, time_window_export)
-            PV_factor_imp, PV_share_unit = calc_PV_factor(year, unit, nations_within_imp, percentage_imp, "Import")
-            PV_factor_exp, PV_share_unit = calc_PV_factor(year, unit, nations_within_exp, percentage_exp, "Export")
-
-            if sum(percentage_imp) < 1:
-                waste = 1-sum(percentage_imp)  # calc the wasted PV per year
-                lack_PV = waste*PV_share_unit[year]["RoW"]  # The lacking PV that comes from the waste
-                PV_factor_imp += lack_PV  # Update PV_factor_imp
-
-            net_trade = ((sum_imports * PV_factor_imp) - (sum_exports * PV_factor_exp)) * 1000
-            previous_capacity_W, installed_capacity = weight_capacity_output(module_weight, year, manufacturing_value, net_trade, previous_capacity_W)
-
-            # if module_weight[year]["Value"] == 0:
-            #     installed_capacity = 0
-            # else:
-            #    installed_capacity = (((net_trade/1000)/module_weight[year]["Value"])/10**6)+(manufacturing_value/4)  # Why divide with 10^6?
-            name = name_cleanup(name, year)
-            output_W_each_year = create_output_weight(ref_data, year_quarter, year, name, installed_capacity, output_W_each_year)
-
-    return output_W_each_year
-
-
-def create_output_weight(reference, year_quarter, year, name, installed_capacity, output_W_each_year):
-    # Creates the output for calculations of weight.
-    PVPS = year + " - PVPS"
-    other = year + " - Other"
-    Irena = year + " - IRENA"
-    if reference[PVPS][name] == 0:
-        ref_value = reference[other][name]
-        source = "Other"
-        if reference[other][name] == 0:
-            ref_value = reference[Irena][name]
-            source = "Irena"
-            if reference[Irena][name] == 0:
-                ref_value = 0
-                source = "No Ref"
-    else:
-        ref_value = reference[PVPS][name]
-        source = "PVPS"
-
-    if "Q4" in year_quarter:
-        year_output = str(int(year) + 1) + "-Q1"
-    if "Q1" in year_quarter:
-        year_output = str(year) + "-Q2"
-    if "Q2" in year_quarter:
-        year_output = str(year) + "-Q3"
-    if "Q3" in year_quarter:
-        year_output = str(year) + "-Q4"
-    output_W_each_year.at[name, "NJORD " + year_output] = installed_capacity
-    output_W_each_year.at[name, "Ref " + year] = ref_value
-    output_W_each_year.at[name, "Source " + year] = source
-    output_W_each_year.at[name, "IRENA " + year] = reference[Irena][name]
-    output_W_each_year.at[name, "IRENA s " + year] = reference[str(year) + " - IRENA s"][name]
-    output_W_each_year.at[name, "PVPS " + year] = reference[PVPS][name]
-    output_W_each_year.at[name, "Other " + year] = reference[other][name]
-    return output_W_each_year
-
-
-def weight_capacity_output(module_weight, year, manufacturing_value, net_trade, previous_capacity_W):
-    if module_weight[year]["Value"] == 0:
-        installed_capacity = 0
-    else:
-        installed_capacity = (((net_trade/1000)/module_weight[year]["Value"])/10**6)+(manufacturing_value/4)
-    previous_capacity_W = previous_capacity_W+installed_capacity
-    return previous_capacity_W, installed_capacity
-
-
-def create_weight_models_result_region():
-    Combined = pd.read_excel("NJORD-Weight_model_results_year.xlsx", index_col=0, na_values=['NA'])  # Must change
-    reference_data_year = pd.read_excel("Reference_accumulated_2022.xlsx", index_col=0, na_values=['NA'])
-    index = ["Ref_country", "Asia", "Europe", "Africa", "North_America", "Central_America", "South_America", "Eurasia",
-             "Oceania", "Middle_East"]
-    period_col = ["NJORD 2010", "Ref 2010", "Source 2010", "Diff 2010", "NJORD 2011", "Ref 2011", "Source 2011",
-                  "Diff 2011", "NJORD 2012", "Ref 2012", "Source 2012", "Diff 2012", "NJORD 2013", "Ref 2013",
-                  "Source 2013", "Diff 2013", "NJORD 2014", "Ref 2014", "Source 2014", "Diff 2014", "NJORD 2015",
-                  "Ref 2015", "Source 2015", "Diff 2015", "NJORD 2016", "Ref 2016", "Source 2016", "Diff 2016",
-                  "NJORD 2017", "Ref 2017", "Source 2017", "Diff 2017", "NJORD 2018", "Ref 2018", "Source 2018",
-                  "Diff 2018", "NJORD 2019", "Ref 2019", "Source 2019", "Diff 2019", "NJORD 2020", "Ref 2020",
-                  "Source 2020", "Diff 2020"]
-    output_col = ["Absolute Country Average [%]", "Total deviation for Data set [%]", "Median [%]", "Median [MW]",
-                     "Standard deviation [MW]", "Average deviation [MW]", "T distribution [MW]"]
-    Combined_region_results = pd.DataFrame()
-
-    for year in period_col:
-        if "Ref" in year or "Source" in year or "Diff" in year:
-            continue
-        for region in index:
-            difference_sum = 0
-            NJORD_value_sum = 0
-            ref_value_sum = 0
-            ref_tot_irena = 0
-            ref_tot_pvps = 0
-            ref_tot_other = 0
-            for country in eval(region):
-                # print(country)
-                # country=country.replace(" ","_")
-                if country == "British_Indian_Ocean_Territory" or country == "Eswatini":
-                    continue
-                only_year = year.split(" ")
-                only_year = only_year[1]
-                PVPS = only_year + " - PVPS"
-                other = only_year + " - Other"
-                Irena = only_year + " - IRENA"
-                country = country.replace("_", " ")
-                country = name_cleanup(country, year)
-                NJORD_value = Combined[year][country]
-                ref_value = 0
-                if reference_data_year[PVPS][country] == 0:
-                    ref_value = reference_data_year[other][country]
-                    source = "Other"
-                    # print("PVPS zero used",reference_data_year[other][country])
-                    if reference_data_year[other][country] == 0:
-                        ref_value = reference_data_year[Irena][country]
-                        source = "Irena"
-                        if reference_data_year[Irena][country] == 0:
-                            ref_value = 0
-                            source = "No ref data"
-                    # print("PVPS e Other zero, while Irena=",reference_data_year[Irena][country])
-                else:
-                    ref_value = reference_data_year[PVPS][country]
-                    source = "PVPS"
-                    # print("PVPS not zero")
-                if NJORD_value < 0:
-                    NJORD_value = 0
-                    NJORD_value_sum = NJORD_value_sum + NJORD_value
-                else:
-                    NJORD_value_sum = NJORD_value_sum + NJORD_value
-                # print(ref_value,source,country,year,"Referenza")
-                ref_value_sum = ref_value_sum + ref_value
-                # print(ref_value_sum,"totale",region,"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-                ref_tot_irena = ref_tot_irena + reference_data_year[Irena][country]
-                ref_tot_pvps = ref_tot_pvps + reference_data_year[PVPS][country]
-                ref_tot_other = ref_tot_other + reference_data_year[other][country]
-                # print(NJORD_value_sum,"SOMMA!!!!!!!",region)
-        region = region.replace("_", " ")
-
-        Combined_region_results.at[region, "NJORD " + only_year] = NJORD_value_sum
-        Combined_region_results.at[region, "Ref " + only_year] = ref_value_sum
-        Combined_region_results.at[region, "IRENA " + only_year] = ref_tot_irena
-        Combined_region_results.at[region, "PVPS " + only_year] = ref_tot_pvps
-        Combined_region_results.at[region, "Other " + only_year] = ref_tot_other
-    return Combined_region_results
-
 # Functions for combined model
 
 
@@ -457,14 +316,20 @@ def extract_one_country(country):
 # extract_one_country(country)
 
 
-
-
+def acc_year(data):
+    for name in data.columns:
+        if "NJORD" in name:
+            if "Q" not in name:
+                temp_name = name[:-2]
+                if temp_name in data.columns:
+                    data[temp_name] += data[name]
+                else:
+                    data[temp_name] = data[name]
+    return data
 
 
 # test1 = weight(nations_list, path_output)
 # test1.to_excel(path_output+"test123.xlsx")
-# path_input = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\Raw_data\\Final_database\\Price\\"  # this is the path_out_final in the script From_html_to_db
-# path_output = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\"# this will be the folder from where the GUI will read the data
 # os.makedirs(path_output, exist_ok=True)
 # nations_list = os.listdir(path_input + "\\Export\\")
 # test1, test2 = price(path_input, period)

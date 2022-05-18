@@ -1,5 +1,4 @@
-# Code for validation of data in the NJORD data using Pearsons coefficient, Central limit theorem and t-distribution
-# and mean absolute deviation (|u|) and total deviation.
+# Code for validation of data in NJORD.
 
 import numpy as np
 import pandas as pd
@@ -15,8 +14,8 @@ import os
 # path_input = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\\\"  # this is the path_out_final in the script From_html_to_db
 path_output = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\"  # this will be the folder from where the GUI will read the data
 os.makedirs(path_output, exist_ok=True)
-price_model_results = pd.read_excel("NJORD-Price_model_results_year.xlsx", index_col=0, na_values=['NA'])
-weight_model_results = pd.read_excel("NJORD-Weight_model_results_year.xlsx", index_col=0, na_values=['NA'])
+price_model_results = pd.read_excel("NJORD_Price_year_with_ref.xlsx", index_col=0, na_values=['NA'])
+weight_model_results = pd.read_excel("Weight_results_yearly.xlsx", index_col=0, na_values=['NA'])
 # reference_data = pd.read_excel("Reference_annual_2022.xlsx", index_col=0, na_values=['NA'])
 reference_countries = ["Australia", "Belgium", "Chile", "Denmark", "Finland", "France", "Israel", "Italy", "Japan",
                        "Spain", "Sweden", "Switzerland", "United States of America"]
@@ -107,10 +106,10 @@ def calc_acc_cap(input_data, data_sources):
     return data_acc
 
 
-# Njord_acc_price = calc_acc_cap(price_model_results, "NJORD")
-# Njord_acc_price.to_excel(path_output+"Njord-Price_acc_all.xlsx")
-# Njord_acc_weight = calc_acc_cap(weight_model_results, "NJORD")
-# Njord_acc_weight.to_excel(path_output+"NJORD-Weight_acc_all.xlsx")
+Njord_acc_price = calc_acc_cap(price_model_results, "NJORD")
+Njord_acc_price.to_excel(path_output+"Njord-Price_acc_all.xlsx")
+Njord_acc_weight = calc_acc_cap(weight_model_results, "NJORD")
+Njord_acc_weight.to_excel(path_output+"NJORD-Weight_acc_all.xlsx")
 
 def plot_acc_cap(input, reference_countries):  # Not done in the smoothest way, look into making it less complicated
     ref_PVPS = pd.DataFrame()
@@ -277,14 +276,11 @@ def check_missing_countries(data1, data2):
             name_not_in_partner.append(name)
 
     not_in_reporting_or_partner = [x for x in name_not_in_reporting if x in set(name_not_in_partner)]
-    testhaah = [x for x in name_not_in_partner if x in set(name_not_in_reporting)]
-    # print(not_in_reporting_or_partner)
-    # print(testhaah)
-    # print(name_not_in_reporting)
-    # print(name_not_in_partner)
+    test_with_set = [x for x in name_not_in_partner if x in set(name_not_in_reporting)]
     return not_in_reporting_or_partner
 
-test1 = pd.read_csv("ITC_yearly_data_HS_6.csv")
-test2 = pd.read_excel("Country_code_list.xlsx")
-check_missing_countries(test1, test2)
+
+# test1 = pd.read_csv("ITC_yearly_data_HS_6.csv")
+# test2 = pd.read_excel("Country_code_list.xlsx")
+# check_missing_countries(test1, test2)
 
