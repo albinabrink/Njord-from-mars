@@ -309,7 +309,7 @@ def extract_one_country(country):
     country_data = data.loc[(data["Reporting Country"] == country)]
     country_data = country_data.loc[(country_data["period"] == 2012)]
     country_data_import = country_data["exportValue"]
-    print(country_data_import)
+    # print(country_data_import)
     return country_data
 
 # country = "Sweden"
@@ -326,6 +326,15 @@ def acc_year(data):
                 else:
                     data[temp_name] = data[name]
     return data
+
+def remove_large_exporters(exports):
+    large_exporters = ["China", "Korea, Republic of", "Taipei, Chinese", "Malaysia", "India", "Indonesia"]
+    for country in large_exporters:
+        if country in exports.index:
+            # print(exports.index)
+            exports = exports.drop(country)
+            # print(exports)
+    return exports
 
 
 # test1 = weight(nations_list, path_output)

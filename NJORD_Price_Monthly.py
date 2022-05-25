@@ -11,18 +11,10 @@ path_output = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\"  # this wi
 os.makedirs(path_output, exist_ok=True)
 
 
-# nation_list = os.listdir(path_input + "\\Export\\")
-# periods = ["2009-Q4", "2010-Q1", "2010-Q2", "2010-Q3", "2010-Q4", "2011-Q1", "2011-Q2", "2011-Q3", "2011-Q4",
-#             "2012-Q1", "2012-Q2", "2012-Q3", "2012-Q4", "2013-Q1", "2013-Q2", "2013-Q3", "2013-Q4", "2014-Q1",
-#             "2014-Q2", "2014-Q3", "2014-Q4", "2015-Q1", "2015-Q2", "2015-Q3", "2015-Q4", "2016-Q1", "2016-Q2",
-#             "2016-Q3", "2016-Q4", "2017-Q1", "2017-Q2", "2017-Q3", "2017-Q4", "2018-Q1", "2018-Q2", "2018-Q3",
-#             "2018-Q4", "2019-Q1", "2019-Q2", "2019-Q3", "2019-Q4", "2020-Q1", "2020-Q2", "2020-Q3", "2020-Q4"]
-
-
 # Functions only used in Price calculations
 def price(raw_data):  # Main function calculating the price model.
     unit = "Price"
-    reference = pd.read_excel("Reference_accumulated_2022.xlsx", index_col=0, na_values=['NA'])  # Read reference data
+    reference = pd.read_excel("Reference_annual_2022.xlsx", index_col=0, na_values=['NA'])  # Read reference data
     pv_share_unit = pd.read_excel("Share_in_PV_" + unit + ".xlsx", index_col=0)  # Read the PV_share from excel
     PVxchange_cost = pd.read_excel("PVxchange.xlsx", index_col=0)  # Read the cost of panels from big producers
     manufacturing_df = pd.read_excel("Manufacturing.xlsx", index_col=0, na_values=['NA'])  # Read manufacturing data
@@ -40,15 +32,20 @@ def price(raw_data):  # Main function calculating the price model.
     all_countries = pd.read_excel("Country_code_list.xlsx")
     country_not_in_data = Validation_functions.check_missing_countries(raw_data, all_countries)
     nation_list = set(all_countries[1]) - set(country_not_in_data)
-    # Main loop, goes through each month and then each country in that month. Takes a couple of minutes to run.
-    for period in periods:
-        monthly_data = raw_data.loc[raw_data["period"] == period]
-        print(period)
-        month = str(period)[4:]
-        year = str(period)[:4]
-        if year == "2009":
-            continue
-        for name in nation_list:
+    exports_period_quarter = pd.Series()
+    imports_period_quarter = pd.Series()
+
+    # Main loop, might be able to be more effective. Takes a couple of minutes to run.
+    for name in nation_list:
+        print(name)
+        i = 0
+        for period in periods:
+            monthly_data = raw_data.loc[raw_data["period"] == period]
+            # print(period)
+            month = str(period)[4:]
+            year = str(period)[:4]
+            if year == "2009":
+                continue
             # Add months to quarters/years before you do the calculations.
             manufacturing_value = NJORD_function_test.manufacturing(name, str(year), manufacturing_df)
             # Imports and exports a specific period for each specific country.
@@ -63,18 +60,43 @@ def price(raw_data):  # Main function calculating the price model.
                                                                            "Value")
             imports_period = NJORD_function_test.combine_reported_and_mirror(imports_period, imports_period_mirror)
             exports_period = NJORD_function_test.combine_reported_and_mirror(exports_period, exports_period_mirror)
+            # print(exports_period)
+            # print(imports_period)
+            # print(i)
+            if i < 3:
+                if i == 0:
+                    exports_period_quarter = exports_period
+                    # print(exports_period_quarter)
+                    imports_period_quarter = imports_period
+                else:
+                    exports_period_quarter = exports_period_quarter.add(exports_period, fill_value=0)
+                    # print(exports_period_quarter)
+                    imports_period_quarter = imports_period_quarter.add(imports_period, fill_value=0)
+                i += 1
+                if i <= 2:
+                    continue
+            i = 0
+            exports_period = exports_period_quarter
+            imports_period = imports_period_quarter
+            exports_period_quarter = pd.DataFrame()
+            imports_period_quarter = pd.DataFrame()
+            # print(imports_period_quarter)
+            exports_period = NJORD_function_test.remove_large_exporters(exports_period)
+
             # Get a list of all the nations in imports and exports for the specific country and year.
             nations_within_imp = imports_period.index.values
             nations_within_exp = exports_period.index.values
-            # Calculate each partner country's part if trade and sum the reporting country's trade.
+            # Calculate each partner country's part of trade and sum the reporting country's trade.
             percentage_imp, sum_imports = NJORD_function_test.calc_percentage_import_or_export(nations_within_imp,
                                                                                                imports_period)
+            # Add a check for export to large exporter, and remove them.
             percentage_exp, sum_exports = NJORD_function_test.calc_percentage_import_or_export(nations_within_exp,
                                                                                                exports_period)
             # Calc PV_factor, used to determine the price of PV-modules.
             PV_factor_imp, PV_share_unit = NJORD_function_test.calc_PV_factor(str(year), pv_share_unit,
                                                                               nations_within_imp, percentage_imp,
                                                                               "Import")
+
             PV_factor_exp, PV_share_unit = NJORD_function_test.calc_PV_factor(str(year), pv_share_unit,
                                                                               nations_within_exp, percentage_exp,
                                                                               "Export")
@@ -93,8 +115,8 @@ def price(raw_data):  # Main function calculating the price model.
                 installed_capacity = 0
                 installed_capacity_MF = 0
             else:
-                installed_capacity = ((net_trade / PV_market_price) / 10 ** 6) + manufacturing_value  # /4 on manufacturing value, check if it should be removed?
-                installed_capacity_MF = ((net_trade / (PV_market_price * market_factor)) / 10 ** 6) + manufacturing_value
+                installed_capacity = ((net_trade / PV_market_price) / 10 ** 6) + manufacturing_value  # /4 # on manufacturing value, check if it should be removed?
+                installed_capacity_MF = ((net_trade / (PV_market_price * market_factor)) / 10 ** 6)# + manufacturing_value
             name = NJORD_function_test.name_cleanup(name, year)
             if name in reference.index.values:
                 output_P_each_year, output_P_MF_each_year = create_output_price(reference, str(year), month, name,
@@ -102,11 +124,11 @@ def price(raw_data):  # Main function calculating the price model.
                                                                                 installed_capacity_MF,
                                                                                 output_P_each_year,
                                                                                 output_P_MF_each_year)
-    output_P_each_year = NJORD_function_test.create_quarterly_data(output_P_each_year)
-    output_P_MF_each_year = NJORD_function_test.create_quarterly_data(output_P_MF_each_year)
-    output_P_each_year = NJORD_function_test.acc_year(output_P_each_year)
-    output_P_MF_each_year = NJORD_function_test.acc_year(output_P_MF_each_year)
-    return output_P_each_year.sort_index(), output_P_MF_each_year.sort_index()
+    # output_P_each_year = NJORD_function_test.create_quarterly_data(output_P_each_year)
+    # output_P_MF_each_year = NJORD_function_test.create_quarterly_data(output_P_MF_each_year)
+    # output_P_each_year = NJORD_function_test.acc_year(output_P_each_year)
+    # output_P_MF_each_year = NJORD_function_test.acc_year(output_P_MF_each_year)
+    return output_P_MF_each_year.sort_index(), output_P_each_year.sort_index()
 
 
 def calc_PV_market_price(nations_within, change, percentage, year, month, Europe):
@@ -154,9 +176,9 @@ def prel_market_size(net_trade, change, year, month):
 
 def create_output_price(reference, year, month, name, installed_capacity, installed_capacity_MF, output_P_each_year,
                         output_P_MF_each_year):
-    PVPS = year + " - PVPS"
-    other = year + " - Other"
-    Irena = year + " - IRENA"
+    PVPS = year + " - PVPS - annual"
+    other = year + " - Other - annual"
+    Irena = year + " - IRENA - annual"
     # year_quarter = add_quarter(year, month)
     if reference[PVPS][name] == 0:
         ref_value = reference[other][name]
@@ -174,6 +196,7 @@ def create_output_price(reference, year, month, name, installed_capacity, instal
     ref_year = year
     year, month = NJORD_function_test.add_time_shift(3, int(year), int(month))
     year_output = str(year + month)
+    # Creation of the excel sheet that will be returned.
     output_P_each_year.at[name, "NJORD " + year_output] = installed_capacity
     output_P_each_year.at[name, "Ref " + ref_year] = ref_value
     output_P_each_year.at[name, "Source " + ref_year] = source
@@ -181,11 +204,11 @@ def create_output_price(reference, year, month, name, installed_capacity, instal
     output_P_MF_each_year.at[name, "Ref " + ref_year] = ref_value
     output_P_MF_each_year.at[name, "Source " + ref_year] = source
     output_P_each_year.at[name, "IRENA " + ref_year] = reference[Irena][name]
-    output_P_each_year.at[name, "IRENA s " + ref_year] = reference[str(ref_year) + " - IRENA s"][name]
+    # output_P_each_year.at[name, "IRENA s " + ref_year] = reference[str(ref_year) + " - IRENA s"][name]
     output_P_each_year.at[name, "PVPS " + ref_year] = reference[PVPS][name]
     output_P_each_year.at[name, "Other " + ref_year] = reference[other][name]
     output_P_MF_each_year.at[name, "IRENA " + ref_year] = reference[Irena][name]
-    output_P_MF_each_year.at[name, "IRENA s " + ref_year] = reference[str(ref_year) + " - IRENA s"][name]
+    # output_P_MF_each_year.at[name, "IRENA s " + ref_year] = reference[str(ref_year) + " - IRENA s"][name]
     output_P_MF_each_year.at[name, "PVPS " + ref_year] = reference[PVPS][name]
     output_P_MF_each_year.at[name, "Other " + ref_year] = reference[other][name]
     return output_P_each_year, output_P_MF_each_year
@@ -193,7 +216,7 @@ def create_output_price(reference, year, month, name, installed_capacity, instal
 
 raw_data = pd.read_csv("ITC_Monthly_data_HS_6.csv")
 output_P_each_year, output_P_MF_each_year = price(raw_data)
-output_P_each_year.to_excel(path_output + "Test_month_Price_max_model_results.xlsx")
+output_P_each_year.to_excel(path_output + "Test2_month_Price_max_model_results.xlsx")
 # output_P_MF_each_year.to_excel(path_output+"Test_NJORD-Price_model_results.xlsx")
 
 

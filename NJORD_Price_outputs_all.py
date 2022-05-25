@@ -895,20 +895,20 @@ desiderio=["2010","2011","2012","2013","2014","2015","2016","2017","2018","2019"
 print(quartly.columns)
 for nation in quartly.index:
     for year in desiderio:
-        q1=quartly.loc[nation,"NJORD "+year+"-Q1"]
+        q1 = quartly.loc[nation,"NJORD "+year+"-Q1"]
         q2 = quartly.loc[nation,"NJORD " + year + "-Q2"]
         q3 = quartly.loc[nation,"NJORD " + year + "-Q3"]
         q4 = quartly.loc[nation,"NJORD " + year + "-Q4"]
-        if q1 <0:
-            q1=0
-        if q2 <0:
-            q2=0
-        if q3 <0:
-            q3=0
-        if q4 <0:
-            q4=0
-        somma=q1+q2+q3+q4
-        yearly.at[nation,"NJORD "+year]=somma
+        if q1 < 0:
+            q1 = 0
+        if q2 < 0:
+            q2 = 0
+        if q3 < 0:
+            q3 = 0
+        if q4 < 0:
+            q4 = 0
+        somma = q1+q2+q3+q4
+        yearly.at[nation, "NJORD "+year] = somma
 
 for column in quartly.columns:
     if "NJORD" in str(column):
@@ -1022,14 +1022,14 @@ for year in period_col:
                 ref_value = reference_data_year[PVPS][country]
                 source = "PVPS"
                 # print("PVPS not zero")
-            if NJORD_value <0:
-                NJORD_value=0
+            if NJORD_value < 0:
+                NJORD_value = 0
                 NJORD_value_sum = NJORD_value_sum + NJORD_value
             else:
                 NJORD_value_sum = NJORD_value_sum + NJORD_value
-            print(ref_value,source,country,year,"Referenza")
+            print(ref_value, source, country, year, "Referenza")
             ref_value_sum = ref_value_sum + ref_value
-            print(ref_value_sum,"totale",region,"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+            print(ref_value_sum, "totale", region, "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
             ref_tot_irena = ref_tot_irena+reference_data_year[Irena][country]
             ref_tot_pvps = ref_tot_pvps+reference_data_year[PVPS][country]
             ref_tot_other = ref_tot_other+reference_data_year[other][country]

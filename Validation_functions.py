@@ -10,6 +10,7 @@ from matplotlib import pyplot as plt
 import statistics
 import itertools
 import os
+import NJORD_function_test
 
 # path_input = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\\\"  # this is the path_out_final in the script From_html_to_db
 path_output = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\"  # this will be the folder from where the GUI will read the data
@@ -67,8 +68,8 @@ def Pearson_coef(input, reference_countries, unit):
 def plot_figure_pearson(price, weight):  # Plots the correlation value between NJORD and ? for the two different models
     x_all_p = []
     y_all_p = []
-    print(price)
-    print(weight)
+    # print(price)
+    # print(weight)
     for i in price:
         mylist = i.items()
         x, y = zip(*mylist)
@@ -279,8 +280,109 @@ def check_missing_countries(data1, data2):
     test_with_set = [x for x in name_not_in_partner if x in set(name_not_in_reporting)]
     return not_in_reporting_or_partner
 
-
 # test1 = pd.read_csv("ITC_yearly_data_HS_6.csv")
 # test2 = pd.read_excel("Country_code_list.xlsx")
 # check_missing_countries(test1, test2)
 
+def outlier_check(data):
+    for name in data.index:
+        return
+
+
+def check_reference_countries(data, reference_countries):
+    data = data.loc[data["Unnamed: 0"].isin(reference_countries)]
+    # print(data)
+    # ref_country_data = data.iloc[:, -9:]
+    ref_country_data = pd.DataFrame()
+    ref_country_data.insert(0, "country", data["Unnamed: 0"], True)
+    # print(ref_country_data)
+    for col in data.columns:
+        cutoff = 2014
+        if "NJORD" in col:
+            NJORD_placeholder = data.loc[:, [col[-6:-2] in i for i in data.columns]]
+            NJORD_placeholder = NJORD_placeholder.loc[:, ~NJORD_placeholder.columns.duplicated()]
+            NJORD_placeholder = NJORD_placeholder.loc[:, ["NJORD" in i for i in NJORD_placeholder.columns]]
+            ref_country_data["NJORD "+col[-6:-2]] = NJORD_placeholder.sum(axis=1)
+            # print(ref_country_data)
+        if "PVPS" in col:
+            if int(col[-4:]) >= cutoff:
+                ref_country_data[col] = data[col]
+    i = 2014
+    while i < 2021:
+        diff = ref_country_data["NJORD "+str(i)] - ref_country_data["PVPS " + str(i)]
+        ref_country_data["DIFF "+str(i)] = diff
+        ref_country_data["Percent Diff "+str(i)] = (diff/ref_country_data["PVPS "+str(i)])
+        i += 1
+    return ref_country_data
+
+
+def outlier_check(raw_data):
+    imports_country_month = pd.DataFrame()
+    exports_country_month = pd.DataFrame()
+    periods = list(dict.fromkeys(raw_data["period"]))
+    # print(periods)
+    all_countries = pd.read_excel("Country_code_list.xlsx")
+    country_not_in_data = check_missing_countries(raw_data, all_countries)
+    nation_list = set(all_countries[1]) - set(country_not_in_data)
+    outliers_import = pd.DataFrame()
+    outliers_export = pd.DataFrame()
+    # Should make a function that does this (330-352)
+    for nation in nation_list:
+        for period in periods:
+            monthly_data = raw_data.loc[raw_data["period"] == period]
+            imports_period = NJORD_function_test.imports_or_export_in_period(monthly_data, nation, int(period), "import",
+                                                                             "Value")
+            exports_period = NJORD_function_test.imports_or_export_in_period(monthly_data, nation, int(period), "export",
+                                                                             "Value")
+            # Handle missing data/mirror data, and combine the direct data with the mirror data.
+            exports_period_mirror = NJORD_function_test.create_mirror_data(monthly_data, nation, int(period), "import",
+                                                                           "Value")
+            imports_period_mirror = NJORD_function_test.create_mirror_data(monthly_data, nation, int(period), "export",
+                                                                           "Value")
+            imports_period = NJORD_function_test.combine_reported_and_mirror(imports_period, imports_period_mirror)
+            exports_period = NJORD_function_test.combine_reported_and_mirror(exports_period, exports_period_mirror)
+
+            nations_within_imp = imports_period.index.values
+            nations_within_exp = exports_period.index.values
+
+            percentage_imp, sum_imports = NJORD_function_test.calc_percentage_import_or_export(nations_within_imp,
+                                                                                               imports_period)
+            # Add a check for export to large exporter, and remove them.
+            percentage_exp, sum_exports = NJORD_function_test.calc_percentage_import_or_export(nations_within_exp,
+                                                                                               exports_period)
+            imports_country_month.at[nation, period] = sum_imports
+            exports_country_month.at[nation, period] = sum_exports
+            imports_country_month = imports_country_month.sort_index()
+            exports_country_month = exports_country_month.sort_index()
+    imports_country = imports_country_month.transpose()
+    exports_country = exports_country_month.transpose()
+    for country in imports_country:
+        # print(imports_country[country])
+        MAD = imports_country[country].mad()
+        median = imports_country[country].median()
+        for i in imports_country.index:
+            print(imports_country[country].loc[i])
+            z_score = 0.6745*(imports_country[country].loc[i]-median)/MAD
+            if z_score.item() > 3.5 or z_score.item() < -3.5:
+                outliers_import.at[country, i] = z_score
+    for country in exports_country:
+        MAD = exports_country[country].mad()
+        median = exports_country[country].median()
+        for i in exports_country.index:
+            z_score = 0.6745*(exports_country[country].loc[i]-median)/MAD
+            if z_score.item() > 3.5 or z_score.item() < -3.5:
+                outliers_export.at[country, i] = z_score
+
+    outliers_import = outliers_import.transpose()
+    outliers_import = outliers_import.sort_index()
+    outliers_export = outliers_import.transpose()
+    outliers_import = outliers_import.sort_index()
+    return outliers_import, outliers_export
+
+#test = pd.read_excel("Test2_NJORD_weight_models_result.xlsx")
+#ref = check_reference_countries(test, reference_countries)
+#ref.to_excel("reference_countries_weight.xlsx")
+
+outlier_data = pd.read_csv("ITC_Monthly_data_HS_6.csv")
+outlier_import, outlier_export = outlier_check(outlier_data)
+outlier_import.to_excel("Z_outliers_import.xlsx")

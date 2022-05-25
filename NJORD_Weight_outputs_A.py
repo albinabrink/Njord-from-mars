@@ -22,7 +22,7 @@ os.makedirs(path_output, exist_ok=True)
 def weight(raw_data):
     unit = "Weight"
     module_weight = pd.read_excel("Module_weight.xlsx", index_col=0)
-    ref_data = pd.read_excel("Reference_accumulated_2022.xlsx", index_col=0, na_values=['NA'])
+    ref_data = pd.read_excel("Reference_annual_2022.xlsx", index_col=0, na_values=['NA'])
     pv_share_unit = pd.read_excel("Share_in_PV_" + unit + ".xlsx", index_col=0)  # Read the PV_share from excel
     manufacturing_df = pd.read_excel("Manufacturing.xlsx", index_col=0, na_values=['NA'])  # Read manufacturing data
     manufacturing_df = manufacturing_df.fillna(0)
@@ -32,17 +32,19 @@ def weight(raw_data):
     all_countries = pd.read_excel("Country_code_list.xlsx")
     country_not_in_data = Validation_functions.check_missing_countries(raw_data, all_countries)
     nation_list = set(all_countries[1]) - set(country_not_in_data)
-    print(nation_list)
-    for period in periods:
-        monthly_data = raw_data.loc[raw_data["period"] == period]
-        month = str(period)[4:]
-        year = str(period)[:4]
-        print(period)
-        if year == "2021":
+    # print(nation_list)
+    for name in nation_list:
+        if name not in ref_data.index.values:
             continue
-        for name in nation_list:
-            if name not in ref_data.index.values:
+        print(name)
+        i = 0
+        for period in periods:
+            monthly_data = raw_data.loc[raw_data["period"] == period]
+            month = str(period)[4:]
+            year = str(period)[:4]
+            if year == "2021":
                 continue
+
             manufacturing_value = NJORD_function_test.manufacturing(name, year, manufacturing_df)
 
             imports_period = NJORD_function_test.imports_or_export_in_period(monthly_data, name, int(period), "import", "Quantity")
@@ -51,6 +53,24 @@ def weight(raw_data):
             exports_mirror = NJORD_function_test.create_mirror_data(monthly_data, name, int(period), "import", "Quantity")
             imports_period = NJORD_function_test.combine_reported_and_mirror(imports_period, imports_mirror)
             exports_period = NJORD_function_test.combine_reported_and_mirror(exports_period, exports_mirror)
+            if i < 3:
+                if i == 0:
+                    exports_period_quarter = exports_period
+                    imports_period_quarter = imports_period
+                else:
+                    exports_period_quarter = exports_period_quarter.add(exports_period, fill_value=0)
+                    imports_period_quarter = imports_period_quarter.add(imports_period, fill_value=0)
+                i += 1
+                if i <= 2:
+                    continue
+            i = 0
+            exports_period = exports_period_quarter
+            imports_period = imports_period_quarter
+            exports_period_quarter = pd.DataFrame()
+            imports_period_quarter = pd.DataFrame()
+            # print(imports_period_quarter)
+            exports_period = NJORD_function_test.remove_large_exporters(exports_period)
+
             nations_within_imp = imports_period.index.values
             nations_within_exp = exports_period.index.values
 
@@ -69,16 +89,16 @@ def weight(raw_data):
 
             name = NJORD_function_test.name_cleanup(name, year)
             output_W_each_year = create_output_weight(ref_data, year, month, name, installed_capacity, output_W_each_year)
-    output_W_each_year = NJORD_function_test.create_quarterly_data(output_W_each_year)
-    output_W_each_year = NJORD_function_test.acc_year(output_W_each_year)
+    # output_W_each_year = NJORD_function_test.create_quarterly_data(output_W_each_year)
+    # output_W_each_year = NJORD_function_test.acc_year(output_W_each_year)
     return output_W_each_year.sort_index()
 
 
 def create_output_weight(reference, year, month, name, installed_capacity, output_W_each_year):
     # Creates the output for calculations of weight.
-    PVPS = year + " - PVPS"
-    other = year + " - Other"
-    Irena = year + " - IRENA"
+    PVPS = year + " - PVPS - annual"
+    other = year + " - Other - annual"
+    Irena = year + " - IRENA - annual"
     if reference[PVPS][name] == 0:
         ref_value = reference[other][name]
         source = "Other"
@@ -98,7 +118,7 @@ def create_output_weight(reference, year, month, name, installed_capacity, outpu
     output_W_each_year.at[name, "Ref " + year] = ref_value
     output_W_each_year.at[name, "Source " + year] = source
     output_W_each_year.at[name, "IRENA " + year] = reference[Irena][name]
-    output_W_each_year.at[name, "IRENA s " + year] = reference[str(year) + " - IRENA s"][name]
+    # output_W_each_year.at[name, "IRENA s " + year] = reference[str(year) + " - IRENA s"][name]
     output_W_each_year.at[name, "PVPS " + year] = reference[PVPS][name]
     output_W_each_year.at[name, "Other " + year] = reference[other][name]
     return output_W_each_year
@@ -189,20 +209,6 @@ def create_weight_models_result_region():
         Combined_region_results.at[region, "Other " + only_year] = ref_tot_other
     return Combined_region_results
 
-def imports_or_export_in_period(dataset, country, year, export_import, value_or_quantity):
-    data = dataset.loc[dataset["Reporting Country"] == country]
-    datatest = data.loc[data["period"] == year]
-    trade_data = datatest[export_import + value_or_quantity]
-    trade_data = trade_data.set_axis(datatest["Partner Country"])
-    return trade_data
-
-
-def create_mirror_data(data, country, year, import_export, value_or_quantity):
-    data = data.loc[data["Partner Country"] == country]
-    data = data.loc[data["period"] == year]
-    mirror_data = data[import_export + value_or_quantity]
-    mirror_data = mirror_data.set_axis(data["Reporting Country"])
-    return mirror_data
 
 data = pd.read_csv("ITC_Monthly_data_HS_6.csv")
 weight_output_each_year = weight(data)
