@@ -41,7 +41,6 @@ def price(raw_data):  # Main function calculating the price model.
         i = 0
         for period in periods:
             monthly_data = raw_data.loc[raw_data["period"] == period]
-            # print(period)
             month = str(period)[4:]
             year = str(period)[:4]
             if year == "2009":
@@ -60,26 +59,27 @@ def price(raw_data):  # Main function calculating the price model.
                                                                            "Value")
             imports_period = NJORD_function_test.combine_reported_and_mirror(imports_period, imports_period_mirror)
             exports_period = NJORD_function_test.combine_reported_and_mirror(exports_period, exports_period_mirror)
-            # print(exports_period)
-            # print(imports_period)
-            # print(i)
-            if i < 3:
-                if i == 0:
-                    exports_period_quarter = exports_period
-                    # print(exports_period_quarter)
-                    imports_period_quarter = imports_period
-                else:
-                    exports_period_quarter = exports_period_quarter.add(exports_period, fill_value=0)
-                    # print(exports_period_quarter)
-                    imports_period_quarter = imports_period_quarter.add(imports_period, fill_value=0)
-                i += 1
-                if i <= 2:
-                    continue
-            i = 0
-            exports_period = exports_period_quarter
-            imports_period = imports_period_quarter
-            exports_period_quarter = pd.DataFrame()
-            imports_period_quarter = pd.DataFrame()
+            # if i < 3:
+            #    if i == 0:
+            #        exports_period_quarter = exports_period
+            #        # print(exports_period_quarter)
+            #        imports_period_quarter = imports_period
+            #    else:
+            #        exports_period_quarter = exports_period_quarter.add(exports_period, fill_value=0)
+            #        # print(exports_period_quarter)
+            #        imports_period_quarter = imports_period_quarter.add(imports_period, fill_value=0)
+            #    i += 1
+            #    if i <= 2:
+            #        continue
+            # i = 0
+            # exports_period = exports_period_quarter
+            # imports_period = imports_period_quarter
+            if "World" in imports_period:
+                imports_period = imports_period.drop(labels="World")
+            if "World" in exports_period:
+                exports_period = exports_period.drop(labels="World")
+            # exports_period_quarter = pd.DataFrame()
+            # imports_period_quarter = pd.DataFrame()
             # print(imports_period_quarter)
             exports_period = NJORD_function_test.remove_large_exporters(exports_period)
 
@@ -171,6 +171,10 @@ def prel_market_size(net_trade, change, year, month):
         market_factor = all_market_factors["10-100MW"]["Factor"]
     if prel_MS > 100:
         market_factor = all_market_factors[">100 MW"]["Factor"]
+    if 10 < prel_MS <= 100:
+        market_factor = all_market_factors["10-100MW"]["Factor"]
+    if prel_MS > 100:
+        market_factor = all_market_factors[">100 MW"]["Factor"]
     return market_factor
 
 
@@ -193,8 +197,8 @@ def create_output_price(reference, year, month, name, installed_capacity, instal
         ref_value = reference[PVPS][name]
         source = "PVPS"
     # Add a timeshift in the month when it should be expected to be installed.
-    ref_year = year
     year, month = NJORD_function_test.add_time_shift(3, int(year), int(month))
+    ref_year = year
     year_output = str(year + month)
     # Creation of the excel sheet that will be returned.
     output_P_each_year.at[name, "NJORD " + year_output] = installed_capacity
@@ -214,9 +218,9 @@ def create_output_price(reference, year, month, name, installed_capacity, instal
     return output_P_each_year, output_P_MF_each_year
 
 
-raw_data = pd.read_csv("ITC_Monthly_data_HS_6.csv")
-output_P_each_year, output_P_MF_each_year = price(raw_data)
-output_P_each_year.to_excel(path_output + "Test2_month_Price_max_model_results.xlsx")
+# raw_data = pd.read_csv("ITC_Monthly_data_HS_6.csv")
+# output_P_each_year, output_P_MF_each_year = price(raw_data)
+# output_P_each_year.to_excel(path_output + "Test2_month_Price_max_model_results.xlsx")
 # output_P_MF_each_year.to_excel(path_output+"Test_NJORD-Price_model_results.xlsx")
 
 

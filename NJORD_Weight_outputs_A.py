@@ -53,21 +53,28 @@ def weight(raw_data):
             exports_mirror = NJORD_function_test.create_mirror_data(monthly_data, name, int(period), "import", "Quantity")
             imports_period = NJORD_function_test.combine_reported_and_mirror(imports_period, imports_mirror)
             exports_period = NJORD_function_test.combine_reported_and_mirror(exports_period, exports_mirror)
-            if i < 3:
-                if i == 0:
-                    exports_period_quarter = exports_period
-                    imports_period_quarter = imports_period
-                else:
-                    exports_period_quarter = exports_period_quarter.add(exports_period, fill_value=0)
-                    imports_period_quarter = imports_period_quarter.add(imports_period, fill_value=0)
-                i += 1
-                if i <= 2:
-                    continue
-            i = 0
-            exports_period = exports_period_quarter
-            imports_period = imports_period_quarter
-            exports_period_quarter = pd.DataFrame()
-            imports_period_quarter = pd.DataFrame()
+            # Add month shift here
+            # year, month = NJORD_function_test.add_time_shift(2, int(year), int(month))
+            # if i < 3:
+            #     if i == 0:
+            #        exports_period_quarter = exports_period
+            #        imports_period_quarter = imports_period
+            #    else:
+            #        exports_period_quarter = exports_period_quarter.add(exports_period, fill_value=0)
+            #        imports_period_quarter = imports_period_quarter.add(imports_period, fill_value=0)
+            #    i += 1
+            #   if i <= 2:
+            #        continue
+            # i = 0
+            # exports_period = exports_period_quarter
+            # imports_period = imports_period_quarter
+            if "World" in imports_period:
+                imports_period = imports_period.drop(labels="World")
+            if "World" in exports_period:
+                exports_period = exports_period.drop(labels="World")
+
+            # exports_period_quarter = pd.DataFrame()
+            # imports_period_quarter = pd.DataFrame()
             # print(imports_period_quarter)
             exports_period = NJORD_function_test.remove_large_exporters(exports_period)
 
@@ -89,7 +96,7 @@ def weight(raw_data):
 
             name = NJORD_function_test.name_cleanup(name, year)
             output_W_each_year = create_output_weight(ref_data, year, month, name, installed_capacity, output_W_each_year)
-    # output_W_each_year = NJORD_function_test.create_quarterly_data(output_W_each_year)
+    output_W_each_year = NJORD_function_test.create_quarterly_data(output_W_each_year)
     # output_W_each_year = NJORD_function_test.acc_year(output_W_each_year)
     return output_W_each_year.sort_index()
 
@@ -111,8 +118,7 @@ def create_output_weight(reference, year, month, name, installed_capacity, outpu
     else:
         ref_value = reference[PVPS][name]
         source = "PVPS"
-    ref_year = year
-    year_month = NJORD_function_test.add_time_shift(3, int(year), int(month))
+    year, month = NJORD_function_test.add_time_shift(3, int(year), int(month))
     year_output = str(year+month)
     output_W_each_year.at[name, "NJORD " + year_output] = installed_capacity
     output_W_each_year.at[name, "Ref " + year] = ref_value
@@ -212,4 +218,4 @@ def create_weight_models_result_region():
 
 data = pd.read_csv("ITC_Monthly_data_HS_6.csv")
 weight_output_each_year = weight(data)
-weight_output_each_year.to_excel(path_output+"Test2_NJORD_weight_models_result.xlsx")
+weight_output_each_year.to_excel(path_output+"Worldrem_NJORD_weight_models_result.xlsx")

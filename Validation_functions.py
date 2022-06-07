@@ -361,7 +361,7 @@ def outlier_check(raw_data):
         MAD = imports_country[country].mad()
         median = imports_country[country].median()
         for i in imports_country.index:
-            print(imports_country[country].loc[i])
+            print(imports_country[country].loc[i], imports_country[country])
             z_score = 0.6745*(imports_country[country].loc[i]-median)/MAD
             if z_score.item() > 3.5 or z_score.item() < -3.5:
                 outliers_import.at[country, i] = z_score
@@ -369,20 +369,24 @@ def outlier_check(raw_data):
         MAD = exports_country[country].mad()
         median = exports_country[country].median()
         for i in exports_country.index:
+            print(exports_country[country].loc[i], exports_country[country])
             z_score = 0.6745*(exports_country[country].loc[i]-median)/MAD
             if z_score.item() > 3.5 or z_score.item() < -3.5:
                 outliers_export.at[country, i] = z_score
 
     outliers_import = outliers_import.transpose()
     outliers_import = outliers_import.sort_index()
-    outliers_export = outliers_import.transpose()
-    outliers_import = outliers_import.sort_index()
+    outliers_export = outliers_export.transpose()
+    outliers_export = outliers_export.sort_index()
     return outliers_import, outliers_export
 
 #test = pd.read_excel("Test2_NJORD_weight_models_result.xlsx")
 #ref = check_reference_countries(test, reference_countries)
 #ref.to_excel("reference_countries_weight.xlsx")
 
-outlier_data = pd.read_csv("ITC_Monthly_data_HS_6.csv")
-outlier_import, outlier_export = outlier_check(outlier_data)
-outlier_import.to_excel("Z_outliers_import.xlsx")
+# outlier_data = pd.read_csv("ITC_Monthly_data_HS_6.csv")
+# outlier_import, outlier_export = outlier_check(outlier_data)
+# outlier_import.to_excel("Z_outliers_import.xlsx")
+# outlier_export.to_excel("Z_outliers_export.xlsx")
+
+

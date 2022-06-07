@@ -119,17 +119,35 @@ def manufacturing(nation, year, manufacturing_df):  # Extract the manufacturing 
 
 def imports_or_export_in_period(dataset, country, year, export_import, value_or_quantity):
     data = dataset.loc[dataset["Reporting Country"] == country]
-    datatest = data.loc[data["period"] == year]
-    trade_data = datatest[export_import + value_or_quantity]
-    trade_data = trade_data.set_axis(datatest["Partner Country"])
+    data = data.loc[data["period"] == year]
+    if value_or_quantity == "Quantity":
+        for unit in data[export_import + "QuantityUnitCd"]:
+            if str(unit)[0] == "W":
+                data = data.loc[data[export_import + "QuantityUnitCd"] == unit]
+            #else:
+            #    data = data.loc[data[export_import + "QuantityUnitCd"] == unit]/72
+        trade_data = data[export_import + value_or_quantity]
+        trade_data = trade_data.set_axis(data["Partner Country"])
+    else:
+        trade_data = data[export_import + value_or_quantity]
+        trade_data = trade_data.set_axis(data["Partner Country"])
     return trade_data
 
 
-def create_mirror_data(data, country, year, import_export, value_or_quantity):
+def create_mirror_data(data, country, year, export_import, value_or_quantity):
     data = data.loc[data["Partner Country"] == country]
     data = data.loc[data["period"] == year]
-    mirror_data = data[import_export + value_or_quantity]
-    mirror_data = mirror_data.set_axis(data["Reporting Country"])
+    if value_or_quantity == "Quantity":
+        for unit in data[export_import + "QuantityUnitCd"]:
+            if str(unit)[0] == "W":
+                data = data.loc[data[export_import + "QuantityUnitCd"] == unit]
+            # else:
+            #   data = data.loc[data[export_import + "QuantityUnitCd"] == unit]/72
+        mirror_data = data[export_import + value_or_quantity]
+        mirror_data = mirror_data.set_axis(data["Reporting Country"])
+    else:
+        mirror_data = data[export_import + value_or_quantity]
+        mirror_data = mirror_data.set_axis(data["Partner Country"])
     return mirror_data
 
 
