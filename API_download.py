@@ -68,8 +68,8 @@ def download_yearly_data():
     return yearly_data_all
 
 
-yearly_data_all = download_yearly_data()
-yearly_data_all.to_csv(path_output+"ITC_yearly_data_HS_6.csv")
+# yearly_data_all = download_yearly_data()
+# yearly_data_all.to_csv(path_output+"ITC_yearly_data_HS_6.csv")
 
 
 def download_monthly_data():
@@ -77,12 +77,12 @@ def download_monthly_data():
     access_token = import_access_token()
     country_list = pd.DataFrame(get_countries()).set_index(0)
     # Has to go through yearly data.
-    years = [2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021]
+    years = [2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022]
     months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
     monthly_data_all = pd.DataFrame()
     for year in years:
         for month in months:
-            monthly_data = access_monthly_data(access_token, str(year), month, '6')  # Important to keep reporterCd, partnerCd, exportValue, importValue
+            monthly_data = access_monthly_data(access_token, str(year), month, '10')  # Important to keep reporterCd, partnerCd, exportValue, importValue
             monthly_data_all = monthly_data_all.append(monthly_data)
     monthly_data_all.rename(columns={'reporterCd': 'Reporting Country', "partnerCd": 'Partner Country'}, inplace=True)
     for code in country_list.index:
@@ -92,7 +92,7 @@ def download_monthly_data():
 
 
 # monthly = download_monthly_data()
-# monthly.to_csv(path_output+"ITC_Monthly_data_HS_6.csv")
+# monthly.to_csv(path_output+"ITC_Monthly_data_HS_10.csv")
 
 
 def download_quantity_units():
@@ -107,7 +107,7 @@ def download_quantity_units():
 
 def download_NTL_codes():  # Way too big, don't use for all countries.
     url = "https://www.trademap.org/api/common/products-ntl"
-    params = {"product_cd": "854140"}
+    params = {"product_cd": "940500"}
     NTL = requests.get(url, params=params, verify=False)
     NTL = pd.DataFrame(NTL.json())
     # Rename the codes to country names
@@ -118,4 +118,4 @@ def download_NTL_codes():  # Way too big, don't use for all countries.
 
 
 NTL_codes = download_NTL_codes()
-NTL_codes.to_csv("NTL_codes.csv")
+NTL_codes.to_csv("NTL_codes_otherlights_940500.csv")

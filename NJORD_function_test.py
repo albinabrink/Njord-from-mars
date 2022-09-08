@@ -2,6 +2,7 @@ import os
 
 import numpy as np
 import pandas as pd
+import Validation_functions
 
 # unit = "weight"
 # path_input = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\Raw_data\\Final_database\\Weight\\"  # this is the path_out_final in the script From_html_to_db
@@ -147,7 +148,7 @@ def create_mirror_data(data, country, year, export_import, value_or_quantity):
         mirror_data = mirror_data.set_axis(data["Reporting Country"])
     else:
         mirror_data = data[export_import + value_or_quantity]
-        mirror_data = mirror_data.set_axis(data["Partner Country"])
+        mirror_data = mirror_data.set_axis(data["Reporting Country"])
     return mirror_data
 
 
@@ -345,6 +346,7 @@ def acc_year(data):
                     data[temp_name] = data[name]
     return data
 
+# Does not do what was intended for the project.
 def remove_large_exporters(exports):
     large_exporters = ["China", "Korea, Republic of", "Taipei, Chinese", "Malaysia", "India", "Indonesia"]
     for country in large_exporters:
@@ -353,6 +355,36 @@ def remove_large_exporters(exports):
             exports = exports.drop(country)
             # print(exports)
     return exports
+
+def create_imports_exports_data(data):
+    periods = list(dict.fromkeys(data["period"]))
+    all_countries = pd.read_excel("Country_code_list.xlsx")
+    country_not_in_data = Validation_functions.check_missing_countries(data, all_countries)
+    nation_list = set(all_countries[1]) - set(country_not_in_data)
+    for name in nation_list:
+        print(name)
+        i = 0
+        for period in periods:
+            monthly_data = data.loc[data["period"] == period]
+            month = str(period)[4:]
+            year = str(period)[:4]
+            if year == "2009":
+                continue
+            # Imports and exports a specific period for each specific country. Put in own function and save the results in a CSV-file?
+            imports_period = imports_or_export_in_period(monthly_data, name, int(period), "import",
+                                                                     "Value")
+            exports_period = imports_or_export_in_period(monthly_data, name, int(period), "export",
+                                                                     "Value")
+            # Handle missing data/mirror data, and combine the direct data with the mirror data.
+            exports_period_mirror = create_mirror_data(monthly_data, name, int(period), "import",
+                                                                   "Value")
+            imports_period_mirror = create_mirror_data(monthly_data, name, int(period), "export",
+                                                                   "Value")
+            imports_period = combine_reported_and_mirror(imports_period, imports_period_mirror)
+            exports_period = combine_reported_and_mirror(exports_period, exports_period_mirror)
+
+            exports_period = remove_large_exporters(exports_period)
+    return imports_period, exports_period
 
 
 # test1 = weight(nations_list, path_output)

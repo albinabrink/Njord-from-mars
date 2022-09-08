@@ -417,13 +417,13 @@ for year in desiderio:
                 name = "Vietnam"
 
             if "Q4" in year:
-                year_output=str(int(year_test)+1)+"-Q1"
+                year_output = str(int(year_test)+1)+"-Q1"
             if "Q1" in year:
-                year_output=str(year_test)+"-Q2"
+                year_output = str(year_test)+"-Q2"
             if "Q2" in year:
-                year_output=str(year_test)+"-Q3"
+                year_output = str(year_test)+"-Q3"
             if "Q3" in year:
-                year_output=str(year_test)+"-Q4"
+                year_output = str(year_test)+"-Q4"
 
             output_P_each_year.at[name, "NJORD " + year_output] = installed_capacity
             output_P_each_year.at[name, "Ref " + year_test] = ref_value
@@ -646,7 +646,7 @@ for year in desiderio:
                 percentage_exp.append(0)
                 continue
             else:
-                value=sum(exports_period.loc[item,time_window_export])/sum_exports    #percentage for each country
+                value=sum(exports_period.loc[item, time_window_export])/sum_exports    #percentage for each country
                 percentage_exp.append(value)
 
         # PVa factor
@@ -671,22 +671,22 @@ for year in desiderio:
         for item in nations_within_exports:
             if item =="DataType":
                 continue
-            single_value= pv_share_unit[year_test]["RoW"]*percentage_exp[cont]
-            PV_factor_exp=PV_factor_exp+single_value
-            cont=cont+1
-        if sum(percentage_imp) <1:
-            scarto=1-sum(percentage_imp)
-            mancanza=scarto*pv_share_unit[year_test]["RoW"]
-            PV_factor_imp=PV_factor_imp+mancanza
+            single_value = pv_share_unit[year_test]["RoW"]*percentage_exp[cont]
+            PV_factor_exp = PV_factor_exp+single_value
+            cont = cont+1
+        if sum(percentage_imp) < 1:
+            scarto = 1-sum(percentage_imp)
+            mancanza = scarto*pv_share_unit[year_test]["RoW"]
+            PV_factor_imp = PV_factor_imp+mancanza
         #### installed capacity ###
         ### the PV_factor_imp is the same because it is selected at the beginning according to the unit needed! ###
 
         #Clculaiton of the Nemarket_factort Trade
-        net_trade=((sum_imports*PV_factor_imp)-(sum_exports*PV_factor_exp))*1000
+        net_trade = ((sum_imports*PV_factor_imp)-(sum_exports*PV_factor_exp))*1000
 
         ###Preliminary Market size:
-        prel_MS=(net_trade/change[year]["RoW"])/10**6
-        all_market_factors=pd.read_excel("Market_size_factor.xlsx",index_col=0)
+        prel_MS = (net_trade/change[year]["RoW"])/10**6
+        all_market_factors = pd.read_excel("Market_size_factor.xlsx", index_col=0)
 
         #print(prel_MS,"prel")
         if prel_MS <= 1:
@@ -889,9 +889,9 @@ for year in desiderio:
 output_P_MF_each_year.to_excel(path_output+"Price_MF_model_results.xlsx")
 output_P_each_year.to_excel(path_output+"Price_model_results.xlsx")
 
-quartly=pd.read_excel("NJORD-Price_model_results.xlsx",index_col=0,)
-yearly=pd.DataFrame()
-desiderio=["2010","2011","2012","2013","2014","2015","2016","2017","2018","2019","2020"] #2008","2009","2010","2011","2012","2013","2014","2015","2016",
+quartly=pd.read_excel("NJORD-Price_model_results.xlsx", index_col=0,)
+yearly = pd.DataFrame()
+desiderio = ["2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020"] #2008","2009","2010","2011","2012","2013","2014","2015","2016",
 print(quartly.columns)
 for nation in quartly.index:
     for year in desiderio:
@@ -924,8 +924,8 @@ Ref_country=["Belgium","Chile","Denmark","Finland","France","Israel","Italy","Sp
 Asia=["Afghanistan","Bangladesh","Bhutan","Brunei_Darussalam","Cambodia","China","Hong_Kong__China","India","Indonesia","Japan","Kazakhstan","Kyrgyzstan","Lao_People's_Democratic_Republic","Malaysia","Maldives","Myanmar","Nepal","Korea__Democratic_People's_Republic_of","Korea__Republic_of","Pakistan","Philippines","Singapore","Korea__Democratic_People's_Republic_of","Sri_Lanka","Taipei__Chinese","Tajikistan","Thailand","Turkmenistan","Uzbekistan","Viet_Nam","Mongolia"]
 Europe=["Albania","Andorra","Austria","Belarus","Belgium","Bosnia_and_Herzegovina","Bulgaria","Croatia","Cyprus","Czech_Republic","Denmark","Estonia","Finland","France","Georgia","Germany","Greece","Greenland","Hungary","Iceland","Ireland","Italy","Latvia","Lithuania","Luxembourg","Macedonia__North","Malta","Moldova__Republic_of","Netherlands","Norway","Poland","Portugal","Romania","Russian_Federation","Serbia","Slovakia","Slovenia","Spain","Sweden","Switzerland","Ukraine","United_Kingdom"]
 Europa=["Albania","Andorra","Austria","Belarus","Belgium","Bosnia and Herzegovina","Bulgaria","Croatia","Cyprus","Czech Republic","Denmark","Estonia","Finland","France","Georgia","Germany","Greece","Greenland","Hungary","Iceland","Ireland","Italy","Latvia","Lithuania","Luxembourg","Macedonia  North","Malta","Moldova Republic of","Netherlands","Norway","Poland","Portugal","Romania","Russian Federation","Serbia","Slovakia","Slovenia","Spain","Sweden","Switzerland","Ukraine","United Kingdom"]
-Africa=["Algeria","Angola","Benin","Botswana","Burkina_Faso","Burundi","Cameroon","Cabo_Verde","Central_African_Republic","Comoros","Congo","Congo__Democratic_Republic_of_the","Djibouti","Egypt","Equatorial_Guinea","Eritrea","Ethiopia","Gabon","Gambia","Ghana","Guinea","Guinea_Bissau","Côte_d'Ivoire","Kenya","Lesotho","Liberia","Libya__State_of","Mayotte","Madagascar","Malawi","Mali","Mauritania","Mauritius","Morocco","Mozambique","Namibia","Niger","Nigeria","Rwanda","Saint_Helena","Sao_Tome_and_Principe","Senegal","Seychelles","Sierra_Leone","Somalia","South_Africa","South_Sudan","Sudan","Tanzania__United_Republic_of","Togo","Tunisia","Uganda","Western_Sahara","Zambia","Zimbabwe"]
 North_America=["Bermuda","Canada","United_States_of_America","Mexico"]
+Africa=["Algeria","Angola","Benin","Botswana","Burkina_Faso","Burundi","Cameroon","Cabo_Verde","Central_African_Republic","Comoros","Congo","Congo__Democratic_Republic_of_the","Djibouti","Egypt","Equatorial_Guinea","Eritrea","Ethiopia","Gabon","Gambia","Ghana","Guinea","Guinea_Bissau","Côte_d'Ivoire","Kenya","Lesotho","Liberia","Libya__State_of","Mayotte","Madagascar","Malawi","Mali","Mauritania","Mauritius","Morocco","Mozambique","Namibia","Niger","Nigeria","Rwanda","Saint_Helena","Sao_Tome_and_Principe","Senegal","Seychelles","Sierra_Leone","Somalia","South_Africa","South_Sudan","Sudan","Tanzania__United_Republic_of","Togo","Tunisia","Uganda","Western_Sahara","Zambia","Zimbabwe"]
 Central_America=["Anguilla","Barbados","Belize","Costa_Rica","Cuba","Curaçao","Dominica","Dominican_Republic","El_Salvador","Grenada","Guatemala","Honduras","Nicaragua","Panama","Saint_Lucia","Saint_Vincent_and_the_Grenadines","Trinidad_and_Tobago","Antigua_and_Barbuda","Bahamas","Haiti","Jamaica"]
 South_America=["Argentina","Bolivia__Plurinational_State_of","Brazil","Colombia","Chile","Ecuador","Guyana","Paraguay","Peru","Suriname","Uruguay","Venezuela__Bolivarian_Republic_of"]
 Eurasia=["Armenia","Azerbaijan","Turkey"]

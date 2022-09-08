@@ -284,10 +284,6 @@ def check_missing_countries(data1, data2):
 # test2 = pd.read_excel("Country_code_list.xlsx")
 # check_missing_countries(test1, test2)
 
-def outlier_check(data):
-    for name in data.index:
-        return
-
 
 def check_reference_countries(data, reference_countries):
     data = data.loc[data["Unnamed: 0"].isin(reference_countries)]
@@ -303,7 +299,11 @@ def check_reference_countries(data, reference_countries):
             NJORD_placeholder = NJORD_placeholder.loc[:, ~NJORD_placeholder.columns.duplicated()]
             NJORD_placeholder = NJORD_placeholder.loc[:, ["NJORD" in i for i in NJORD_placeholder.columns]]
             ref_country_data["NJORD "+col[-6:-2]] = NJORD_placeholder.sum(axis=1)
-            # print(ref_country_data)
+            if "Q" in col:
+                NJORD_placeholder = data.loc[:, ["Q" in i for i in data.columns]]
+                NJORD_placeholder = NJORD_placeholder.loc[:, ~NJORD_placeholder.columns.duplicated()]
+                ref_country_data["NJORD " + col[-6:-2]] = NJORD_placeholder.sum(axis=1)
+                print(ref_country_data)
         if "PVPS" in col:
             if int(col[-4:]) >= cutoff:
                 ref_country_data[col] = data[col]
@@ -380,13 +380,57 @@ def outlier_check(raw_data):
     outliers_export = outliers_export.sort_index()
     return outliers_import, outliers_export
 
-#test = pd.read_excel("Test2_NJORD_weight_models_result.xlsx")
-#ref = check_reference_countries(test, reference_countries)
-#ref.to_excel("reference_countries_weight.xlsx")
+test = pd.read_excel("Test_NJORD-Weight_model_10codes_share1.xlsx")
+#print(test)
+ref = check_reference_countries(test, reference_countries)
+ref.to_excel("reference_countries_Weight_10codes_PVSHAREREMOVED.xlsx")
 
 # outlier_data = pd.read_csv("ITC_Monthly_data_HS_6.csv")
 # outlier_import, outlier_export = outlier_check(outlier_data)
 # outlier_import.to_excel("Z_outliers_import.xlsx")
 # outlier_export.to_excel("Z_outliers_export.xlsx")
 
+def sort_out_data(data, NTL_codes):
+    periods = list(dict.fromkeys(data["period"]))
+    all_countries = pd.read_excel("Country_code_list.xlsx")
+    country_not_in_data = check_missing_countries(data, all_countries)
+    nation_list = set(all_countries[1]) - set(country_not_in_data)
+
+    # Main loop, might be able to be more effective. Takes a couple of minutes to run.
+    for name in nation_list:
+        print(name)
+        i = 0
+        for period in periods:
+            monthly_data = data.loc[data["period"] == period]
+            month = str(period)[4:]
+            year = str(period)[:4]
+            if year == "2009":
+                continue
+            # NTL_codes_rel = NTL_codes.loc[NTL_codes["countryCd"] == name]
+            NTL_codes_rel = NTL_codes_rel.loc[NTL_codes_rel["PV?"] == "Yes"]
+            relevant_codes = NTL_codes_rel.index.values
+            relevant_codes = relevant_codes.tolist()
+            # print(relevant_codes)
+            # Only keep the codes of the month that will be relevant here.
+            monthly_data_relevant_codes = monthly_data[monthly_data["productCd"].isin(relevant_codes)]
+            # Imports and exports a specific period for each specific country. Put in own function and save the results in a CSV-file?
+            imports_period = NJORD_function_test.imports_or_export_in_period(monthly_data_relevant_codes, name, int(period), "import",
+                                                                     "Value")
+            imports_period = imports_period.groupby(["Partner Country"]).sum()
+            exports_period = NJORD_function_test.imports_or_export_in_period(monthly_data_relevant_codes, name, int(period), "export",
+                                                                     "Value")
+            exports_period = exports_period.groupby(["Partner Country"]).sum()
+            # Handle missing data/mirror data, and combine the direct data with the mirror data.
+
+            exports_period_mirror = NJORD_function_test.create_mirror_data(monthly_data, name, int(period), "import",
+                                                                   "Value")
+
+            exports_period_mirror = exports_period_mirror.groupby(["Reporting Country"]).sum()
+            imports_period_mirror = NJORD_function_test.create_mirror_data(monthly_data, name, int(period), "export",
+                                                                   "Value")
+            imports_period_mirror = imports_period_mirror.groupby(["Reporting Country"]).sum()
+            imports_period = NJORD_function_test.combine_reported_and_mirror(imports_period, imports_period_mirror)
+            exports_period = NJORD_function_test.combine_reported_and_mirror(exports_period, exports_period_mirror)
+
+    return imports_period, exports_period
 
