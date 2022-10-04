@@ -2,9 +2,7 @@ import os
 
 import numpy as np
 import pandas as pd
-import Validation_functions
 
-# unit = "weight"
 # path_input = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\Raw_data\\Final_database\\Weight\\"  # this is the path_out_final in the script From_html_to_db
 path_output = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\"# this will be the folder from where the GUI will read the data
 
@@ -104,18 +102,14 @@ def name_cleanup(name, year):
 
 
 def manufacturing(nation, year, manufacturing_df):  # Extract the manufacturing for a nation in a specific year
-    # print(manufacturing_df)
-    # year = year.split("-")
-    # year = year[0]
     if nation in manufacturing_df.index.values:
         if year == "2009":
             manufacturing_value = manufacturing_df[year][nation]
         else:
-            manufacturing_value = manufacturing_df[year][nation]/4
+            manufacturing_value = manufacturing_df[year][nation]
     else:
         manufacturing_value = 0
     return manufacturing_value
-# print(manufacturing(test, period))
 
 
 def imports_or_export_in_period(dataset, country, year, export_import, value_or_quantity):
@@ -125,6 +119,8 @@ def imports_or_export_in_period(dataset, country, year, export_import, value_or_
         for unit in data[export_import + "QuantityUnitCd"]:
             if str(unit)[0] == "W":
                 data = data.loc[data[export_import + "QuantityUnitCd"] == unit]
+            # else:
+            #    data = data.loc[data[export_import + "QuantityUnitCd"] == 0]
             #else:
             #    data = data.loc[data[export_import + "QuantityUnitCd"] == unit]/72
         trade_data = data[export_import + value_or_quantity]
@@ -179,28 +175,64 @@ def calc_percentage_import_or_export(nations_within, imp_or_exp):
     return percentage_trade, sum_trade
 
 
-def calc_PV_factor(year, pv_share_unit, nations_within, percentage, import_export):
+def calc_PV_factor(year, pv_share_unit, nations_within, percentage, import_export, six_or_ten):
     pv_share_unit_list = pv_share_unit.index.values
     cont = 0
     pv_factor = 0
+
     if import_export == "Import":
         for nation in nations_within:
-            # print(nation)
             if nation == "DataType":
                 continue
-            if nation in pv_share_unit_list:
-                single_value = pv_share_unit[year][nation] * percentage[cont]
+            if six_or_ten == "ten":
+                single_value = percentage[cont]
             else:
-                single_value = pv_share_unit[year]["RoW"] * percentage[cont]
+                if nation in pv_share_unit_list:
+                    single_value = pv_share_unit[year][nation + " export"] * percentage[cont]
+                else:
+                    single_value = pv_share_unit[year]["China" + " export"] * percentage[cont]
             pv_factor += single_value
             cont = cont + 1
     if import_export == "Export":  # Why is this different?
         for nation in nations_within:
             if nation == "DataType":
                 continue
-            single_value = pv_share_unit[year]["RoW"] * percentage[cont]
+            if six_or_ten == "ten":
+                single_value = percentage[cont]
+            else:
+                if nation in pv_share_unit_list:
+                    single_value = pv_share_unit[year][nation + " import"] * percentage[cont]
+                else:
+                    single_value = pv_share_unit[year]["China import"] * percentage[cont]
             pv_factor += single_value
-    return pv_factor, pv_share_unit
+            cont = cont + 1
+    return pv_factor
+
+def share_in_PV(year, country, imp_or_exp_data, pv_share_unit, nations_within, import_or_export, six_or_ten):
+    pv_share_unit_list = pv_share_unit.index.values
+    if six_or_ten == "six":
+        if import_or_export == "Import":
+            for nation in nations_within:
+                if nation in pv_share_unit_list:
+                    if nation in ["China", "Italy", "Taipei, Chinese", "Japan", "United States of America", "Germany", "France"]:
+                        imp_or_exp_data[nation] = imp_or_exp_data[nation] * pv_share_unit[year][nation + " export"]
+                    else:
+                        if pv_share_unit[year][country + " import"] >= 0.3 and pv_share_unit[year][country + " import"] <= 1:
+                            imp_or_exp_data[nation] = imp_or_exp_data[nation] * pv_share_unit[year][country + " import"]
+                        else:
+                            imp_or_exp_data[nation] = imp_or_exp_data[nation] * pv_share_unit[year]["China export"]
+                else:
+                    imp_or_exp_data[nation] = imp_or_exp_data[nation] * pv_share_unit[year]["China export"]
+        if import_or_export == "Export":
+            for nation in nations_within:
+                if nation in pv_share_unit_list:
+                    if pv_share_unit[year][country + " export"] == 0:
+                        imp_or_exp_data[nation] = imp_or_exp_data[nation] * pv_share_unit[year]["China import"]
+                    else:
+                        imp_or_exp_data[nation] = imp_or_exp_data[nation] * pv_share_unit[year][country + " export"]
+                else:
+                    imp_or_exp_data[nation] = imp_or_exp_data[nation] * pv_share_unit[year]["China import"]
+    return imp_or_exp_data
 
 
 def add_quarter(year, month):
@@ -212,7 +244,7 @@ def add_quarter(year, month):
         quarter = "-Q3"
     else:
         quarter = "-Q4"
-    return year + quarter
+    return "".join([year, quarter])
 
 
 def add_time_shift(months_shift, year, month):
@@ -243,10 +275,8 @@ def create_quarterly_data(data):
                 data[temp_name] = data[name]
     return data
 
-
-def direct_or_mirror(data, unit, import_export, year, name):  # Do not need to check direct or mirror data, rewritten in ...
-    # print(data+import_export+"\\"+name+".xlsx")
-    # print(data)
+# Not used
+def direct_or_mirror(data, unit, import_export, year, name):  # Do not need to check direct or mirror data, rewritten in the specific programs
     data = pd.read_excel(data+import_export+"\\"+name+".xlsx", index_col=0, na_values=['NA'])  # Needs to be changed now.
     data = data.fillna(0)  # filling empty spaces with 0
     data = data.replace(to_replace="No Quantity", value=0)  # replacing no quantity with 0
@@ -323,7 +353,7 @@ def direct_or_mirror(data, unit, import_export, year, name):  # Do not need to c
 #    combined_MF.at[name, "Other " + str(2009)] = reference_data_year[other][name]
 
 
-def extract_one_country(country):
+def extract_one_country(country): # Never used
     data = pd.read_csv("ITC_yearly_data_HS_6.csv")
     country_data = data.loc[(data["Reporting Country"] == country)]
     country_data = country_data.loc[(country_data["period"] == 2012)]
@@ -335,7 +365,7 @@ def extract_one_country(country):
 # extract_one_country(country)
 
 
-def acc_year(data):
+def acc_year(data): # Not relevant anymore?
     for name in data.columns:
         if "NJORD" in name:
             if "Q" not in name:
@@ -356,10 +386,11 @@ def remove_large_exporters(exports):
             # print(exports)
     return exports
 
+
 def create_imports_exports_data(data):
     periods = list(dict.fromkeys(data["period"]))
     all_countries = pd.read_excel("Country_code_list.xlsx")
-    country_not_in_data = Validation_functions.check_missing_countries(data, all_countries)
+    country_not_in_data = check_missing_countries(data, all_countries)
     nation_list = set(all_countries[1]) - set(country_not_in_data)
     for name in nation_list:
         print(name)
@@ -386,6 +417,28 @@ def create_imports_exports_data(data):
             exports_period = remove_large_exporters(exports_period)
     return imports_period, exports_period
 
+
+def check_missing_countries(data1, data2):
+    downloaded_countries = data1["Reporting Country"]
+    downloaded_countries = list(downloaded_countries)
+    downloaded_countries = list(dict.fromkeys(downloaded_countries))
+    country_list = data2[1]
+    name_not_in_reporting = list()
+    for name in country_list:
+        if name not in downloaded_countries:
+            name_not_in_reporting.append(name)
+
+    downloaded_countries = data1["Partner Country"]
+    downloaded_countries = list(downloaded_countries)
+    downloaded_countries = list(dict.fromkeys(downloaded_countries))
+    name_not_in_partner = []
+    for name in country_list:
+        if name not in downloaded_countries:
+            name_not_in_partner.append(name)
+
+    not_in_reporting_or_partner = [x for x in name_not_in_reporting if x in set(name_not_in_partner)]
+    test_with_set = [x for x in name_not_in_partner if x in set(name_not_in_reporting)]
+    return not_in_reporting_or_partner
 
 # test1 = weight(nations_list, path_output)
 # test1.to_excel(path_output+"test123.xlsx")
