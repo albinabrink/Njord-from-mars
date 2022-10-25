@@ -15,9 +15,6 @@ import NJORD_function_test
 # path_input = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\\\"  # this is the path_out_final in the script From_html_to_db
 path_output = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\"  # this will be the folder from where the GUI will read the data
 os.makedirs(path_output, exist_ok=True)
-price_model_results = pd.read_excel("NJORD_Price_year_with_ref.xlsx", index_col=0, na_values=['NA'])
-weight_model_results = pd.read_excel("Weight_results_yearly.xlsx", index_col=0, na_values=['NA'])
-# reference_data = pd.read_excel("Reference_annual_2022.xlsx", index_col=0, na_values=['NA'])
 reference_countries = ["Australia", "Belgium", "Chile", "Denmark", "Finland", "France", "Israel", "Italy", "Japan",
                        "Spain", "Sweden", "Switzerland", "United States of America"]
 
@@ -164,18 +161,6 @@ def mean_difference_from_ref_data(input):
     return mean_difference_Njord_Irena, diff_Njord_Irena, percentual_diff_Njord_Irena
 
 
-# mean_diff, diff, perc_diff = mean_difference_from_ref_data(price_model_results)
-# std_diff_countries, std_diff_year = standard_deviation_all_countries(diff)
-# perc_std_diff_countries, perc_std_diff_year = standard_deviation_all_countries(perc_diff)
-# perc_std_diff_countries_df = pd.DataFrame(perc_std_diff_countries).set_index(0)
-# std_diff_countries_df = pd.DataFrame(std_diff_countries).set_index(0)
-# perc_diff.to_excel(path_output+"Njord_percentual_diff_Irena.xlsx")
-# diff.to_excel(path_output+"Njord_diff_Irena.xlsx")
-# diff_1 = perc_diff# .transpose()
-# print(diff_1)
-# diff_1.plot()#hist(bins=50)
-# plt.show()
-
 def calc_median(data_input, datasources=""):  # Takes a DataFrame as input and returns the median for all rows and columns in the DataFrame. Returns it as Series.
     median_rows = data_input.median(axis="columns")
     median_columns = data_input.median()
@@ -186,11 +171,9 @@ def calc_median(data_input, datasources=""):  # Takes a DataFrame as input and r
 def check_reference_countries(data, reference_countries):
     data = data.loc[data["Unnamed: 0"].isin(reference_countries)]
     # data = data.loc[data.index.isin(reference_countries)]
-    # print(data)
-    # ref_country_data = data.iloc[:, -9:]
     ref_country_data = pd.DataFrame()
     ref_country_data.insert(0, "country", data["Unnamed: 0"], True)
-    # print(ref_country_data)
+    # ref_country_data.insert(0, "Country", data["Country"], True)
     for col in data.columns:
         cutoff = 2014
         if "NJORD" in col:
@@ -198,20 +181,19 @@ def check_reference_countries(data, reference_countries):
             NJORD_placeholder = NJORD_placeholder.loc[:, ~NJORD_placeholder.columns.duplicated()]
             NJORD_placeholder = NJORD_placeholder.loc[:, ["NJORD" in i for i in NJORD_placeholder.columns]]
             ref_country_data["NJORD " + col[-6:-2]] = NJORD_placeholder.sum(axis=1)
-            # print(ref_country_data)
         if "PVPS" in col:
             if int(col[-4:]) >= cutoff:
                 ref_country_data[col] = data[col]
     i = 2014
-    while i < 2021:
+    while i < 2022:
         diff = ref_country_data["NJORD "+str(i)] - ref_country_data["PVPS " + str(i)]
         ref_country_data["DIFF "+str(i)] = diff
         ref_country_data["Percent Diff "+str(i)] = (diff/ref_country_data["PVPS "+str(i)])
         i += 1
-    ref_country_data = ref_country_data.set_index(ref_country_data.iloc[:]["country"])
-    ref_country_data = ref_country_data.drop(columns="country")
+    # ref_country_data = ref_country_data.set_index(ref_country_data.iloc[:]["country"])
+    # ref_country_data = ref_country_data.drop(columns="country")
     i = 2014
-    while i < 2021:
+    while i < 2022:
         summed = ref_country_data["NJORD "+str(i)].sum()
         ref_country_data.at["Summed", "NJORD "+str(i)] = summed
         summed = ref_country_data["PVPS "+str(i)].sum()
@@ -236,7 +218,6 @@ def outlier_check(raw_data):
     nation_list = set(all_countries[1]) - set(country_not_in_data)
     outliers_import = pd.DataFrame()
     outliers_export = pd.DataFrame()
-    # Should make a function that does this (330-352)
     for nation in nation_list:
         for period in periods:
             monthly_data = raw_data.loc[raw_data["period"] == period]
@@ -290,10 +271,10 @@ def outlier_check(raw_data):
     outliers_export = outliers_export.sort_index()
     return outliers_import, outliers_export
 
-test = pd.read_excel("Test_NJORD-Price_model_results_10codes_pvshareremoved.xlsx")
+test = pd.read_excel("NJORD-Combined_model_results2_2022.xlsx")
 # print(test)
 ref = check_reference_countries(test, reference_countries)
-ref.to_excel("reference_countries_Price_10codes_shareadded4.xlsx")
+ref.to_excel("reference_countries_Combined_final2.xlsx")
 
 # outlier_data = pd.read_csv("ITC_Monthly_data_HS_6.csv")
 # outlier_import, outlier_export = outlier_check(outlier_data)
@@ -377,7 +358,6 @@ def sort_out_data(data):
 
             imports_period_six = NJORD_function_test.share_in_PV(str(year), name, imports_period, pv_share_unit,
                                                                  nations_within_imp, "Import", "six")
-
             exports_period = NJORD_function_test.imports_or_export_in_period(monthly_data, name, int(period),
                                                                              "export", "Value")
             exports_period_mirror = NJORD_function_test.create_mirror_data(monthly_data, name, int(period),
@@ -403,7 +383,6 @@ def sort_out_data(data):
             PV_market_price_summed.at[name, period] = PV_market_price
             net_trade_summed = imports_period-exports_period
             net_trade_summed = net_trade_summed.sum()
-            print(net_trade_summed)
             imports_period = imports_period.sum()
             exports_period = exports_period.sum()
             exports_period_summed.at[name, period] = exports_period
@@ -432,43 +411,10 @@ def calc_PV_market_price(imp_or_exp_data, change, year, month, Europe):
     return PV_market_price
 
 
-# imp_summed, exp_summed, PV_marksum, net_trade = sort_out_data(pd.read_csv("ITC_Monthly_data_HS_10.csv", dtype={"productCd": str}))
-# imp_summed.to_csv("Import_summed_NJORD.csv")
-# exp_summed.to_csv("Export_summed_NJORD.csv")
-# PV_marksum.to_csv("PV_market_price.csv")
-
-def market_factor_testing(imp_sum, exp_sum, PV_market_sum):
-    market_factors = pd.read_excel("Market_size_factor_test.xlsx", index_col=0)
-    print(market_factors)
-    reference = pd.read_excel("Reference_annual_2022.xlsx", index_col=0, na_values=['NA'])  # Read reference data
-    manufacturing_df = pd.read_excel("Manufacturing.xlsx", index_col=0, na_values=['NA'])  # Read manufacturing data
-    manufacturing_df = manufacturing_df.fillna(0)
-    output_P_each_year = pd.DataFrame()
-    output_P_MF_each_year = pd.DataFrame()
-    prel_ms_save = pd.DataFrame()
-    for nation in imp_sum.index.values:
-        print(nation)
-        for month in imp_sum.columns.values:
-            manufacturing_value = NJORD_function_test.manufacturing(nation, str(month[:4]), manufacturing_df)
-            net_trade = (imp_sum.loc[nation][month] - exp_sum.loc[nation][month]) * 1000
-            if PV_market_sum.loc[nation][month] == 0:
-                installed_capacity = 0
-                installed_capacity_MF = 0
-            else:
-                installed_capacity = ((net_trade/PV_market_sum.loc[nation][month])/10**6) + manufacturing_value/12  # on manufacturing value, check if it should be removed?
-                market_factor, prel_ms = prel_market_size(net_trade, month, market_factors)
-                prel_ms_save.at[name, month] = prel_ms
-                installed_capacity_MF = ((net_trade/(PV_market_sum.loc[nation][month]*market_factor))/10**6) + manufacturing_value/12
-            name = NJORD_function_test.name_cleanup(nation, month[:4])
-            if name in reference.index.values:
-                output_P_each_year, output_P_MF_each_year = create_output_price(reference, str(month[:4]), month[4:], name,
-                                                                                installed_capacity,
-                                                                                installed_capacity_MF,
-                                                                                output_P_each_year,
-                                                                                output_P_MF_each_year)
-    prel_ms_save.to_excel("prel_ms_save.xlsx")
-    return output_P_MF_each_year
-
+#imp_summed, exp_summed, PV_marksum, net_trade = sort_out_data(pd.read_csv("ITC_Monthly_data_HS_10.csv", dtype={"productCd": str}))
+##imp_summed.to_csv("Import_summed_NJORD.csv")
+#exp_summed.to_csv("Export_summed_NJORD.csv")
+#PV_marksum.to_csv("PV_market_price.csv")
 
 def prel_market_size(net_trade, month, all_market_factors):
     change = pd.read_excel("PVxchange.xlsx", index_col=0)  # Read the cost of panels from big producers
@@ -476,7 +422,7 @@ def prel_market_size(net_trade, month, all_market_factors):
     # Preliminary Market size:
     prel_MS = (net_trade / change[year_quarter]["RoW"]) / 10 ** 6
     # print(prel_MS,"prel")
-    if prel_MS < 0:
+    if prel_MS <= 0:
         market_factor = 1
     if 0 < prel_MS <= 1:
         market_factor = all_market_factors["0-1MW"]["Factor"]
@@ -533,9 +479,31 @@ def create_output_price(reference, year, month, name, installed_capacity, instal
     # output_P_MF_each_year.at[name, "Other " + ref_year] = reference[other][name]
     return output_P_each_year, output_P_MF_each_year
 
+def visualise_the_results(data):
+    # print(test)
+    ref = check_reference_countries(data, reference_countries)
+    # ref = ref.set_index("country")
+    ref_njord = ref.filter(like="NJORD")
+    ref_pvps = ref.filter(like="PVPS")
+    ref_njord_summed = ref_njord.iloc[-1, :]
+    ref_pvps_summed = ref_pvps.iloc[-1, :]
+    print(ref_pvps_summed)
+    print(ref_njord_summed)
+    ref_pvps_summed.index = range(2014, 2023) #ref_pvps_summed.reindex(years)
+    ref_njord_summed.index = range(2014, 2022)
+    plt.plot(ref_njord_summed, label="NJORD")
+    plt.plot(ref_pvps_summed, label="PVPS")
+    plt.ylabel("Installed capacity [MW]")
+    plt.grid(axis="y")
+    # ax1 = ref_njord.A.plot(color='blue', grid=True, label='NJORD')
+    # ax2 = ref_pvps.B.plot(color='red', grid=True, secondary_y=True, label='PVPS')
+    plt.show()
+    # ref.to_excel("reference_countries_Weight_10codes_test_only_kilos.xlsx")
+    return
+
 
 def market_factor_training(imp_summed, exp_summed, PV_marksum, ref):
-    mf = pd.read_excel("Market_size_factor_test2.xlsx", index_col=0)
+    mf = pd.read_excel("Market_size_factor.xlsx", index_col=0)
     reference = pd.read_excel("Reference_annual_2022.xlsx", index_col=0, na_values=[0])  # Read reference data
     manufacturing_df = pd.read_excel("Manufacturing.xlsx", index_col=0, na_values=[0])  # Read manufacturing data
     manufacturing_df.fillna(0, inplace=True)
@@ -546,27 +514,31 @@ def market_factor_training(imp_summed, exp_summed, PV_marksum, ref):
     output_P_MF_each_year = pd.DataFrame()
     net_trade_df = pd.DataFrame()
     prel_ms_cat = pd.DataFrame()
-    market_factor_count = pd.DataFrame(np.zeros((12, 7)),
-                                       columns=["<1", "1-5", "5-10", "10-100", "100-500", "500-1000", ">1000"],
+    market_factor_count = pd.DataFrame(np.zeros((12, 8)),
+                                       columns=["<0", "0-1", "1-5", "5-10", "10-100", "100-500", "500-1000", ">1000"],
                                        index=["2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018",
                                               "2019", "2020", "2021"])
     for nation in imp_summed_ref.index.values:
         for month in imp_summed_ref.columns.values:
             net_trade = (imp_summed_ref.loc[nation][month]-exp_summed_ref.loc[nation][month]) * 1000
-            # print(nation, month, net_trade)
             net_trade_df.at[nation, month] = net_trade
             market_factor, prel_ms = prel_market_size(net_trade_df.loc[nation][month], month, mf)
             prel_ms_cat.at[nation, month] = prel_ms
             market_factor_count = market_factor_test_calculation(prel_ms_cat.loc[nation][month], market_factor_count,
                                                                  month[:-2])
+    net_trade_test = (imp_summed_ref-exp_summed_ref)*1000
+    if net_trade_test.equals(net_trade_df):
+        print("hej")
+    print(net_trade_df)
     for i in range(0, 100):
         print(i)
         for nation in net_trade_df.index.values:
             for month in net_trade_df.columns.values:
+                print(month)
                 manufacturing_value = NJORD_function_test.manufacturing(nation, str(month[:4]), manufacturing_df)
                 # Minimize the abs deviation changing the market factors
                 market_factor, prel_ms = prel_market_size(net_trade_df.loc[nation][month], month, mf)
-                installed_capacity = ((net_trade_df.loc[nation][month]/(PV_marksum.loc[nation][month]*market_factor))/(10**6)) - (manufacturing_value/12)
+                installed_capacity = ((net_trade_df.loc[nation][month]/(PV_marksum.loc[nation][month]*market_factor))/(10**6)) + (manufacturing_value/12)
                 name = NJORD_function_test.name_cleanup(nation, month[:4])
                 if name in reference.index.values:
                     output_P_each_year, output_P_MF_each_year = create_output_price(reference, str(month[:4]), month[4:], name,
@@ -576,50 +548,47 @@ def market_factor_training(imp_summed, exp_summed, PV_marksum, ref):
                                                                                 output_P_MF_each_year)
         output_P_MF_each_year.to_excel("testest.xlsx")
         mf_test = pd.read_excel("testest.xlsx")
+        visualise_the_results(mf_test)
         ref = check_reference_countries(mf_test, reference_countries)
         mf_test = mf_test.set_index("Unnamed: 0")
+        ref = ref.set_index("country")
         ref_absdiff = ref.filter(like="AbsDiff")
         ref_diff = ref.filter(like="DIFF")
-        print(ref_absdiff.loc["Summed"].sum())
         print(ref_absdiff_best)
         market_factor_count = pd.DataFrame(np.zeros((2, 8)),
-                                           columns=[">0", "0-1MW", "1-5MW", "5-10MW", "10-100MW", "100-500MW", "500-1000MW", "> 1000MW"],
+                                           columns=["<0MW", "0-1MW", "1-5MW", "5-10MW", "10-100MW", "100-500MW", "500-1000MW", "> 1000MW"],
                                            index=["higher", "lower"])
-        if ref_absdiff.loc["Summed"].sum() < ref_absdiff_best:
-            ref_absdiff_best = ref_absdiff.loc["Summed"].sum()
+        if ref_absdiff.iloc[-1].sum() < ref_absdiff_best:
+            ref_absdiff_best = ref_absdiff.iloc[-1].sum()
             print(ref_absdiff_best)
             mf_best = mf
-            print(mf_best)
-            print("End of loop " + str(i))
+            print(mf_best.to_string())
+            # print("End of loop " + str(i))
         for country in net_trade_df.index.values:
             for month in net_trade_df.columns.values:
-                if month[:-2] == "2010" or month[:-2] == "2011" or month[:-2] == "2012" or month[:-2] == "2013" or month[:-2] == "2021":
+                if month[:-2] == "2010" or month[:-2] == "2011" or month[:-2] == "2012" or month[:-2] == "2013":
                     continue
                 market_size_month = market_size(mf_test.loc[country]["NJORD " + month])
-                if market_size_month == "<0":
-                    continue
-                elif ref_diff.loc[country]["DIFF "+month[:-2]] <= 0:
+                if ref_diff.loc[country]["DIFF "+month[:-2]] <= 0:
                     market_factor_count.at["lower", market_size_month] += 1
-                    # mf[market_size_month] = mf[market_size_month] - 0.01
                 else:
                     market_factor_count.at["higher", market_size_month] += 1
-                    # mf[market_size_month] = mf[market_size_month] + 0.01
         print(market_factor_count)
         for column in market_factor_count:
-            if column == ">0":
-                continue
             if market_factor_count.loc["higher"][column] > market_factor_count.loc["lower"][column]:
-                mf[column] -= 0.001
+                mf[column] += 0.01
             else:
-                mf[column] += 0.001
+                mf[column] -= 0.01
 
     print(mf_best)
     return
 
 
 def market_factor_test_calculation(prel_ms, market_factor_count, year):
-    if 0 < prel_ms <= 1:
-        market_factor_count.loc[str(year)]["<1"] += 1
+    if prel_ms <= 0:
+        market_factor_count.loc[str(year)]["<0"] += 1
+    elif 0 < prel_ms <= 1:
+        market_factor_count.loc[str(year)]["0-1"] += 1
     elif 1 < prel_ms <= 5:
         market_factor_count.loc[str(year)]["1-5"] += 1
     elif 5 < prel_ms <= 10:
@@ -636,7 +605,7 @@ def market_factor_test_calculation(prel_ms, market_factor_count, year):
 
 
 def market_size(Njord_calc):
-    if 0 <= Njord_calc <= 1:
+    if 0 < Njord_calc <= 1:
         market_size_a = "0-1MW"
     elif 1 < Njord_calc <= 5:
         market_size_a = "1-5MW"
@@ -651,15 +620,14 @@ def market_size(Njord_calc):
     elif Njord_calc > 1000:
         market_size_a = "> 1000MW"
     else:
-        market_size_a = "<0"
+        market_size_a = "<0MW"
     return market_size_a
-
-
 
 
 imp_summed = pd.read_csv("Import_summed_NJORD.csv", index_col=0)
 exp_summed = pd.read_csv("Export_summed_NJORD.csv", index_col=0)
 PV_marksum = pd.read_csv("PV_market_price.csv", index_col=0)
+
 
 # market_factor_training(imp_summed, exp_summed, PV_marksum, reference_countries)
 
@@ -668,4 +636,12 @@ PV_marksum = pd.read_csv("PV_market_price.csv", index_col=0)
 #mf_test = pd.read_excel("test.xlsx")  # , index_col=0)
 #ref = check_reference_countries(mf_test, reference_countries)
 #ref.to_excel("reference_countries_test.xlsx")
+
+
+
+
+test = pd.read_excel("NJORD-Combined_model_results2_2022.xlsx")
+# test = pd.read_excel("testest.xlsx")
+visualise_the_results(test)
+
 

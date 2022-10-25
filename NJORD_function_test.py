@@ -1,53 +1,42 @@
 import os
-
 import numpy as np
 import pandas as pd
 
-# path_input = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\Raw_data\\Final_database\\Weight\\"  # this is the path_out_final in the script From_html_to_db
 path_output = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\"# this will be the folder from where the GUI will read the data
-
 os.makedirs(path_output, exist_ok=True)
-# nations_list = os.listdir(path_input + "\\Export\\")
-
-# period = ["2009-Q4", "2010-Q1", "2010-Q2", "2010-Q3", "2010-Q4", "2011-Q1", "2011-Q2", "2011-Q3", "2011-Q4",
-#             "2012-Q1", "2012-Q2", "2012-Q3", "2012-Q4", "2013-Q1", "2013-Q2", "2013-Q3", "2013-Q4", "2014-Q1",
-#             "2014-Q2", "2014-Q3", "2014-Q4", "2015-Q1", "2015-Q2", "2015-Q3", "2015-Q4", "2016-Q1", "2016-Q2",
-#             "2016-Q3", "2016-Q4", "2017-Q1", "2017-Q2", "2017-Q3", "2017-Q4", "2018-Q1", "2018-Q2", "2018-Q3",
-#             "2018-Q4", "2019-Q1", "2019-Q2", "2019-Q3", "2019-Q4", "2020-Q1", "2020-Q2", "2020-Q3", "2020-Q4"]
-
-# Generic functions for both weight and price calculations, name_cleanup,
+# Generic functions for both weight and price calculations, name_cleanup, a poorly written library for the NJORD models.
 
 
-def name_clean_up(nation_list):  # NOT USED!!!
+def name_clean_up(nation_list):
     # Clean up the names of nations from the raw database and return a list of countries
     # print(nation_list)
-    nation_list = [sub.replace("Bolivia__Plurinational_State_of", "Bolivia") for sub in nation_list]
-    nation_list = [sub.replace("Congo__Democratic_Republic_of", "Democratic Republic of the Congo") for sub in nation_list]
-    nation_list = [sub.replace("Côte_d'Ivoire", "Côte dIvoire") for sub in nation_list]
-    nation_list = [sub.replace("Falkland_Islands_(Malvinas)", "Falkland Islands") for sub in nation_list]
-    nation_list = [sub.replace("Hong_Kong__China", "Hong Kong") for sub in nation_list]
-    nation_list = [sub.replace("Iran__Islamic_Republic_of", "Iran") for sub in nation_list]
-    nation_list = [sub.replace("Korea__Democratic_People's_Republic_of", "North_Korea") for sub in nation_list]
-    nation_list = [sub.replace("Korea__Republic_of", "South Korea") for sub in nation_list]
-    nation_list = [sub.replace("Lao_People's_Democratic_Republic", "Laos") for sub in nation_list]
-    nation_list = [sub.replace("Libya__State_of", "Libya") for sub in nation_list]
-    nation_list = [sub.replace("Macedonia__North", "Macedonia") for sub in nation_list]
-    nation_list = [sub.replace("Micronesia__Federated_States_of", "Micronesia") for sub in nation_list]
-    nation_list = [sub.replace("Moldova__State_of", "Moldova") for sub in nation_list]
-    nation_list = [sub.replace("Palestine__State_of", "Palestine") for sub in nation_list]
-    nation_list = [sub.replace("Russian_Federation", "Russia") for sub in nation_list]
-    nation_list = [sub.replace("Syrian_Arab_Republic", "Syria") for sub in nation_list]
-    nation_list = [sub.replace("Taipei__Chinese", "Taiwan") for sub in nation_list]
-    nation_list = [sub.replace("Tanzania__United_Republic_of", "Tanzania") for sub in nation_list]
-    nation_list = [sub.replace("Venezuela__United_Republic_of", "Venezuela") for sub in nation_list]
-    nation_list = [sub.replace("Viet_Nam", "Vietnam") for sub in nation_list]
+    nation_list = [sub.replace("Bolivia, Plurinational State of", "Bolivia") for sub in nation_list]
+    nation_list = [sub.replace("Congo, Democratic Republic of the", "Democratic Republic of the Congo") for sub in nation_list]
+    nation_list = [sub.replace("Côte d'Ivoire", "Côte dIvoire") for sub in nation_list]
+    nation_list = [sub.replace("Falkland Islands (Malvinas)", "Falkland Islands") for sub in nation_list]
+    nation_list = [sub.replace("Hong Kong, China", "Hong Kong") for sub in nation_list]
+    nation_list = [sub.replace("Iran, Islamic Republic of", "Iran") for sub in nation_list]
+    nation_list = [sub.replace("Korea, Democratic People's Republic of", "North_Korea") for sub in nation_list]
+    nation_list = [sub.replace("Korea, Republic of", "South Korea") for sub in nation_list]
+    nation_list = [sub.replace("Lao People's Democratic Republic", "Laos") for sub in nation_list]
+    nation_list = [sub.replace("Libya, State of", "Libya") for sub in nation_list]
+    nation_list = [sub.replace("Macedonia, North", "Macedonia") for sub in nation_list]
+    nation_list = [sub.replace("Micronesia, Federated States of", "Micronesia") for sub in nation_list]
+    nation_list = [sub.replace("Moldova, Republic of", "Moldova") for sub in nation_list]
+    nation_list = [sub.replace("Palestine, State of", "Palestine") for sub in nation_list]
+    nation_list = [sub.replace("Russian Federation", "Russia") for sub in nation_list]
+    nation_list = [sub.replace("Syrian Arab Republic", "Syria") for sub in nation_list]
+    nation_list = [sub.replace("Taipei, Chinese", "Taiwan") for sub in nation_list]
+    nation_list = [sub.replace("Tanzania, United Republic of", "Tanzania") for sub in nation_list]
+    nation_list = [sub.replace("Venezuela, Bolivarian Republic of", "Venezuela") for sub in nation_list]
+    nation_list = [sub.replace("Viet Nam", "Vietnam") for sub in nation_list]
     # Add a way to handle Sudan
 
     nation_list = [name.split(".") for name in nation_list]
     nation_list = [name[0] for name in nation_list]
-    for name in nation_list:
-        if name == "American_Samoa" or name == "British_Indian_Ocean_Territory" or name == "Eswatini":
-            nation_list.remove(name)
+    #for name in nation_list:
+    #    if name == "American_Samoa" or name == "British_Indian_Ocean_Territory" or name == "Eswatini":
+    #        nation_list.remove(name)
     nation_list = [name.replace("_", " ") for name in nation_list]
     # print(nation_list)
     return nation_list
@@ -103,11 +92,8 @@ def name_cleanup(name, year):
 
 def manufacturing(nation, year, manufacturing_df):  # Extract the manufacturing for a nation in a specific year
     if nation in manufacturing_df.index.values:
-        if year == "2009":
-            manufacturing_value = manufacturing_df[year][nation]
-        else:
-            manufacturing_value = manufacturing_df[year][nation]
-    else:
+        manufacturing_value = manufacturing_df[year][nation]
+    else: # if no reported manufacturing, set to 0
         manufacturing_value = 0
     return manufacturing_value
 
@@ -115,14 +101,12 @@ def manufacturing(nation, year, manufacturing_df):  # Extract the manufacturing 
 def imports_or_export_in_period(dataset, country, year, export_import, value_or_quantity):
     data = dataset.loc[dataset["Reporting Country"] == country]
     data = data.loc[data["period"] == year]
+    # Only viable for the weight model.
     if value_or_quantity == "Quantity":
-        for unit in data[export_import + "QuantityUnitCd"]:
-            if str(unit)[0] == "W":
-                data = data.loc[data[export_import + "QuantityUnitCd"] == unit]
-            # else:
-            #    data = data.loc[data[export_import + "QuantityUnitCd"] == 0]
-            #else:
-            #    data = data.loc[data[export_import + "QuantityUnitCd"] == unit]/72
+        # Sort out all trade reported in kilos or tonnes
+        data = data[data[export_import + "QuantityUnitCd"].str.contains("W", na=False)]
+        # Change the trade reported in tonnes to kilos
+        data.loc[data[export_import + "QuantityUnitCd"] == "WC0", export_import + value_or_quantity] = data[export_import + value_or_quantity] * 1000
         trade_data = data[export_import + value_or_quantity]
         trade_data = trade_data.set_axis(data["Partner Country"])
     else:
@@ -134,12 +118,12 @@ def imports_or_export_in_period(dataset, country, year, export_import, value_or_
 def create_mirror_data(data, country, year, export_import, value_or_quantity):
     data = data.loc[data["Partner Country"] == country]
     data = data.loc[data["period"] == year]
+    # If statement to only select trade in tonnes in the weight model
     if value_or_quantity == "Quantity":
-        for unit in data[export_import + "QuantityUnitCd"]:
-            if str(unit)[0] == "W":
-                data = data.loc[data[export_import + "QuantityUnitCd"] == unit]
-            # else:
-            #   data = data.loc[data[export_import + "QuantityUnitCd"] == unit]/72
+        # Sort out all trade reported in kilos or tonnes
+        data = data[data[export_import + "QuantityUnitCd"].str.contains("W", na=False)]
+        # Change the trade reported in tonnes to kilos
+        data.loc[data[export_import + "QuantityUnitCd"] == "WC0", export_import + value_or_quantity] = data[export_import + value_or_quantity]*1000
         mirror_data = data[export_import + value_or_quantity]
         mirror_data = mirror_data.set_axis(data["Reporting Country"])
     else:
@@ -150,6 +134,9 @@ def create_mirror_data(data, country, year, export_import, value_or_quantity):
 
 def combine_reported_and_mirror(reported, mirror):
     merged = reported.combine_first(mirror).fillna(0)
+    #print(reported)
+    #print(mirror)
+    #print(merged)
     return merged
 
 
@@ -159,8 +146,7 @@ def calc_percentage_import_or_export(nations_within, imp_or_exp):
     else:
         sum_trade = imp_or_exp.to_numpy().sum()
     percentage_trade = []
-    for item in imp_or_exp.index:
-        # print(item)
+    for item in imp_or_exp.index: # Should be able to speed up with apply or vectorization
         if item == "DataType":
             continue
         if sum_trade == 0:
@@ -179,7 +165,6 @@ def calc_PV_factor(year, pv_share_unit, nations_within, percentage, import_expor
     pv_share_unit_list = pv_share_unit.index.values
     cont = 0
     pv_factor = 0
-
     if import_export == "Import":
         for nation in nations_within:
             if nation == "DataType":
@@ -208,24 +193,33 @@ def calc_PV_factor(year, pv_share_unit, nations_within, percentage, import_expor
             cont = cont + 1
     return pv_factor
 
+
 def share_in_PV(year, country, imp_or_exp_data, pv_share_unit, nations_within, import_or_export, six_or_ten):
-    pv_share_unit_list = pv_share_unit.index.values
+    pv_share_unit_list1 = pv_share_unit.index.values
+    pv_share_unit_list = []
+    for nation in pv_share_unit_list1:
+        # print(nation.rsplit(' ', 1)[0])
+        pv_share_unit_list.append(nation.rsplit(' ', 1)[0])
+
+    # .rsplit(' ', 1)[0]
+    pv_share_unit_list = list(dict.fromkeys(pv_share_unit_list))
+    #print(pv_share_unit_list)
     if six_or_ten == "six":
         if import_or_export == "Import":
             for nation in nations_within:
-                if nation in pv_share_unit_list:
-                    if nation in ["China", "Italy", "Taipei, Chinese", "Japan", "United States of America", "Germany", "France"]:
-                        imp_or_exp_data[nation] = imp_or_exp_data[nation] * pv_share_unit[year][nation + " export"]
-                    else:
-                        if pv_share_unit[year][country + " import"] >= 0.3 and pv_share_unit[year][country + " import"] <= 1:
+                if nation in ["China", "Italy", "Japan", "United States of America", "Germany",
+                              "France"]:  # "Taipei, Chinese"
+                    imp_or_exp_data[nation] = imp_or_exp_data[nation] * pv_share_unit[year][nation + " export"]
+                elif country in pv_share_unit_list:
+                    if pv_share_unit[year][country + " import"] >= 0.3 and pv_share_unit[year][country + " import"] <= 1:
                             imp_or_exp_data[nation] = imp_or_exp_data[nation] * pv_share_unit[year][country + " import"]
-                        else:
-                            imp_or_exp_data[nation] = imp_or_exp_data[nation] * pv_share_unit[year]["China export"]
+                    else:
+                        imp_or_exp_data[nation] = imp_or_exp_data[nation] * pv_share_unit[year]["China export"]
                 else:
                     imp_or_exp_data[nation] = imp_or_exp_data[nation] * pv_share_unit[year]["China export"]
         if import_or_export == "Export":
             for nation in nations_within:
-                if nation in pv_share_unit_list:
+                if country in pv_share_unit_list:
                     if pv_share_unit[year][country + " export"] == 0:
                         imp_or_exp_data[nation] = imp_or_exp_data[nation] * pv_share_unit[year]["China import"]
                     else:
@@ -288,7 +282,6 @@ def direct_or_mirror(data, unit, import_export, year, name):  # Do not need to c
         word1 = "Imported "
         word2 = "Exported "
     else:
-        add2 = ""
         add1 = ""
         word1 = ""
         word2 = ""
@@ -418,11 +411,11 @@ def create_imports_exports_data(data):
     return imports_period, exports_period
 
 
-def check_missing_countries(data1, data2):
+def check_missing_countries(data1, all_countries_list):
     downloaded_countries = data1["Reporting Country"]
     downloaded_countries = list(downloaded_countries)
     downloaded_countries = list(dict.fromkeys(downloaded_countries))
-    country_list = data2[1]
+    country_list = all_countries_list[1]
     name_not_in_reporting = list()
     for name in country_list:
         if name not in downloaded_countries:
@@ -435,17 +428,179 @@ def check_missing_countries(data1, data2):
     for name in country_list:
         if name not in downloaded_countries:
             name_not_in_partner.append(name)
-
     not_in_reporting_or_partner = [x for x in name_not_in_reporting if x in set(name_not_in_partner)]
-    test_with_set = [x for x in name_not_in_partner if x in set(name_not_in_reporting)]
+    # test_with_set = [x for x in name_not_in_partner if x in set(name_not_in_reporting)]
     return not_in_reporting_or_partner
 
-# test1 = weight(nations_list, path_output)
-# test1.to_excel(path_output+"test123.xlsx")
-# os.makedirs(path_output, exist_ok=True)
-# nations_list = os.listdir(path_input + "\\Export\\")
-# test1, test2 = price(path_input, period)
-# test1.to_excel(path_output+"test2.xlsx")
-# test_price1, test_price2 = price(nations_list, period)
-# test2.to_excel(path_output+"vadihelafriden.xlsx")
+
+def sort_out_data(ten_code_data, six_code_data, PVxchange_cost, pv_share_unit, NTL_codes, unit):
+    if unit == "Price":
+        value_or_quantity = "Value"
+    else:
+        value_or_quantity = "Quantity"
+    # Extract the available periods in the data, and the countries that are in the data.
+    periods = list(dict.fromkeys(ten_code_data["period"]))
+    # Select all the countries in the data, could probably be made more effective.
+    all_countries = pd.read_excel("Country_code_list.xlsx")
+    country_not_in_data = check_missing_countries(ten_code_data, all_countries)
+    nation_list = set(all_countries[1]) - set(country_not_in_data)
+    # Set up the frames that will be returned.
+    exports_period_summed = pd.DataFrame()
+    imports_period_summed = pd.DataFrame()
+    PV_market_price_summed = pd.DataFrame()
+    for name in nation_list:
+        print(name)
+        for period in periods:
+            monthly_data = ten_code_data.loc[ten_code_data["period"] == period]
+            month = str(period)[4:]
+            year = str(period)[:4]
+            if year == "2022" or year == "2009":
+                continue
+            # Picks out the relevant codes
+            NTL_codes_rel = NTL_codes.loc[NTL_codes["countryCd"] == name]
+            NTL_codes_rel = NTL_codes_rel.loc[NTL_codes_rel["PV?"] == "Yes"]
+            relevant_codes = NTL_codes_rel.index.values
+            relevant_codes = relevant_codes.tolist()
+            print(relevant_codes)
+            # print(relevant_codes)
+            # Only keep the codes of the month that will be relevant here.
+            monthly_data = monthly_data[monthly_data["productCd"].isin(relevant_codes)]
+            # Imports and exports a specific period for each specific country.
+            imports_period = imports_or_export_in_period(monthly_data, name, int(period), "import", value_or_quantity)
+            imports_period = imports_period.groupby(["Partner Country"]).sum()
+            exports_period = imports_or_export_in_period(monthly_data, name, int(period), "export", value_or_quantity)
+            exports_period = exports_period.groupby(["Partner Country"]).sum()
+            # Handle missing data/mirror data, and combine the direct data with the mirror data.
+            monthly_data = ten_code_data.loc[ten_code_data["period"] == period]
+            monthly_data = monthly_data.loc[monthly_data["Partner Country"] == name]
+            NTL_codes_rel = pd.DataFrame()
+            for country in monthly_data["Reporting Country"]:
+                NTL_codes_country = NTL_codes.loc[NTL_codes["countryCd"] == country]
+                NTL_codes_country = NTL_codes_country.loc[NTL_codes_country["PV?"] == "Yes"]
+                NTL_codes_rel = NTL_codes_rel.append(NTL_codes_country)
+                # print(NTL_codes_rel)
+            relevant_codes = NTL_codes_rel.index.values
+            relevant_codes = relevant_codes.tolist()
+            # Only keep the codes of the month that will be relevant here.
+            monthly_data = monthly_data[monthly_data["productCd"].isin(relevant_codes)]
+
+            exports_period_mirror = create_mirror_data(monthly_data, name, int(period), "import", value_or_quantity)
+            exports_period_mirror = exports_period_mirror.groupby(["Reporting Country"]).sum()
+            exports_period_mirror = exports_period_mirror[exports_period_mirror != 0]
+            imports_period_mirror = create_mirror_data(monthly_data, name, int(period), "export", value_or_quantity)
+            imports_period_mirror = imports_period_mirror.groupby(["Reporting Country"]).sum()
+            imports_period_mirror = imports_period_mirror[imports_period_mirror != 0]
+            imports_period_ten = combine_reported_and_mirror(imports_period, imports_period_mirror)
+            exports_period_ten = combine_reported_and_mirror(exports_period, exports_period_mirror)
+
+            # Calc PV_factor, used to determine the price of PV-modules.
+            monthly_data = six_code_data[six_code_data["period"] == period]
+            imports_period = imports_or_export_in_period(monthly_data, name, int(period), "import", value_or_quantity)
+            imports_period_mirror = create_mirror_data(monthly_data, name, int(period), "export", value_or_quantity)
+            imports_period = combine_reported_and_mirror(imports_period, imports_period_mirror)
+            nations_within_imp = imports_period.index.values
+
+            imports_period_six = share_in_PV(str(year), name, imports_period, pv_share_unit, nations_within_imp, "Import", "six")
+            exports_period = imports_or_export_in_period(monthly_data, name, int(period), "export", value_or_quantity)
+            exports_period_mirror = create_mirror_data(monthly_data, name, int(period), "import", value_or_quantity)
+            exports_period = combine_reported_and_mirror(exports_period, exports_period_mirror)
+            nations_within_exp = exports_period.index.values
+            exports_period_six = share_in_PV(str(year), name, exports_period, pv_share_unit, nations_within_exp, "Export", "six")
+            imports_period = combine_reported_and_mirror(imports_period_ten, imports_period_six)
+            exports_period = combine_reported_and_mirror(exports_period_ten, exports_period_six)
+            PV_market_price = calc_PV_market_price(imports_period, PVxchange_cost, str(year), month,
+                                                   ["Albania", "Andorra", "Austria", "Belarus", "Belgium",
+                                                    "Bosnia_and_Herzegovina", "Bulgaria", "Croatia",
+                                                    "Cyprus", "Czech_Republic", "Denmark", "Estonia", "Finland",
+                                                    "France", "Georgia", "Germany", "Greece",
+                                                    "Greenland", "Hungary", "Iceland", "Ireland", "Italy", "Latvia",
+                                                    "Lithuania", "Luxembourg",
+                                                    "Macedonia__North", "Malta", "Moldova__Republic_of", "Netherlands",
+                                                    "Norway", "Poland", "Portugal",
+                                                    "Romania", "Russian_Federation", "Serbia", "Slovakia", "Slovenia",
+                                                    "Spain", "Sweden", "Switzerland",
+                                                    "Ukraine", "United_Kingdom"])
+            PV_market_price_summed.at[name, period] = PV_market_price
+            imports_period = imports_period.sum()
+            exports_period = exports_period.sum()
+            exports_period_summed.at[name, period] = exports_period
+            imports_period_summed.at[name, period] = imports_period
+    return imports_period_summed, exports_period_summed, PV_market_price_summed
+
+
+def calc_PV_market_price(imp_or_exp_data, pvxchange, year, month, Europe):
+    PV_market_price = 0
+    nations_within = imp_or_exp_data.index.values
+    pvxchange_list = pvxchange.index.values
+    year_quarter = add_quarter(year, month)
+    for item in nations_within:
+        if item in pvxchange_list:
+            if imp_or_exp_data[item] == 0:
+                continue
+            single_value = pvxchange[year_quarter][item] * (imp_or_exp_data[item]/imp_or_exp_data.sum())  # value for each single nation
+        else:
+            if imp_or_exp_data[item] == 0:
+                continue
+            if item in Europe:
+                single_value = pvxchange[year_quarter]["EU"] * (imp_or_exp_data[item]/imp_or_exp_data.sum())  # value for each single nation
+            else:
+                single_value = pvxchange[year_quarter]["RoW"] * (imp_or_exp_data[item]/imp_or_exp_data.sum())
+        PV_market_price = PV_market_price + single_value
+    return PV_market_price
+
+
+def count_units_in_trade(ten_code_data, six_code_data):
+    unit_or_weight = pd.DataFrame()
+    unit_or_weight_six =pd.DataFrame()
+    NTL_codes = pd.read_csv("NTL_codes - Marked.csv", index_col=0)
+    periods = list(dict.fromkeys(ten_code_data["period"]))
+    all_countries = pd.read_excel("Country_code_list.xlsx")
+    country_not_in_data = check_missing_countries(ten_code_data, all_countries)
+    nation_list = set(all_countries[1]) - set(country_not_in_data)
+    for name in nation_list:
+        print(name)
+        for month in periods:
+            country_data = ten_code_data.loc[ten_code_data["Reporting Country"] == name]
+            country_data = country_data.loc[country_data["period"] == month]
+            country_data_six = six_code_data.loc[six_code_data["Reporting Country"] == name]
+            country_data_six = country_data_six.loc[country_data_six["period"] == month]
+            NTL_codes_rel = NTL_codes.loc[NTL_codes["countryCd"] == name]
+            NTL_codes_rel = NTL_codes_rel.loc[NTL_codes_rel["PV?"] == "Yes"]
+            relevant_codes = NTL_codes_rel.index.values
+            relevant_codes = relevant_codes.tolist()
+            # Only keep the codes of the month that will be relevant here.
+            country_data = country_data[country_data["productCd"].isin(relevant_codes)]
+            # print(test["Reporting Country"])
+            imports_period = imports_or_export_in_period(country_data_six, name, int(month), "import", "Quantity")
+            trade_data = country_data_six["importQuantity"]
+            trade_data = trade_data.set_axis(country_data_six["Partner Country"])
+            trade_data = trade_data.replace(np.nan, 0)
+            exports_period = imports_or_export_in_period(country_data, name, int(month), "export", "Quantity")
+            trade_data_exp = country_data_six["importQuantity"]
+            trade_data_exp = trade_data_exp.set_axis(country_data_six["Partner Country"])
+            trade_data_exp = trade_data_exp.replace(np.nan, 0)
+            if sum(trade_data) == 0:
+                continue
+            if sum(trade_data_exp) == 0:
+                continue
+            if sum(imports_period)-sum(trade_data)/sum(trade_data) < 0.9:
+                unit_or_weight_six.at[name, month] = "Unit"
+            elif sum(exports_period)-sum(trade_data_exp)/sum(trade_data_exp) < 0.9:
+                unit_or_weight_six.at[name, month] = "Unit"
+            else:
+                unit_or_weight_six.at[name, month] = "Weight"
+
+
+
+            #export_country_weight_data = country_data[country_data["export" + "QuantityUnitCd"].str.contains("W", na=False)]
+            #import_country_weight_data = country_data[country_data["import" + "QuantityUnitCd"].str.contains("W", na=False)]
+
+    print(unit_or_weight)
+    print(unit_or_weight_six)
+    return unit_or_weight, unit_or_weight_six
+
+
+# units_or_weights, units_or_weights_six = count_units_in_trade(pd.read_csv("ITC_Monthly_data_HS_10.csv", dtype={"productCd": str}), pd.read_csv("ITC_Monthly_data_HS_6.csv", dtype={"productCd": str}))
+# units_or_weights.to_csv("units_or_weights.csv")
+# units_or_weights_six.to_csv("units_or_weight_six.csv")
 

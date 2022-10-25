@@ -6,110 +6,49 @@ import Validation_functions
 
 # path_input = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\Raw_data\\Final_database\\Weight\\"  # this is the path_out_final in the script From_html_to_db
 path_output = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\"# this will be the folder from where the GUI will read the data
-
-########
-
 os.makedirs(path_output, exist_ok=True)
 
+unit = "Weight"
+ten_code = pd.read_csv("ITC_Monthly_data_HS_10.csv", dtype={"productCd": str})
+six_code = pd.read_csv("ITC_Monthly_data_HS_6.csv", dtype={"productCd": str})
+pv_xchange = pd.read_excel("PVxchange.xlsx", index_col=0)  # Not needed or used in Weight, but same sort data function
+NTL_codes = pd.read_csv("NTL_codes - Marked.csv", index_col=0)
+pv_share = pd.read_excel("Share_in_PV_Weight.xlsx", index_col=0)
 
-# Functions only used in weight calculations
-def weight(raw_data):
-    unit = "Weight"
-    six_code_data = pd.read_csv("ITC_Monthly_data_HS_6.csv")
+#imp_summed, exp_summed, PV_mark_summed = NJORD_function_test.sort_out_data(ten_code, six_code, pv_xchange, pv_share, NTL_codes, unit)
+
+#imp_summed.to_csv("Imports_summed_Weight.csv")
+#exp_summed.to_csv("Exports_summed_Weight.csv")
+# PV_mark_summed.to_csv("PVxchange_summed_Price.csv") # Doesn't exist in the weight model, therefore just let it be.
+imp_summed = pd.read_csv("Imports_summed_Weight.csv", index_col=0)
+exp_summed = pd.read_csv("Exports_summed_Weight.csv", index_col=0)
+
+def weight(imp_sum, exp_sum):
     module_weight = pd.read_excel("Module_weight.xlsx", index_col=0)
     ref_data = pd.read_excel("Reference_annual_2022.xlsx", index_col=0, na_values=['NA'])
-    pv_share_unit = pd.read_excel("Share_in_PV_" + unit + ".xlsx", index_col=0)  # Read the PV_share from excel
-    NTL_codes = pd.read_csv("NTL_codes - Marked.csv", index_col=0)
     manufacturing_df = pd.read_excel("Manufacturing.xlsx", index_col=0, na_values=['NA'])  # Read manufacturing data
     manufacturing_df = manufacturing_df.fillna(0)
     output_W_each_year = pd.DataFrame()
-    periods = list(dict.fromkeys(raw_data["period"]))
-    all_countries = pd.read_excel("Country_code_list.xlsx")
-    country_not_in_data = Validation_functions.check_missing_countries(raw_data, all_countries)
-    nation_list = set(all_countries[1]) - set(country_not_in_data)
-    for name in nation_list:
+    # Calc the net trade. *1000 to make it MW/kg
+    net_trade_df = (imp_sum - exp_sum)
+    net_trade_df.to_csv("Net_trade_Weight.csv")
+    print(net_trade_df)
+    for name in net_trade_df.index.values:
         print(name)
-        for period in periods:
-            monthly_data = raw_data.loc[raw_data["period"] == period]
+        for period in net_trade_df.columns.values:
             month = str(period)[4:]
-            year = str(period)[:4]
-            if year == "2021" or year == "2022" or year == "2009":
-                continue
-            # Read in manufacturing values for the specific country and year
-            manufacturing_value = NJORD_function_test.manufacturing(name, year, manufacturing_df)
-            # Read in the relevant NTL-codes for the country
-            NTL_codes_rel = NTL_codes.loc[NTL_codes["countryCd"] == name]
-            NTL_codes_rel = NTL_codes_rel.loc[NTL_codes_rel["PV?"] == "Yes"]
-            relevant_codes = NTL_codes_rel.index.values
-            relevant_codes = relevant_codes.tolist()
-            # Only keep the codes of the month that will be relevant here.
-            monthly_data = monthly_data[monthly_data["productCd"].isin(relevant_codes)]
-            # Sum up the countries reported NTL-codes trade (direct data)
-            imports_period = NJORD_function_test.imports_or_export_in_period(monthly_data, name, int(period), "import",
-                                                                             "Quantity")
-            imports_period = imports_period.groupby(["Partner Country"]).sum()
-            exports_period = NJORD_function_test.imports_or_export_in_period(monthly_data, name, int(period), "export",
-                                                                             "Quantity")
-            exports_period = exports_period.groupby(["Partner Country"]).sum()
-            # Select and sum upp relevant mirror data (aka trade reported from other countries to the current country)
-            monthly_data = raw_data.loc[raw_data["period"] == period]
-            monthly_data = monthly_data.loc[monthly_data["Partner Country"] == name]
-            NTL_codes_rel = pd.DataFrame()
-            for country in monthly_data["Reporting Country"]:
-                NTL_codes_country = NTL_codes.loc[NTL_codes["countryCd"] == country]
-                NTL_codes_country = NTL_codes_country.loc[NTL_codes_country["PV?"] == "Yes"]
-                NTL_codes_rel = NTL_codes_rel.append(NTL_codes_country)
-                # print(NTL_codes_rel)
-            relevant_codes = NTL_codes_rel.index.values
-            relevant_codes = relevant_codes.tolist()
-            # Only keep the codes of the month that will be relevant here.
-            monthly_data = monthly_data[monthly_data["productCd"].isin(relevant_codes)]
-            imports_period_mirror = NJORD_function_test.create_mirror_data(monthly_data, name, int(period), "export",
-                                                                           "Quantity")
-            imports_period_mirror = imports_period_mirror.groupby(["Reporting Country"]).sum()
-            imports_period_mirror = imports_period_mirror[imports_period_mirror != 0]  # Remove probable irrelevant data
-            exports_period_mirror = NJORD_function_test.create_mirror_data(monthly_data, name, int(period), "import",
-                                                                           "Quantity")
-            exports_period_mirror = exports_period_mirror.groupby(["Reporting Country"]).sum()
-            exports_period_mirror = exports_period_mirror[exports_period_mirror != 0]  # Remove probable irrelevant data
-            # Merge the direct and mirror data and save as the data from NTL-codes. Direct data takes precedence
-            imports_period_ten = NJORD_function_test.combine_reported_and_mirror(imports_period, imports_period_mirror)
-            exports_period_ten = NJORD_function_test.combine_reported_and_mirror(exports_period, exports_period_mirror)
-            # Calculate for six-digit codes to fill gaps in the ten code data.
-            monthly_data = six_code_data[six_code_data["period"] == period]
-            imports_period = NJORD_function_test.imports_or_export_in_period(monthly_data, name, int(period),
-                                                                             "import",
-                                                                             "Quantity")
-            imports_period_mirror = NJORD_function_test.create_mirror_data(monthly_data, name, int(period),
-                                                                           "export",
-                                                                           "Quantity")
-            imports_period = NJORD_function_test.combine_reported_and_mirror(imports_period, imports_period_mirror)
-            nations_within_imp = imports_period.index.values
-            imports_period_six = NJORD_function_test.share_in_PV(str(year), name, imports_period, pv_share_unit,
-                                                                 nations_within_imp, "Import", "six")
-            exports_period = NJORD_function_test.imports_or_export_in_period(monthly_data, name, int(period),
-                                                                             "export", "Quantity")
-            exports_period_mirror = NJORD_function_test.create_mirror_data(monthly_data, name, int(period),
-                                                                           "import", "Quantity")
-            exports_period = NJORD_function_test.combine_reported_and_mirror(exports_period, exports_period_mirror)
-            nations_within_exp = exports_period.index.values
-            exports_period_six = NJORD_function_test.share_in_PV(str(year), name, exports_period, pv_share_unit,
-                                                                 nations_within_exp, "Export", "six")
-            # Combine ten-code and six-code, ten code takes precedence
-            imports_period = NJORD_function_test.combine_reported_and_mirror(imports_period_ten, imports_period_six)
-            exports_period = NJORD_function_test.combine_reported_and_mirror(exports_period_ten, exports_period_six)
-            # Sum the trade together, to give a country's total import and export
-            sum_imports = imports_period.sum()
-            sum_exports = exports_period.sum()
-            # Calc the net trade. *1000 to make it?
-            net_trade = (sum_imports - sum_exports) * 1000
-            # Calculate the installed capacity. Previous capacity due to ???
-            installed_capacity = weight_capacity_output(module_weight, year, manufacturing_value, net_trade)
+            year = str(period[:4])
+            manufacturing_value = NJORD_function_test.manufacturing(name, str(year), manufacturing_df)
+            # Calculate the installed capacity.
+            if module_weight[year]["Value"] == 0:
+                installed_capacity = 0
+            else:
+                installed_capacity = (((net_trade_df.loc[name][period])/module_weight[year]["Value"])/10**6)+(manufacturing_value/12)
             # Clean up the names of the countries in the data, so they are shorter and lie closer to the everyday use
-            name = NJORD_function_test.name_cleanup(name, year)
+            name1 = NJORD_function_test.name_cleanup(name, year)
             # Only keep the data for relevant countries, the original data contains regions and misc areas.
-            if name in ref_data.index.values:
-                output_W_each_year = create_output_weight(ref_data, year, month, name, installed_capacity, output_W_each_year)
+            if name1 in ref_data.index.values:
+                output_W_each_year = create_output_weight(ref_data, year, month, name1, installed_capacity, output_W_each_year)
     return output_W_each_year.sort_index()
 
 
@@ -227,6 +166,5 @@ def create_weight_models_result_region(): # Not currently in use, needs to be ma
     return Combined_region_results
 
 
-data = pd.read_csv("ITC_Monthly_data_HS_10.csv", dtype={"productCd": str})
-weight_output_each_year = weight(data)
-weight_output_each_year.to_excel(path_output+"Test_NJORD-Weight_model_10codes_shareadded.xlsx")
+weight_output_each_year = weight(imp_summed, exp_summed)
+weight_output_each_year.to_excel(path_output+"NJORD-Weight_model_results_2022.xlsx")
