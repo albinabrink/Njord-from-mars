@@ -1,7 +1,7 @@
 import pandas as pd
 import os
-import NJORD_function_test
-import Validation_functions
+import NJORD_functions
+import NJORD_Validation
 
 
 # path_input = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\Raw_data\\Final_database\\Weight\\"  # this is the path_out_final in the script From_html_to_db

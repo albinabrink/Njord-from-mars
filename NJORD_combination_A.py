@@ -1,4 +1,4 @@
-import NJORD_function_test
+import NJORD_functions
 import pandas as pd
 import os
 

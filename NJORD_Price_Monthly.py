@@ -1,8 +1,8 @@
 import numpy as np
 import pandas as pd
 import os
-import NJORD_function_test
-import Validation_functions
+import NJORD_functions
+import NJORD_Validation
 
 # This script calculates the installed capacity for the NJORD price model
 
