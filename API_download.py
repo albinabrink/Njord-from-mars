@@ -1,7 +1,7 @@
 import warnings
 import pandas as pd
 import requests
-import certifi
+# import certifi
 import urllib3
 from urllib3.exceptions import InsecureRequestWarning
 
@@ -11,7 +11,7 @@ path_output = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\"
 
 urllib3.disable_warnings(InsecureRequestWarning)
 
-print(certifi.where())
+# print(certifi.where())
 
 
 def import_access_token():
@@ -51,8 +51,9 @@ def get_countries():
 def access_monthly_data(token, year, month, level):
     url = "https://www.trademap.org/api/data/monthly"
     header = {"Authorization": "Bearer " + token["access_token"]}
+    # change the value after product_cd to change which code is downloaded. As this is written, only 854140 available.
     params = {"product_cd": "854140", "months": str(year)+str(month), "hs_level": level}  # "country_cd": country_cd,
-    result = requests.get(url, headers=header, params=params, verify=False)
+    result = requests.get(url, headers=header, params=params, verify=False)  # This is the call to the server side!
     return result.json()
 
 
@@ -84,24 +85,24 @@ def download_monthly_data():
     country_list = pd.DataFrame(get_countries()).set_index(0)
     # Has to go through yearly data.
     years = ['2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021',
-             '2022']
-    months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
+             '2022'] # Change to the years one is interested here, now 2009-2022
+    months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']  # Signifying the months
     monthly_data_all = pd.DataFrame()
     for year in years:
-        print(year)
         for month in months:
             # Important to keep reporterCd, partnerCd, exportValue, importValue
-            monthly_data = access_monthly_data(access_token, year, month, '10')
-            monthly_data_all = monthly_data_all.append(monthly_data, ignore_index=True)
+            monthly_data = access_monthly_data(access_token, year, month, '10')  # Downloads a month worth of data
+            monthly_data_all = monthly_data_all.append(monthly_data, ignore_index=True)  # Store all downloaded data in 1 file
     monthly_data_all.rename(columns={'reporterCd': 'Reporting Country', "partnerCd": 'Partner Country'}, inplace=True)
     for code in country_list.index:
+        # Changes the country code to the country name for readability
         monthly_data_all['Reporting Country'].replace(code, country_list.loc[code][1], inplace=True)
         monthly_data_all['Partner Country'].replace(code, country_list.loc[code][1], inplace=True)
     return monthly_data_all
 
 
 monthly = download_monthly_data()
-monthly.to_csv(path_output+"ITC_Monthly_data_HS_10_test.csv")
+monthly.to_csv(path_output+"ITC_Monthly_data_HS_10.csv")
 
 
 def download_quantity_units():
@@ -116,7 +117,7 @@ def download_quantity_units():
 
 def download_NTL_codes():  # Way too big, don't use for all countries.
     url = "https://www.trademap.org/api/common/products-ntl"
-    params = {"product_cd": "850790"}
+    params = {"product_cd": "854140"}
     NTL = requests.get(url, params=params, verify=False)
     NTL = pd.DataFrame(NTL.json())
     # Rename the codes to country names

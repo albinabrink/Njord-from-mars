@@ -46,7 +46,7 @@ def combined(NJORD_Price, NJORD_Weight, imp_sum_price, imp_sum_weight, exp_sum_p
                     combined_df.at[name, period] = NJORD_Price.loc[name][period]
                     continue
                 if name == "Burkina Faso":  # Added specially as it was missing in the weight data.
-                    print(NJORD_Price.loc[name][period])
+                    #print(NJORD_Price.loc[name][period])
                     combined_df.at[name, period] = NJORD_Price.loc[name][period]
                     continue
                 if units_or_weight.loc[name][period[-6:]] == "Unit" or units_or_weight.loc[name][period[-6:]] == np.nan:
@@ -83,5 +83,5 @@ def combined(NJORD_Price, NJORD_Weight, imp_sum_price, imp_sum_weight, exp_sum_p
 
 
 combined_data = combined(njord_price, njord_weight, imp_sum_price, imp_sum_weight, exp_sum_price, exp_sum_weight)
-combined_data.to_excel("NJORD-Combined_model_results_last_test.xlsx")
+combined_data.to_excel("NJORD-Combined_model_results.xlsx")
 

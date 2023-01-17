@@ -19,22 +19,23 @@ NTL_codes = pd.read_csv("NTL_codes - Marked.csv", index_col=0)
 # If all code has already been run once, should be able to comment out rows 21-31 as it is not needed for the last
 # values. If any input data is changed, this would need to be rerun.
 
-to_calculate_share_price = NJORD_functions.percent_trade_PV(ten_code, six_code, "Value")
-pv_share = NJORD_functions.calculate_percentage_of_PV(to_calculate_share_price)
-pv_share.to_excel("Share_in_PV_Price.xlsx")
+# to_calculate_share_price = NJORD_functions.percent_trade_PV(ten_code, six_code, "Value")
+# pv_share = NJORD_functions.calculate_percentage_of_PV(to_calculate_share_price)
+# pv_share.to_excel("Share_in_PV_Price.xlsx")
 
 pv_share = pd.read_excel("Share_in_PV_Price.xlsx", index_col=0)  # Comment out if the previous three lines are not
 # commented out
 
-imp_summed, exp_summed, PV_mark_summed = NJORD_functions.sort_out_data(ten_code, six_code, pv_xchange, pv_share, NTL_codes, unit)
+# imp_summed, exp_summed, PV_mark_summed = NJORD_functions.sort_out_data(ten_code, six_code, pv_xchange, pv_share, NTL_codes, unit)
 
-imp_summed.to_csv("Imports_summed_Price.csv")
-exp_summed.to_csv("Exports_summed_Price.csv")
-PV_mark_summed.to_csv("PVxchange_summed_Price.csv")
+# imp_summed.to_csv("Imports_summed_Price.csv")
+# exp_summed.to_csv("Exports_summed_Price.csv")
+# PV_mark_summed.to_csv("PVxchange_summed_Price.csv")
 # Functions only used in Price calculations in this file, should be rewritten into own files/libraries
 imp_summed = pd.read_csv("Imports_summed_Price.csv", index_col=0)
 exp_summed = pd.read_csv("Exports_summed_Price.csv", index_col=0)
 PV_mark_summed = pd.read_csv("PVxchange_summed_Price.csv", index_col=0)
+
 
 def NJORD_price_function(imp_summed, exp_summed, PV_mark_summed):  # Main function calculating the price model.
     reference = pd.read_excel("Reference_annual_2022.xlsx", index_col=0, na_values=['NA'])  # Read reference data
@@ -45,8 +46,7 @@ def NJORD_price_function(imp_summed, exp_summed, PV_mark_summed):  # Main functi
     output_P_MF = pd.DataFrame()
 
     net_trade_df = (imp_summed-exp_summed) * 1000
-    net_trade_df.to_csv("Net_trade_price_last_test.csv")
-    print(net_trade_df)
+    net_trade_df.to_csv("Net_trade_price.csv")
     for name in net_trade_df.index.values:
         print(name)
         for period in net_trade_df.columns.values:
@@ -103,43 +103,25 @@ def prel_market_size(net_trade, month, all_market_factors):
 def create_output_price(reference, year, month, name, installed_capacity, installed_capacity_MF, output_P_each_year,
                         output_P_MF_each_year):
     PVPS = year + " - PVPS - annual"
-    other = year + " - Other - annual"
     Irena = year + " - IRENA - annual"
     # year_quarter = add_quarter(year, month)
-    if reference[PVPS][name] == 0:
-        ref_value = reference[other][name]
-        source = "Other"
-        if reference[other][name] == 0:
-            ref_value = reference[Irena][name]
-            source = "Irena"
-            if reference[Irena][name] == 0:
-                ref_value = 0
-                source = "No Ref"
-    else:
-        ref_value = reference[PVPS][name]
-        source = "PVPS"
     # Add a timeshift in the month when it should be expected to be installed.
     year, month = NJORD_functions.add_time_shift(3, int(year), int(month))
     ref_year = year
     year_output = str(year + month)
     # Creation of the Excel sheet that will be returned.
     output_P_each_year.at[name, "NJORD " + year_output] = installed_capacity
-    # output_P_each_year.at[name, "Ref " + ref_year] = ref_value
-    # output_P_each_year.at[name, "Source " + ref_year] = source
     output_P_MF_each_year.at[name, "NJORD " + year_output] = installed_capacity_MF
-    # output_P_MF_each_year.at[name, "Ref " + ref_year] = ref_value
-    # output_P_MF_each_year.at[name, "Source " + ref_year] = source
     output_P_each_year.at[name, "IRENA " + ref_year] = reference[Irena][name]
-    # output_P_each_year.at[name, "IRENA s " + ref_year] = reference[str(ref_year) + " - IRENA s"][name]
     output_P_each_year.at[name, "PVPS " + ref_year] = reference[PVPS][name]
-    # output_P_each_year.at[name, "Other " + ref_year] = reference[other][name]
     output_P_MF_each_year.at[name, "IRENA " + ref_year] = reference[Irena][name]
-    # output_P_MF_each_year.at[name, "IRENA s " + ref_year] = reference[str(ref_year) + " - IRENA s"][name]
     output_P_MF_each_year.at[name, "PVPS " + ref_year] = reference[PVPS][name]
-    # output_P_MF_each_year.at[name, "Other " + ref_year] = reference[other][name]
     return output_P_each_year, output_P_MF_each_year
 
 
 output_P_each_year, output_P_MF_each_year = NJORD_price_function(imp_summed, exp_summed, PV_mark_summed)
+#test = NJORD_functions.acc_year(output_P_MF_each_year)
+# print(test)
+
 # output_P_each_year.to_excel(path_output + "NJORD_Price_model_10Codes.xlsx")
-output_P_MF_each_year.to_excel(path_output+"NJORD-Price_model_final_results.xlsx")
+output_P_MF_each_year.to_excel(path_output+"NJORD-Price_model_results.xlsx")

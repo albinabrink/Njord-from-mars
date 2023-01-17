@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
+warnings.simplefilter(action='ignore', category=pd.errors.PerformanceWarning)
 
 path_output = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\"  # this will be the folder from where the GUI will read the data
 os.makedirs(path_output, exist_ok=True)
@@ -418,29 +419,6 @@ def sort_out_data(ten_code_data, six_code_data, PVxchange_cost, pv_share_unit, N
     return imports_period_summed, exports_period_summed, PV_market_price_summed
 
 
-def calc_PV_market_price(imp_or_exp_data, pvinsights, year, month, Europe):
-    PV_market_price = 0
-    nations_within = imp_or_exp_data.index.values
-    pvxchange_list = pvinsights.index.values
-    year_quarter = add_quarter(year, month)
-    for item in nations_within:
-        if item in pvxchange_list:
-            if imp_or_exp_data[item] == 0:
-                continue
-            single_value = pvinsights[year_quarter][item] * (
-                    imp_or_exp_data[item] / imp_or_exp_data.sum())  # value for each single nation
-        else:
-            if imp_or_exp_data[item] == 0:
-                continue
-            if item in Europe:
-                single_value = pvinsights[year_quarter]["EU"] * (
-                        imp_or_exp_data[item] / imp_or_exp_data.sum())  # value for each single nation
-            else:
-                single_value = pvinsights[year_quarter]["RoW"] * (imp_or_exp_data[item] / imp_or_exp_data.sum())
-        PV_market_price = PV_market_price + single_value
-    return PV_market_price
-
-
 def count_units_in_trade(ten_code_data, six_code_data):
     unit_or_weight = pd.DataFrame()
     unit_or_weight_six = pd.DataFrame()
@@ -634,95 +612,7 @@ def calculate_percentage_of_PV(trade_data):
 # trade_data = calculate_percentage_of_PV(trade_data)
 # trade_data.to_excel("share_in_PV_weight.xlsx")
 
-
 #  Not used anymore!!!!
-def calc_PV_factor(year, pv_share_unit, nations_within, percentage, import_export, six_or_ten):
-    pv_share_unit_list = pv_share_unit.index.values
-    cont = 0
-    pv_factor = 0
-    if import_export == "Import":
-        for nation in nations_within:
-            if nation == "DataType":
-                continue
-            if six_or_ten == "ten":
-                single_value = percentage[cont]
-            else:
-                if nation in pv_share_unit_list:
-                    single_value = pv_share_unit[year][nation + " export"] * percentage[cont]
-                else:
-                    single_value = pv_share_unit[year]["China" + " export"] * percentage[cont]
-            pv_factor += single_value
-            cont = cont + 1
-    if import_export == "Export":  # Why is this different?
-        for nation in nations_within:
-            if nation == "DataType":
-                continue
-            if six_or_ten == "ten":
-                single_value = percentage[cont]
-            else:
-                if nation in pv_share_unit_list:
-                    single_value = pv_share_unit[year][nation + " import"] * percentage[cont]
-                else:
-                    single_value = pv_share_unit[year]["China import"] * percentage[cont]
-            pv_factor += single_value
-            cont = cont + 1
-    return pv_factor
-
-
-# Not used
-def direct_or_mirror(data, unit, import_export, year,
-                     name):  # Do not need to check direct or mirror data, rewritten in the specific programs
-    data = pd.read_excel(data + import_export + "\\" + name + ".xlsx", index_col=0,
-                         na_values=['NA'])  # Needs to be changed now.
-    data = data.fillna(0)  # filling empty spaces with 0
-    data = data.replace(to_replace="No Quantity", value=0)  # replacing no quantity with 0
-    source = []
-    d_count = 0
-    m_count = 0
-    if unit == "Price":
-        add1 = "value in "
-        word1 = "Imported "
-        word2 = "Exported "
-    else:
-        add1 = ""
-        word1 = ""
-        word2 = ""
-    time_window = [word1 + add1 + str(year)]
-    if import_export == "Export":
-        time_window = [word2 + add1 + str(year)]
-    data_period = data[time_window]
-    # print(data_period)
-    nations_within = data_period.index.values
-    # print(nations_within)
-    for letter in data_period.loc["DataType"]:
-        source.append(letter)
-        if letter == "D":
-            d_count += 1
-        else:
-            m_count += 1
-    t = True
-    while t is True:
-        if d_count == 4:
-            source_data = "D"
-            t = False
-            continue
-        if m_count == 4:
-            source_data = "M"
-            t = False
-            continue
-        if m_count < d_count:
-            source_data = "D*"
-            t = False
-            continue
-        if m_count > d_count:
-            source_data = "M*"
-            t = False
-        if m_count == d_count:
-            source_data = "M*"
-            t = False
-            continue
-    return source_data, data_period, time_window, nations_within
-
 
 def extract_one_country(country):  # Never used
     data = pd.read_csv("ITC_yearly_data_HS_6.csv")

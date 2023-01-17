@@ -64,105 +64,34 @@ def check_reference_countries(data, reference_countries):
     return ref_country_data
 
 
-def outlier_check(raw_data):
-    imports_country_month = pd.DataFrame()
-    exports_country_month = pd.DataFrame()
-    periods = list(dict.fromkeys(raw_data["period"]))
-    # print(periods)
-    all_countries = pd.read_excel("Country_code_list.xlsx")
-    country_not_in_data = NJORD_functions.check_missing_countries(raw_data, all_countries)
-    nation_list = set(all_countries[1]) - set(country_not_in_data)
-    outliers_import = pd.DataFrame()
-    outliers_export = pd.DataFrame()
-    for nation in nation_list:
-        for period in periods:
-            monthly_data = raw_data.loc[raw_data["period"] == period]
-            imports_period = NJORD_functions.imports_or_export_in_period(monthly_data, nation, int(period), "import",
-                                                                             "Value")
-            exports_period = NJORD_functions.imports_or_export_in_period(monthly_data, nation, int(period), "export",
-                                                                             "Value")
-            # Handle missing data/mirror data, and combine the direct data with the mirror data.
-            exports_period_mirror = NJORD_functions.create_mirror_data(monthly_data, nation, int(period), "import",
-                                                                           "Value")
-            imports_period_mirror = NJORD_functions.create_mirror_data(monthly_data, nation, int(period), "export",
-                                                                           "Value")
-            imports_period = NJORD_functions.combine_reported_and_mirror(imports_period, imports_period_mirror)
-            exports_period = NJORD_functions.combine_reported_and_mirror(exports_period, exports_period_mirror)
-
-            nations_within_imp = imports_period.index.values
-            nations_within_exp = exports_period.index.values
-
-            percentage_imp, sum_imports = NJORD_functions.calc_percentage_import_or_export(nations_within_imp,
-                                                                                               imports_period)
-            # Add a check for export to large exporter, and remove them.
-            percentage_exp, sum_exports = NJORD_functions.calc_percentage_import_or_export(nations_within_exp,
-                                                                                               exports_period)
-            imports_country_month.at[nation, period] = sum_imports
-            exports_country_month.at[nation, period] = sum_exports
-            imports_country_month = imports_country_month.sort_index()
-            exports_country_month = exports_country_month.sort_index()
-    imports_country = imports_country_month.transpose()
-    exports_country = exports_country_month.transpose()
-    for country in imports_country:
-        # print(imports_country[country])
-        MAD = imports_country[country].mad()
-        median = imports_country[country].median()
-        for i in imports_country.index:
-            print(imports_country[country].loc[i], imports_country[country])
-            z_score = 0.6745*(imports_country[country].loc[i]-median)/MAD
-            if z_score.item() > 3.5 or z_score.item() < -3.5:
-                outliers_import.at[country, i] = z_score
-    for country in exports_country:
-        MAD = exports_country[country].mad()
-        median = exports_country[country].median()
-        for i in exports_country.index:
-            print(exports_country[country].loc[i], exports_country[country])
-            z_score = 0.6745*(exports_country[country].loc[i]-median)/MAD
-            if z_score.item() > 3.5 or z_score.item() < -3.5:
-                outliers_export.at[country, i] = z_score
-
-    outliers_import = outliers_import.transpose()
-    outliers_import = outliers_import.sort_index()
-    outliers_export = outliers_export.transpose()
-    outliers_export = outliers_export.sort_index()
-    return outliers_import, outliers_export
-
-test = pd.read_excel("NJORD-Price_model_final_results.xlsx")
+test = pd.read_excel("NJORD-Price_model_results.xlsx")
 # print(test)
 ref = check_reference_countries(test, reference_countries)
-ref.to_excel("reference_countries_Price_final_results.xlsx")
-
-# outlier_data = pd.read_csv("ITC_Monthly_data_HS_6.csv")
-# outlier_import, outlier_export = outlier_check(outlier_data)
-# outlier_import.to_excel("Z_outliers_import.xlsx")
-# outlier_export.to_excel("Z_outliers_export.xlsx")
+ref.to_excel("reference_countries_Price_results.xlsx")
 
 
-def calc_PV_market_price(imp_or_exp_data, change, year, month, Europe):
-    PV_market_price = 0
-    nations_within = imp_or_exp_data.index.values
-    change_list = change.index.values
-    year_quarter = NJORD_functions.add_quarter(year, month)
-    for item in nations_within:
-        if item in change_list:
-            if imp_or_exp_data[item] == 0:
-                continue
-            single_value = change[year_quarter][item] * (imp_or_exp_data[item]/imp_or_exp_data.sum())  # value for each single nation
-        else:
-            if imp_or_exp_data[item] == 0:
-                continue
-            if item in Europe:
-                single_value = change[year_quarter]["EU"] * (imp_or_exp_data[item]/imp_or_exp_data.sum())  # value for each single nation
-            else:
-                single_value = change[year_quarter]["RoW"] * (imp_or_exp_data[item]/imp_or_exp_data.sum())
-        PV_market_price = PV_market_price + single_value
-    return PV_market_price
+def visualise_the_results(data):
+    # print(test)
+    ref = check_reference_countries(data, reference_countries)
+    # ref = ref.set_index("country")
+    ref_njord = ref.filter(like="NJORD")
+    ref_pvps = ref.filter(like="PVPS")
+    ref_njord_summed = ref_njord.iloc[-1, :]
+    ref_pvps_summed = ref_pvps.iloc[-1, :]
+    print(ref_pvps_summed)
+    print(ref_njord_summed)
+    ref_pvps_summed.index = range(2014, 2023) #ref_pvps_summed.reindex(years)
+    ref_njord_summed.index = range(2010, 2023)
+    plt.plot(ref_njord_summed, label="NJORD")
+    plt.plot(ref_pvps_summed, label="PVPS")
+    plt.ylabel("Installed capacity [MW]")
+    plt.grid(axis="y")
+    # ax1 = ref_njord.A.plot(color='blue', grid=True, label='NJORD')
+    # ax2 = ref_pvps.B.plot(color='red', grid=True, secondary_y=True, label='PVPS')
+    plt.show()
+    # ref.to_excel("reference_countries_Weight_10codes_test_only_kilos.xlsx")
+    return
 
-
-#imp_summed, exp_summed, PV_marksum, net_trade = sort_out_data(pd.read_csv("ITC_Monthly_data_HS_10.csv", dtype={"productCd": str}))
-##imp_summed.to_csv("Import_summed_NJORD.csv")
-#exp_summed.to_csv("Export_summed_NJORD.csv")
-#PV_marksum.to_csv("PV_market_price.csv")
 
 def prel_market_size(net_trade, month, all_market_factors):
     change = pd.read_excel("PVxchange.xlsx", index_col=0)  # Read the cost of panels from big producers
@@ -189,6 +118,7 @@ def prel_market_size(net_trade, month, all_market_factors):
     elif prel_MS > 1000:
         market_factor = all_market_factors["> 1000MW"]["Factor"]
     return market_factor, prel_MS
+
 
 def create_output_price(reference, year, month, name, installed_capacity, installed_capacity_MF, output_P_each_year,
                         output_P_MF_each_year):
@@ -228,28 +158,6 @@ def create_output_price(reference, year, month, name, installed_capacity, instal
     output_P_MF_each_year.at[name, "PVPS " + ref_year] = reference[PVPS][name]
     # output_P_MF_each_year.at[name, "Other " + ref_year] = reference[other][name]
     return output_P_each_year, output_P_MF_each_year
-
-def visualise_the_results(data):
-    # print(test)
-    ref = check_reference_countries(data, reference_countries)
-    # ref = ref.set_index("country")
-    ref_njord = ref.filter(like="NJORD")
-    ref_pvps = ref.filter(like="PVPS")
-    ref_njord_summed = ref_njord.iloc[-1, :]
-    ref_pvps_summed = ref_pvps.iloc[-1, :]
-    print(ref_pvps_summed)
-    print(ref_njord_summed)
-    ref_pvps_summed.index = range(2014, 2023) #ref_pvps_summed.reindex(years)
-    ref_njord_summed.index = range(2010, 2023)
-    plt.plot(ref_njord_summed, label="NJORD")
-    plt.plot(ref_pvps_summed, label="PVPS")
-    plt.ylabel("Installed capacity [MW]")
-    plt.grid(axis="y")
-    # ax1 = ref_njord.A.plot(color='blue', grid=True, label='NJORD')
-    # ax2 = ref_pvps.B.plot(color='red', grid=True, secondary_y=True, label='PVPS')
-    plt.show()
-    # ref.to_excel("reference_countries_Weight_10codes_test_only_kilos.xlsx")
-    return
 
 
 def market_factor_training(imp_summed, exp_summed, PV_marksum, ref):  # Used to calculate the new market factors
@@ -326,7 +234,6 @@ def market_factor_training(imp_summed, exp_summed, PV_marksum, ref):  # Used to 
                 mf[column] *= 1.1
             else:
                 mf[column] *= .9
-
     print(mf_best)
     return
 
@@ -383,3 +290,72 @@ market_factor_training(imp_summed, exp_summed, PV_marksum, reference_countries)
 # visualise_the_results(test)
 
 
+def outlier_check(raw_data):  # Never used
+    imports_country_month = pd.DataFrame()
+    exports_country_month = pd.DataFrame()
+    periods = list(dict.fromkeys(raw_data["period"]))
+    # print(periods)
+    all_countries = pd.read_excel("Country_code_list.xlsx")
+    country_not_in_data = NJORD_functions.check_missing_countries(raw_data, all_countries)
+    nation_list = set(all_countries[1]) - set(country_not_in_data)
+    outliers_import = pd.DataFrame()
+    outliers_export = pd.DataFrame()
+    for nation in nation_list:
+        for period in periods:
+            monthly_data = raw_data.loc[raw_data["period"] == period]
+            imports_period = NJORD_functions.imports_or_export_in_period(monthly_data, nation, int(period), "import",
+                                                                             "Value")
+            exports_period = NJORD_functions.imports_or_export_in_period(monthly_data, nation, int(period), "export",
+                                                                             "Value")
+            # Handle missing data/mirror data, and combine the direct data with the mirror data.
+            exports_period_mirror = NJORD_functions.create_mirror_data(monthly_data, nation, int(period), "import",
+                                                                           "Value")
+            imports_period_mirror = NJORD_functions.create_mirror_data(monthly_data, nation, int(period), "export",
+                                                                           "Value")
+            imports_period = NJORD_functions.combine_reported_and_mirror(imports_period, imports_period_mirror)
+            exports_period = NJORD_functions.combine_reported_and_mirror(exports_period, exports_period_mirror)
+
+            nations_within_imp = imports_period.index.values
+            nations_within_exp = exports_period.index.values
+
+            percentage_imp, sum_imports = NJORD_functions.calc_percentage_import_or_export(nations_within_imp,
+                                                                                               imports_period)
+            # Add a check for export to large exporter, and remove them.
+            percentage_exp, sum_exports = NJORD_functions.calc_percentage_import_or_export(nations_within_exp,
+                                                                                               exports_period)
+            imports_country_month.at[nation, period] = sum_imports
+            exports_country_month.at[nation, period] = sum_exports
+            imports_country_month = imports_country_month.sort_index()
+            exports_country_month = exports_country_month.sort_index()
+    imports_country = imports_country_month.transpose()
+    exports_country = exports_country_month.transpose()
+    for country in imports_country:
+        # print(imports_country[country])
+        MAD = imports_country[country].mad()
+        median = imports_country[country].median()
+        for i in imports_country.index:
+            print(imports_country[country].loc[i], imports_country[country])
+            z_score = 0.6745*(imports_country[country].loc[i]-median)/MAD
+            if z_score.item() > 3.5 or z_score.item() < -3.5:
+                outliers_import.at[country, i] = z_score
+    for country in exports_country:
+        MAD = exports_country[country].mad()
+        median = exports_country[country].median()
+        for i in exports_country.index:
+            print(exports_country[country].loc[i], exports_country[country])
+            z_score = 0.6745*(exports_country[country].loc[i]-median)/MAD
+            if z_score.item() > 3.5 or z_score.item() < -3.5:
+                outliers_export.at[country, i] = z_score
+
+    outliers_import = outliers_import.transpose()
+    outliers_import = outliers_import.sort_index()
+    outliers_export = outliers_export.transpose()
+    outliers_export = outliers_export.sort_index()
+    return outliers_import, outliers_export
+
+
+
+# outlier_data = pd.read_csv("ITC_Monthly_data_HS_6.csv")
+# outlier_import, outlier_export = outlier_check(outlier_data)
+# outlier_import.to_excel("Z_outliers_import.xlsx")
+# outlier_export.to_excel("Z_outliers_export.xlsx")

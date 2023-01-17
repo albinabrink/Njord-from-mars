@@ -5,7 +5,7 @@ import warnings
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
-path_output = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\"# this will be the folder from where the GUI will read the data
+path_output = "C:\\Users\\lucar\\PycharmProjects\\NJORD_2022_Albin\\"  # this will be the folder to where the program will write the data
 os.makedirs(path_output, exist_ok=True)
 
 unit = "Weight"
@@ -17,17 +17,17 @@ NTL_codes = pd.read_csv("NTL_codes - Marked.csv", index_col=0)
 # If all code has already been run once, should be able to comment out rows 21-31 as it is not needed for the last
 # values. If any input data is changed, this would need to be rerun.
 
-to_calculate_share_price = NJORD_functions.percent_trade_PV(ten_code, six_code, "Quantity")
-pv_share = NJORD_functions.calculate_percentage_of_PV(to_calculate_share_price)
-pv_share.to_excel("Share_in_PV_Weight.xlsx")
+#to_calculate_share_price = NJORD_functions.percent_trade_PV(ten_code, six_code, "Quantity")
+#pv_share = NJORD_functions.calculate_percentage_of_PV(to_calculate_share_price)
+#pv_share.to_excel("Share_in_PV_Weight.xlsx")
 
 pv_share = pd.read_excel("Share_in_PV_Weight.xlsx", index_col=0)  # Comment out if the previous three lines are not
 # commented out
 
-imp_summed, exp_summed, PV_mark_summed = NJORD_functions.sort_out_data(ten_code, six_code, pv_xchange, pv_share, NTL_codes, unit)
+# imp_summed, exp_summed, PV_mark_summed = NJORD_functions.sort_out_data(ten_code, six_code, pv_xchange, pv_share, NTL_codes, unit)
 
-imp_summed.to_csv("Imports_summed_Weight.csv")
-exp_summed.to_csv("Exports_summed_Weight.csv")
+#imp_summed.to_csv("Imports_summed_Weight.csv")
+#exp_summed.to_csv("Exports_summed_Weight.csv")
 imp_summed = pd.read_csv("Imports_summed_Weight.csv", index_col=0)
 exp_summed = pd.read_csv("Exports_summed_Weight.csv", index_col=0)
 
@@ -40,7 +40,7 @@ def weight(imp_sum, exp_sum):
     output_W = pd.DataFrame()
     # Calc the net trade by subtracting the export from the import.
     net_trade_df = (imp_sum - exp_sum)
-    net_trade_df.to_csv("Net_trade_Weight_last_test.csv")
+    net_trade_df.to_csv("Net_trade_Weight.csv")
     for name in net_trade_df.index.values:
         print(name)
         for period in net_trade_df.columns.values:
@@ -65,29 +65,14 @@ def create_output_weight(reference, year, month, name, installed_capacity, outpu
     PVPS = "".join([year, " - PVPS - annual"])
     other = "".join([year, " - Other - annual"])
     Irena = "".join([year, " - IRENA - annual"])
-    if reference[PVPS][name] == 0:
-        ref_value = reference[other][name]
-        source = "Other"
-        if reference[other][name] == 0:
-            ref_value = reference[Irena][name]
-            source = "Irena"
-            if reference[Irena][name] == 0:
-                ref_value = 0
-                source = "No Ref"
-    else:
-        ref_value = reference[PVPS][name]
-        source = "PVPS"
     year, month = NJORD_functions.add_time_shift(3, int(year), int(month))
     year_output = str(year+month)
     output_W_each_year.at[name, "NJORD " + year_output] = installed_capacity
-    # output_W_each_year.at[name, "Ref " + year] = ref_value
-    # output_W_each_year.at[name, "Source " + year] = source
     output_W_each_year.at[name, "IRENA " + year] = reference[Irena][name]
-    # output_W_each_year.at[name, "IRENA s " + year] = reference[str(year) + " - IRENA s"][name]
     output_W_each_year.at[name, "PVPS " + year] = reference[PVPS][name]
     output_W_each_year.at[name, "Other " + year] = reference[other][name]
     return output_W_each_year
 
 
 weight_output_each_year = weight(imp_summed, exp_summed)
-weight_output_each_year.to_excel(path_output+"NJORD-Weight_model_final_results.xlsx")
+weight_output_each_year.to_excel(path_output+"NJORD-Weight_model_results.xlsx")
